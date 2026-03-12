@@ -472,12 +472,47 @@
           <p class="page-subtitle">Daily Check-in</p>
         </div>
         <div class="page-body">
-          <div class="placeholder-card">
-            <div class="placeholder-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          <div class="daily-checkin-layout">
+            <section class="daily-checkin-calendar-panel">
+              <div class="daily-checkin-calendar-toolbar">
+                <button type="button" class="daily-checkin-month-btn" id="daily-checkin-prev-month" aria-label="上一月">‹</button>
+                <h3 class="daily-checkin-month-title" id="daily-checkin-month-title"></h3>
+                <button type="button" class="daily-checkin-month-btn" id="daily-checkin-next-month" aria-label="下一月">›</button>
+              </div>
+              <div class="daily-checkin-weekdays">
+                <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+              </div>
+              <div class="daily-checkin-calendar-grid" id="daily-checkin-calendar-grid"></div>
+            </section>
+
+            <section class="daily-checkin-task-panel">
+              <div class="daily-checkin-task-header">
+                <h3 class="daily-checkin-task-date" id="daily-checkin-task-date"></h3>
+                <span class="daily-checkin-task-count" id="daily-checkin-task-count">0/9</span>
+              </div>
+              <div class="daily-checkin-task-list" id="daily-checkin-task-list"></div>
+              <div class="daily-checkin-task-empty" id="daily-checkin-task-empty">
+                <p class="daily-checkin-task-empty-en">No tasks today~</p>
+                <p class="daily-checkin-task-empty-zh">今天没有任务~</p>
+              </div>
+              <div class="daily-checkin-task-actions">
+                <button type="button" class="form-submit-btn" id="daily-checkin-add-task">新建条目</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="daily-checkin-modal" id="daily-checkin-modal" aria-hidden="true">
+            <div class="daily-checkin-modal-card" role="dialog" aria-modal="true" aria-labelledby="daily-checkin-modal-title">
+              <h3 class="daily-checkin-modal-title" id="daily-checkin-modal-title">新增任务</h3>
+              <label class="daily-checkin-modal-label" for="daily-checkin-modal-input">任务内容</label>
+              <textarea id="daily-checkin-modal-input" class="daily-checkin-modal-input" maxlength="200" placeholder="请输入任务内容（可详细一点）"></textarea>
+              <label class="daily-checkin-modal-label" for="daily-checkin-modal-color">任务颜色</label>
+              <select id="daily-checkin-modal-color" class="daily-checkin-modal-color"></select>
+              <div class="daily-checkin-modal-actions">
+                <button type="button" class="form-submit-btn" id="daily-checkin-modal-cancel">取消</button>
+                <button type="button" class="form-submit-btn" id="daily-checkin-modal-confirm">确认添加</button>
+              </div>
             </div>
-            <p class="placeholder-text">每日打卡功能即将上线</p>
-            <p class="placeholder-hint">记录每日学习进度，保持前进动力</p>
           </div>
         </div>
       </section>
@@ -540,12 +575,61 @@
           <p class="page-subtitle">Community Messages</p>
         </div>
         <div class="page-body">
-          <div class="placeholder-card">
-            <div class="placeholder-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <div class="community-board-container">
+            <div class="community-board-toolbar">
+              <button type="button" class="form-submit-btn" id="community-new-post-btn">新建帖子</button>
             </div>
-            <p class="placeholder-text">社区留言功能即将上线</p>
-            <p class="placeholder-hint">与其他留学伙伴交流互动</p>
+            <div class="community-board-list" id="community-board-list"></div>
+            <div class="community-board-pagination" id="community-board-pagination"></div>
+          </div>
+
+          <div class="community-modal" id="community-post-modal" aria-hidden="true">
+            <div class="community-modal-card" role="dialog" aria-modal="true" aria-labelledby="community-post-modal-title">
+              <h3 class="community-modal-title" id="community-post-modal-title">新建帖子</h3>
+              <label class="community-modal-label" for="community-post-title-input">标题</label>
+              <input id="community-post-title-input" class="community-modal-input" type="text" maxlength="120" placeholder="请输入帖子标题">
+              <label class="community-modal-label" for="community-post-author-input">发帖人昵称</label>
+              <input id="community-post-author-input" class="community-modal-input" type="text" maxlength="40" placeholder="请输入发帖人昵称">
+              <label class="community-modal-label" for="community-post-content-input">帖子内容</label>
+              <textarea id="community-post-content-input" class="community-modal-textarea" maxlength="5000" placeholder="请输入帖子内容"></textarea>
+              <div class="community-modal-actions">
+                <button type="button" class="form-submit-btn community-btn-ghost" id="community-post-cancel-btn">取消</button>
+                <button type="button" class="form-submit-btn" id="community-post-submit-btn">发布帖子</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="community-modal" id="community-detail-modal" aria-hidden="true">
+            <div class="community-modal-card community-detail-card" role="dialog" aria-modal="true" aria-labelledby="community-detail-title">
+              <button type="button" class="community-detail-close-btn" id="community-detail-close-btn" aria-label="关闭">×</button>
+              <h3 class="community-detail-title" id="community-detail-title"></h3>
+              <p class="community-detail-meta" id="community-detail-meta"></p>
+              <div class="community-detail-content" id="community-detail-content"></div>
+              <div class="community-replies-wrap">
+                <h4 class="community-replies-title">回复区</h4>
+                <div class="community-replies-list" id="community-replies-list"></div>
+              </div>
+              <div class="community-detail-actions">
+                <button type="button" class="form-submit-btn" id="community-open-reply-btn">回复评论</button>
+                <button type="button" class="form-submit-btn community-btn-danger" id="community-delete-post-btn">删除帖子</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="community-bottom-sheet" id="community-reply-sheet" aria-hidden="true">
+            <div class="community-bottom-sheet-mask" id="community-reply-sheet-mask"></div>
+            <div class="community-bottom-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="community-reply-sheet-title">
+              <h3 class="community-modal-title" id="community-reply-sheet-title">回复评论</h3>
+              <p class="community-reply-target-text" id="community-reply-target-text"></p>
+              <label class="community-modal-label" for="community-reply-author-input">回复人昵称</label>
+              <input id="community-reply-author-input" class="community-modal-input" type="text" maxlength="40" placeholder="请输入回复人昵称">
+              <label class="community-modal-label" for="community-reply-content-input">回复内容</label>
+              <textarea id="community-reply-content-input" class="community-modal-textarea" maxlength="2000" placeholder="请输入回复内容"></textarea>
+              <div class="community-modal-actions">
+                <button type="button" class="form-submit-btn community-btn-ghost" id="community-reply-cancel-btn">取消</button>
+                <button type="button" class="form-submit-btn" id="community-reply-submit-btn">发送回复</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -592,14 +676,76 @@
           <p class="page-subtitle">Settings</p>
         </div>
         <div class="page-body">
-          <div class="placeholder-card settings-card">
-            <h3 class="settings-section">外观 Appearance</h3>
-            <label class="settings-item">
-              <span class="settings-item-label">夜间模式 Night Mode</span>
-              <span class="settings-toggle">
-                <input type="checkbox" id="night-mode-toggle" aria-label="夜间模式">
-              </span>
-            </label>
+          <div class="settings-layout" id="settings-layout">
+            <div class="settings-top-actions">
+              <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden>编辑</button>
+              <button class="settings-back-btn" id="settings-back-btn" type="button" hidden>返回</button>
+            </div>
+            <div class="settings-main-list" id="settings-main-list">
+              <button class="settings-profile-card settings-nav-item" id="settings-profile-trigger" data-settings-route="profile" type="button">
+                <div class="settings-profile-avatar" aria-hidden="true">测</div>
+                <div class="settings-profile-meta">
+                  <p class="settings-profile-name">测试用户</p>
+                  <p class="settings-profile-tip">点击查看并编辑个人信息</p>
+                </div>
+              </button>
+
+              <div class="settings-item-card settings-nav-item" id="settings-night-mode-item">
+                <label class="settings-item">
+                  <span class="settings-item-label">夜间模式 Night Mode</span>
+                  <span class="settings-toggle">
+                    <input type="checkbox" id="night-mode-toggle" aria-label="夜间模式">
+                  </span>
+                </label>
+              </div>
+
+              <button class="settings-item-card settings-item-button settings-nav-item" id="settings-about-trigger" data-settings-route="about" type="button">
+                <span class="settings-item-label">关于</span>
+              </button>
+            </div>
+
+            <div class="settings-subviews" id="settings-subviews">
+              <section class="settings-subview" id="settings-subview-profile">
+                <div class="settings-detail-card settings-form-card">
+                  <h3 class="settings-subview-title">个人信息</h3>
+                  <form class="settings-profile-form" id="settings-profile-form">
+                    <label class="settings-form-row">
+                      <span class="settings-form-label">性别</span>
+                      <input class="settings-form-input" id="settings-profile-gender" name="gender" type="text" placeholder="请输入性别">
+                    </label>
+                    <label class="settings-form-row">
+                      <span class="settings-form-label">手机</span>
+                      <input class="settings-form-input" id="settings-profile-phone" name="phone" type="text" placeholder="请输入手机号">
+                    </label>
+                    <label class="settings-form-row">
+                      <span class="settings-form-label">邮箱</span>
+                      <input class="settings-form-input" id="settings-profile-email" name="email" type="text" placeholder="请输入邮箱地址">
+                    </label>
+                    <label class="settings-form-row">
+                      <span class="settings-form-label">地区</span>
+                      <input class="settings-form-input" id="settings-profile-region" name="region" type="text" placeholder="请输入地区">
+                    </label>
+                    <div class="settings-form-actions" id="settings-form-actions" hidden>
+                      <button class="settings-save-btn" id="settings-profile-save" type="submit">保存</button>
+                      <button class="settings-cancel-btn" id="settings-profile-cancel" type="button">取消</button>
+                    </div>
+                  </form>
+                </div>
+              </section>
+
+              <section class="settings-subview" id="settings-subview-about">
+                <div class="settings-detail-card settings-info-card">
+                  <div class="settings-detail-row">
+                    <span class="settings-detail-key">当前版本</span>
+                    <span class="settings-detail-value">v0.0.1</span>
+                  </div>
+                  <div class="settings-detail-row">
+                    <span class="settings-detail-key">联系邮箱</span>
+                    <span class="settings-detail-value">2026@m.scnu.edu.cn</span>
+                  </div>
+                </div>
+              </section>
+            </div>
           </div>
         </div>
       </section>
