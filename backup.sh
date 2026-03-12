@@ -29,31 +29,41 @@ echo "[backup] staging changes (exclude node_modules)..."
 git add -A -- . ":(exclude)node_modules/**"
 
 if git diff --cached --quiet; then
-    echo "[backup] no changes to commit"
-    exit 0
-fi
+    echo "[backup] no new changes to commit, will only push pending commits"
+else
+    COMMIT_MSG="backup $(date '+%Y-%m-%d %H:%M:%S')"
 
-COMMIT_MSG="backup $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "[backup] committing..."
+    git commit -m "$COMMIT_MSG"
 
-echo "[backup] committing..."
-git commit -m "$COMMIT_MSG"
-
-# ===== 可选：打 tag =====
-if [ -n "$TAG_NAME" ]; then
-    if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-        echo "[backup] tag '$TAG_NAME' already exists, skip tagging"
-    else
-        echo "[backup] tagging commit as '$TAG_NAME'"
-        git tag -a "$TAG_NAME" -m "$COMMIT_MSG"
+    # ===== 可选：打 tag =====
+    if [ -n "$TAG_NAME" ]; then
+        if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "[backup] tag '$TAG_NAME' already exists, skip tagging"
+        else
+            echo "[backup] tagging commit as '$TAG_NAME'"
+            git tag -a "$TAG_NAME" -m "$COMMIT_MSG"
+        fi
     fi
+    # =======================
 fi
-# =======================
+
 
 echo "[backup] ensuring branch '$BRANCH_NAME'..."
 git branch -M "$BRANCH_NAME"
 
 echo "[backup] pushing commits..."
-git push "$REMOTE_NAME" "$BRANCH_NAME"
+if ! git push "$REMOTE_NAME" "$BRANCH_NAME"; then
+    echo "[backup] push rejected, trying to sync remote history first..."
+    if ! git pull --rebase --allow-unrelated-histories "$REMOTE_NAME" "$BRANCH_NAME"; then
+        echo "[backup] failed to auto-sync (likely conflict)."
+        echo "[backup] resolve conflicts, then run: git rebase --continue"
+        echo "[backup] after that, run this script again."
+        exit 1
+    fi
+    echo "[backup] retrying push..."
+    git push "$REMOTE_NAME" "$BRANCH_NAME"
+fi
 
 if [ -n "$TAG_NAME" ]; then
     echo "[backup] pushing tag '$TAG_NAME'..."
