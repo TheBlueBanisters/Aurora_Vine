@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora Vine</title>
+  <script>
+  (function(){
+    try {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    } catch(e){}
+  })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- 左侧导航栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header" style="-webkit-app-region: drag;">
+        <div class="sidebar-logo-wrap" style="-webkit-app-region: no-drag;">
+          <img src="../image/logo.png" alt="Aurora Vine" class="sidebar-logo">
+          <img src="../image/hi.png" alt="" class="sidebar-logo-hi">
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" style="-webkit-app-region: no-drag;">
+        <!-- 功能简介（第一级之下） -->
+        <div class="nav-group">
+          <a class="nav-item" data-page="feature-intro">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>功能简介</span>
+          </a>
+        </div>
+
+        <!-- 第一组：核心入口 -->
+        <div class="nav-group">
+          <div class="nav-group-label">核心入口</div>
+          <a class="nav-item" data-page="school-planning">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <span>定校规划</span>
+          </a>
+          <a class="nav-item" data-page="my-profile">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>我的背景</span>
+          </a>
+          <a class="nav-item" data-page="university-explorer">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>院校大全</span>
+          </a>
+        </div>
+
+        <!-- 第二组：目标推进区 -->
+        <div class="nav-group">
+          <div class="nav-group-label">目标推进</div>
+          <a class="nav-item" data-page="target-universities">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>目标院校</span>
+          </a>
+          <a class="nav-item" data-page="study-planning">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>留学规划</span>
+          </a>
+          <a class="nav-item" data-page="daily-checkin">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>每日打卡</span>
+          </a>
+        </div>
+
+        <!-- 第三组：信息参考 -->
+        <div class="nav-group">
+          <div class="nav-group-label">信息参考</div>
+          <a class="nav-item" data-page="university-database">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span>院校数据库</span>
+          </a>
+          <a class="nav-item" data-page="application-cases">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>申请案例</span>
+          </a>
+        </div>
+
+        <!-- 第四组：资源与社区 -->
+        <div class="nav-group">
+          <div class="nav-group-label">资源与社区</div>
+          <a class="nav-item" data-page="resource-center">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>资源中心</span>
+          </a>
+          <a class="nav-item" data-page="community-messages">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>社区留言</span>
+          </a>
+        </div>
+
+        <!-- 第五组：工具 -->
+        <div class="nav-group">
+          <div class="nav-group-label">工具</div>
+          <a class="nav-item" data-page="settings">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>设置</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 右侧主工作区 -->
+    <main class="main-content">
+      <div class="main-content-titlebar-shield" style="-webkit-app-region: drag;" aria-hidden="true"></div>
+
+      <!-- 功能简介 -->
+      <section class="page active" id="page-feature-intro">
+        <div class="page-header">
+          <h1 class="page-title">功能简介</h1>
+          <p class="page-subtitle">Feature Introduction</p>
+        </div>
+        <div class="page-body">
+          <div class="feature-intro-box">
+            <img src="../image/welcome.png" alt="Welcome" class="feature-intro-image">
+            <h2 class="feature-intro-title">极光藤 · Aurora Vine</h2>
+            <p class="feature-intro-subtitle">— 让留学规划更清晰 · A Clearer Path to Studying Abroad</p>
+            <p class="feature-intro-text">
+              Aurora Vine 是一款为留学申请者设计的规划工具，致力于帮助每一位正在准备申请的学生更从容地整理信息、探索院校，并逐步构建属于自己的申请路径。在这里，你可以记录和管理自己的学术背景与标化成绩，获得定校建议与申请方向参考；浏览世界各地的大学信息，了解院校环境并建立自己的目标院校列表；同时通过留学时间规划与每日打卡功能，将长期目标拆解为清晰可执行的步骤。Aurora Vine 还整合了院校数据库、真实申请案例、留学资源与交流社区，帮助你在信息纷繁的申请过程中保持方向与节奏。我们希望 Aurora Vine 能成为你留学旅程中的一个安静而可靠的伙伴，陪伴你从最初的探索，到最终抵达理想的校园。
+            </p>
+            <p class="feature-intro-text feature-intro-text-en">
+              Aurora Vine is a planning tool designed for students preparing for international study. It helps applicants organize their information, explore universities, and gradually build a clear application path. Within Aurora Vine, you can record and manage your academic background and test scores, receive guidance for school selection, and explore universities around the world while building your own list of target institutions. With integrated study planning timelines and daily progress tracking, long-term goals become clear and manageable steps. Aurora Vine also brings together a university database, real application cases, study resources, and a community for discussion, helping you stay informed and focused throughout the complex application journey. Our hope is that Aurora Vine becomes a quiet and reliable companion on your path-supporting you from the first stage of exploration all the way to your arrival at the campus you aspire to join.
+            </p>
+            <div class="feature-intro-carousel-wrap" id="feature-intro-carousel-wrap">
+              <div class="feature-intro-carousel">
+                <div class="feature-intro-carousel-track" id="feature-intro-carousel-track">
+                  <img src="../image/intro/1.jpg" alt="Aurora Vine intro 1">
+                  <img src="../image/intro/2.jpg" alt="Aurora Vine intro 2">
+                  <img src="../image/intro/3.jpg" alt="Aurora Vine intro 3">
+                  <img src="../image/intro/4.jpg" alt="Aurora Vine intro 4">
+                  <img src="../image/intro/5.jpg" alt="Aurora Vine intro 5">
+                  <img src="../image/intro/6.jpg" alt="Aurora Vine intro 6">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 定校规划 -->
+      <section class="page" id="page-school-planning">
+        <div class="page-header">
+          <h1 class="page-title">定校规划</h1>
+          <p class="page-subtitle">School Planning</p>
+        </div>
+        <div class="page-body">
+          <div class="planning-intro-box">
+            <img src="../image/plan.png" alt="Plan" class="planning-intro-image">
+            <h2 class="planning-intro-title">定校规划 · School Planning</h2>
+            <p class="planning-intro-text">
+              欢迎来到 Aurora Vine 的定校规划模块。在这里，我们会根据你的本科背景、成绩情况和语言成绩，为你生成一份个性化的留学定校建议。填写这些信息只需要几分钟，但它将帮助系统更准确地评估你的申请竞争力，并为你推荐合适的目标院校梯度，同时生成一份未来申请规划路径。请尽量如实填写，你随时可以返回修改；准备好了的话，就从下面开始吧。
+            </p>
+            <p class="planning-intro-text planning-intro-text-en">
+              Welcome to the School Planning module of Aurora Vine. Here, we will generate personalized study-abroad school recommendations based on your undergraduate background, academic performance, and language test scores. Completing this information only takes a few minutes, but it will help the system evaluate your application competitiveness more accurately, recommend appropriate tiers of target universities, and outline a future application roadmap. Please fill in the information as accurately as possible-you can always return to edit it later. When you're ready, simply begin below.
+            </p>
+          </div>
+          <div id="school-planning-form" class="school-planning-form">
+            <div class="form-section">
+              <h3 class="form-section-title">基本信息 Basic Info</h3>
+
+              <div class="form-basic-info-grid">
+                <div class="form-field" data-field="graduationYear">
+                  <label class="form-label">
+                    <span class="form-label-zh">本科毕业年份</span>
+                    <span class="form-label-en">Undergraduate Graduation Year</span>
+                  </label>
+                  <select id="sp-graduation-year" class="form-select">
+                    <option value="">请选择 Select</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                    <option value="2031">2031</option>
+                    <option value="2032">2032</option>
+                  </select>
+                  <span class="form-error"></span>
+                </div>
+
+                <div class="form-field" data-field="institutionTier">
+                  <label class="form-label">
+                    <span class="form-label-zh">本科院校层次</span>
+                    <span class="form-label-en">Institution Tier</span>
+                  </label>
+                  <select id="sp-institution-tier" class="form-select">
+                    <option value="">请选择 Select</option>
+                    <option value="985">985</option>
+                    <option value="211">211</option>
+                    <option value="双一流">双一流</option>
+                    <option value="双非">双非</option>
+                    <option value="民办">民办</option>
+                  </select>
+                  <span class="form-error"></span>
+                </div>
+
+                <div class="form-field" data-field="schoolName">
+                  <label class="form-label">
+                    <span class="form-label-zh">本科学校名称</span>
+                    <span class="form-label-en">Undergraduate School</span>
+                  </label>
+                  <input type="text" id="sp-school-name" class="form-input" placeholder="请输入学校名称 Enter school name">
+                  <span class="form-error"></span>
+                </div>
+
+                <div class="form-field" data-field="major">
+                  <label class="form-label">
+                    <span class="form-label-zh">本科专业</span>
+                    <span class="form-label-en">Undergraduate Major</span>
+                  </label>
+                  <input type="text" id="sp-major" class="form-input" placeholder="请输入专业名称 Enter major">
+                  <span class="form-error"></span>
+                </div>
+              </div>
+
+              <div class="form-gpa-row">
+                <div class="form-field form-field-inline" data-field="gpa">
+                <label class="form-label">
+                  <span class="form-label-zh">绩点</span>
+                  <span class="form-label-en">GPA</span>
+                </label>
+                <div class="form-inline-group">
+                  <input type="number" id="sp-gpa" class="form-input form-input-sm" placeholder="0.00" step="0.01" min="0" max="5">
+                  <div class="form-radio-group">
+                    <label class="form-radio-label">
+                      <input type="radio" name="sp-gpa-scale" value="4" id="sp-gpa-4">
+                      <span>四分制</span>
+                    </label>
+                    <label class="form-radio-label">
+                      <input type="radio" name="sp-gpa-scale" value="5" id="sp-gpa-5">
+                      <span>五分制</span>
+                    </label>
+                  </div>
+                </div>
+                <span class="form-error"></span>
+                </div>
+
+                <div class="form-field" data-field="gpaPercentile">
+                  <label class="form-label">
+                    <span class="form-label-zh">绩点前百分比</span>
+                    <span class="form-label-en">GPA Percentile</span>
+                  </label>
+                  <input type="number" id="sp-gpa-percentile" class="form-input form-input-narrow" placeholder="0-100" min="0" max="100" step="0.1">
+                  <span class="form-error"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="form-section-title">语言与标化成绩 Language & Test Scores</h3>
+
+              <div class="form-test-scores-grid">
+                <div class="form-field form-field-with-check" data-field="ielts">
+                  <label class="form-label">
+                    <span class="form-label-zh">雅思</span>
+                    <span class="form-label-en">IELTS</span>
+                  </label>
+                  <div class="form-inline-group">
+                    <select id="sp-ielts" class="form-select">
+                      <option value="">请选择 Select</option>
+                    </select>
+                    <label class="form-check-label">
+                      <input type="checkbox" id="sp-ielts-none" class="form-check">
+                      <span>无 None</span>
+                    </label>
+                  </div>
+                  <span class="form-error"></span>
+                </div>
+
+                <div class="form-field form-field-with-check" data-field="toefl">
+                  <label class="form-label">
+                    <span class="form-label-zh">托福</span>
+                    <span class="form-label-en">TOEFL</span>
+                  </label>
+                  <div class="form-inline-group">
+                    <select id="sp-toefl" class="form-select">
+                      <option value="">请选择 Select</option>
+                    </select>
+                    <label class="form-check-label">
+                      <input type="checkbox" id="sp-toefl-none" class="form-check">
+                      <span>无 None</span>
+                    </label>
+                  </div>
+                  <span class="form-error"></span>
+                </div>
+
+                <div class="form-field form-field-with-check form-field-gre" data-field="gre">
+                  <label class="form-label">
+                    <span class="form-label-zh">GRE / GRE 写作</span>
+                    <span class="form-label-en">GRE / GRE Writing</span>
+                  </label>
+                  <div class="form-inline-group form-gre-group">
+                    <select id="sp-gre" class="form-select">
+                      <option value="">请选择 Select</option>
+                    </select>
+                    <select id="sp-gre-writing" class="form-select">
+                      <option value="">请选择 Select</option>
+                    </select>
+                    <label class="form-check-label">
+                      <input type="checkbox" id="sp-gre-none" class="form-check">
+                      <span>无 None</span>
+                    </label>
+                  </div>
+                  <span class="form-error"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="form-section-title">简历 Resume</h3>
+              <div class="form-field" data-field="resume">
+                <label class="form-label">
+                  <span class="form-label-zh">简历（选填）</span>
+                  <span class="form-label-en">Resume（Optional）</span>
+                </label>
+                <input type="file" id="sp-resume" class="form-file" accept=".pdf,.doc,.docx">
+                <span class="form-error"></span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="school-planning-submit" class="form-submit-btn">提交 Submit</button>
+            </div>
+          </div>
+
+          <div id="school-planning-thanks" class="school-planning-thanks" style="display: none;">
+            <div class="placeholder-card">
+              <div class="placeholder-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+              </div>
+              <p class="placeholder-text">谢谢您的提交</p>
+              <p class="placeholder-hint">Thank you for your submission</p>
+              <button type="button" id="school-planning-refill" class="form-submit-btn school-planning-refill-btn">重新填写 Re-fill</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 我的背景 -->
+      <section class="page" id="page-my-profile">
+        <div class="page-header">
+          <h1 class="page-title">我的背景</h1>
+          <p class="page-subtitle">My Profile</p>
+        </div>
+        <div class="page-body">
+          <div id="my-profile-empty" class="placeholder-card my-profile-empty">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <p class="placeholder-text">暂无背景信息</p>
+            <p class="placeholder-hint">请先在定校规划中填写您的学术背景，提交后将在此展示</p>
+            <button type="button" id="my-profile-go-planning" class="form-submit-btn">去定校规划填写</button>
+          </div>
+          <div id="my-profile-content" class="my-profile-content" style="display: none;">
+            <div class="my-profile-info-card">
+              <h3 class="form-section-title">基本信息 Basic Info</h3>
+              <div class="my-profile-info-grid" id="my-profile-info-grid"></div>
+            </div>
+            <div class="my-profile-chart-card">
+              <h3 class="form-section-title">标化成绩 Standardized Test Scores</h3>
+              <div id="my-profile-chart" class="my-profile-chart"></div>
+            </div>
+            <div class="my-profile-statement-card">
+              <h3 class="form-section-title">个人陈述 Personal Statement</h3>
+              <div class="my-profile-statement-box">无</div>
+            </div>
+            <div class="my-profile-actions">
+              <button type="button" id="my-profile-refill" class="form-submit-btn">重新填写定校规划 Re-fill School Planning</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 院校大全 -->
+      <section class="page" id="page-university-explorer">
+        <div class="page-header">
+          <h1 class="page-title">院校大全</h1>
+          <p class="page-subtitle">University Explorer</p>
+        </div>
+        <div class="page-body">
+          <div class="school-list-container" id="school-list-explorer">
+            <div class="school-list-grid" id="school-list-explorer-grid"></div>
+            <div class="school-list-pagination" id="school-list-explorer-pagination"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 目标院校 -->
+      <section class="page" id="page-target-universities">
+        <div class="page-header">
+          <h1 class="page-title">目标院校</h1>
+          <p class="page-subtitle">Target Universities</p>
+        </div>
+        <div class="page-body">
+          <div class="school-list-container" id="school-list-target">
+            <div class="school-list-grid" id="school-list-target-grid"></div>
+            <div class="school-list-empty" id="school-list-target-empty">
+              <p class="placeholder-text">暂无目标院校</p>
+              <p class="placeholder-hint">去院校大全添加你心仪的院校吧</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 留学规划 -->
+      <section class="page" id="page-study-planning">
+        <div class="page-header">
+          <h1 class="page-title">留学规划</h1>
+          <p class="page-subtitle">Study Planning</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <p class="placeholder-text">留学规划功能即将上线</p>
+            <p class="placeholder-hint">制定个性化的留学时间线和任务规划</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 每日打卡 -->
+      <section class="page" id="page-daily-checkin">
+        <div class="page-header">
+          <h1 class="page-title">每日打卡</h1>
+          <p class="page-subtitle">Daily Check-in</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            </div>
+            <p class="placeholder-text">每日打卡功能即将上线</p>
+            <p class="placeholder-hint">记录每日学习进度，保持前进动力</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 院校数据库 -->
+      <section class="page" id="page-university-database">
+        <div class="page-header">
+          <h1 class="page-title">院校数据库</h1>
+          <p class="page-subtitle">University Database</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+            </div>
+            <p class="placeholder-text">院校数据库功能即将上线</p>
+            <p class="placeholder-hint">查询详细的院校数据和录取信息</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 申请案例 -->
+      <section class="page" id="page-application-cases">
+        <div class="page-header">
+          <h1 class="page-title">申请案例</h1>
+          <p class="page-subtitle">Application Cases</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <p class="placeholder-text">申请案例功能即将上线</p>
+            <p class="placeholder-hint">浏览真实的留学申请案例和经验分享</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 资源中心 -->
+      <section class="page" id="page-resource-center">
+        <div class="page-header">
+          <h1 class="page-title">资源中心</h1>
+          <p class="page-subtitle">Resource Center</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
+            <p class="placeholder-text">资源中心功能即将上线</p>
+            <p class="placeholder-hint">获取留学相关的工具、模板和资料</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 社区留言 -->
+      <section class="page" id="page-community-messages">
+        <div class="page-header">
+          <h1 class="page-title">社区留言</h1>
+          <p class="page-subtitle">Community Messages</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <p class="placeholder-text">社区留言功能即将上线</p>
+            <p class="placeholder-hint">与其他留学伙伴交流互动</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 院校详情层（覆盖在主内容区之上） -->
+      <div class="school-detail-overlay" id="school-detail-overlay">
+        <div class="school-detail-header" style="-webkit-app-region: no-drag;">
+          <button class="school-detail-back" id="school-detail-back" type="button">返回</button>
+          <h1 class="school-detail-title" id="school-detail-title"></h1>
+          <button class="school-detail-star" id="school-detail-star" title="收藏">
+            <svg class="star-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </button>
+        </div>
+        <div class="school-detail-body">
+          <div class="school-detail-hero" id="school-detail-hero">
+            <div class="school-detail-hero-bg" id="school-detail-hero-bg"></div>
+            <div class="school-detail-hero-mask"></div>
+            <div class="school-detail-hero-content">
+              <img class="school-detail-logo" id="school-detail-logo" alt="校徽">
+              <div class="school-detail-hero-info">
+                <h2 class="school-detail-name" id="school-detail-name"></h2>
+                <p class="school-detail-meta" id="school-detail-meta"></p>
+              </div>
+            </div>
+          </div>
+          <div class="school-detail-intro" id="school-detail-intro"></div>
+          <div class="school-detail-carousel-wrap" id="school-detail-carousel-wrap">
+            <div class="school-detail-carousel" id="school-detail-carousel">
+              <div class="school-detail-carousel-track" id="school-detail-carousel-track"></div>
+            </div>
+          </div>
+          <div class="school-detail-lightbox" id="school-detail-lightbox">
+            <button class="school-detail-lightbox-close" id="school-detail-lightbox-close">×</button>
+            <img class="school-detail-lightbox-img" id="school-detail-lightbox-img" alt="">
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置 -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <h1 class="page-title">设置</h1>
+          <p class="page-subtitle">Settings</p>
+        </div>
+        <div class="page-body">
+          <div class="placeholder-card settings-card">
+            <h3 class="settings-section">外观 Appearance</h3>
+            <label class="settings-item">
+              <span class="settings-item-label">夜间模式 Night Mode</span>
+              <span class="settings-toggle">
+                <input type="checkbox" id="night-mode-toggle" aria-label="夜间模式">
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../node_modules/echarts/dist/echarts.min.js"></script>
+  <script src="../node_modules/echarts-gl/dist/echarts-gl.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
