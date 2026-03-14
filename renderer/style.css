@@ -112,6 +112,14 @@ html, body {
   user-select: none;
 }
 
+body.auth-only .app-layout {
+  display: none;
+}
+
+body:not(.auth-only) .auth-gate {
+  display: none;
+}
+
 button,
 input,
 select,
@@ -124,6 +132,190 @@ select,
 textarea {
   user-select: text;
   -webkit-user-select: text;
+}
+
+/* ============================================
+   登录 / 注册页
+   ============================================ */
+
+.auth-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: #ffffff;
+}
+
+.auth-gate-panel {
+  width: min(520px, 100%);
+}
+
+.auth-gate-card {
+  position: relative;
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgba(40, 72, 120, 0.12);
+  padding: 24px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-gate-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 4px 0 2px;
+}
+
+.auth-gate-logo {
+  width: 270px;
+  height: 126px;
+  object-fit: contain;
+}
+
+/* 登录页小精灵 */
+.auth-gate-sprite-corner {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 0;
+  animation: auth-sprite-float 3s ease-in-out infinite;
+}
+
+.auth-gate-sprite-hi {
+  top: -55px;
+  right: -55px;
+}
+
+.auth-gate-sprite-plan {
+  bottom: -55px;
+  left: -55px;
+  animation-delay: 0.5s;
+}
+
+@keyframes auth-sprite-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.auth-gate-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.auth-tab {
+  height: 44px;
+  border: 1px solid var(--content-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--content-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.auth-tab:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.auth-tab.active {
+  background: var(--btn-primary);
+  border-color: var(--btn-primary);
+  color: #ffffff;
+}
+
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: block;
+}
+
+.auth-label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--content-text-secondary);
+}
+
+.auth-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--content-text);
+  padding: 0 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.auth-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.18);
+}
+
+.auth-submit-btn {
+  width: 100%;
+  margin-top: 18px;
+  height: 44px;
+}
+
+.auth-divider {
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--content-text-secondary);
+  font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--content-border);
+}
+
+.auth-guest-btn {
+  height: 44px;
+  border: 1px solid var(--content-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--content-text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.auth-guest-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .auth-gate {
+  background: #181825;
+}
+
+[data-theme="dark"] .auth-gate-card {
+  background: var(--card-bg);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
 }
 
 /* ============================================
@@ -595,6 +787,67 @@ textarea {
 .settings-main-list {
   display: grid;
   gap: 16px;
+}
+
+.settings-account-card {
+  padding: 18px 20px;
+}
+
+.settings-account-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.settings-account-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--content-text);
+}
+
+.settings-account-subtitle {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--content-text-secondary);
+}
+
+.settings-account-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.settings-account-badge[data-mode="account"] {
+  color: #2f8f5b;
+  background: rgba(47, 143, 91, 0.12);
+}
+
+.settings-account-badge[data-mode="guest"] {
+  color: #c7861e;
+  background: rgba(249, 226, 175, 0.24);
+}
+
+.settings-account-info {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--content-text-secondary);
+}
+
+.settings-account-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .settings-nav-item {
@@ -2289,6 +2542,12 @@ body.school-detail-open .main-content {
   justify-content: flex-end;
 }
 
+.community-board-auth-tip {
+  margin-top: -6px;
+  font-size: 13px;
+  color: var(--content-text-secondary);
+}
+
 .community-board-list {
   display: flex;
   flex-direction: column;
@@ -2389,6 +2648,16 @@ body.school-detail-open .main-content {
   display: block;
   margin-bottom: 6px;
   margin-top: 12px;
+  font-size: 13px;
+  color: var(--content-text-secondary);
+}
+
+.community-modal-current-user {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--content-bg) 72%, transparent);
   font-size: 13px;
   color: var(--content-text-secondary);
 }
@@ -2649,6 +2918,7 @@ body.school-detail-open .main-content {
 
 [data-theme="dark"] .form-select,
 [data-theme="dark"] .form-input,
+[data-theme="dark"] .auth-input,
 [data-theme="dark"] .daily-checkin-modal-input,
 [data-theme="dark"] .daily-checkin-modal-color,
 [data-theme="dark"] .community-modal-input,
@@ -2663,6 +2933,38 @@ body.school-detail-open .main-content {
 @media (max-width: 900px) {
   :root {
     --sidebar-width: 213px;
+  }
+
+  .auth-gate {
+    padding: 18px;
+  }
+
+  .auth-gate-card {
+    padding: 20px 18px 18px;
+  }
+
+  .auth-gate-brand {
+    gap: 8px;
+  }
+
+  .auth-gate-logo {
+    width: 216px;
+    height: 101px;
+  }
+
+  .auth-gate-sprite-corner {
+    width: 72px;
+    height: 72px;
+  }
+
+  .auth-gate-sprite-hi {
+    top: -44px;
+    right: -44px;
+  }
+
+  .auth-gate-sprite-plan {
+    bottom: -44px;
+    left: -44px;
   }
 
   .page-header {

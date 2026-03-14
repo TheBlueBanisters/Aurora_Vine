@@ -2,14 +2,18 @@
   "name": "aurora-vine",
   "version": "1.0.0",
   "description": "Aurora Vine - 留学规划桌面应用",
-  "main": "main.js",
+  "main": "out/main/main.js",
   "scripts": {
+    "prestart": "electron-rebuild -f -w better-sqlite3",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
     "start": "electron .",
     "postinstall": "electron-rebuild -f -w better-sqlite3"
   },
   "devDependencies": {
     "electron": "^33.0.0",
-    "electron-rebuild": "^3.2.9"
+    "electron-rebuild": "^3.2.9",
+    "electron-vite": "^3.1.0"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

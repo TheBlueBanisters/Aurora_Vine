@@ -15,7 +15,46 @@
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="auth-only">
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-gate-panel">
+      <div class="auth-gate-card">
+        <img src="../image/welcome.png" alt="" class="auth-gate-sprite auth-gate-sprite-corner auth-gate-sprite-hi">
+        <img src="../image/plan.png" alt="" class="auth-gate-sprite auth-gate-sprite-corner auth-gate-sprite-plan">
+        <div class="auth-gate-brand">
+          <img src="../image/logo.png" alt="Aurora Vine" class="auth-gate-logo">
+        </div>
+        <div class="auth-gate-tabs" role="tablist" aria-label="登录注册切换">
+          <button type="button" class="auth-tab active" id="auth-tab-login" data-auth-tab="login">登录</button>
+          <button type="button" class="auth-tab" id="auth-tab-register" data-auth-tab="register">注册</button>
+        </div>
+
+        <form class="auth-form active" id="auth-login-form">
+          <label class="auth-label" for="auth-login-email">邮箱</label>
+          <input id="auth-login-email" class="auth-input" type="email" autocomplete="username" placeholder="请输入邮箱地址">
+          <label class="auth-label" for="auth-login-password">密码</label>
+          <input id="auth-login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="请输入密码">
+          <button type="submit" class="form-submit-btn auth-submit-btn">登录</button>
+        </form>
+
+        <form class="auth-form" id="auth-register-form">
+          <label class="auth-label" for="auth-register-email">邮箱</label>
+          <input id="auth-register-email" class="auth-input" type="email" autocomplete="username" placeholder="请输入邮箱地址">
+          <label class="auth-label" for="auth-register-nickname">昵称</label>
+          <input id="auth-register-nickname" class="auth-input" type="text" maxlength="40" placeholder="选填，默认取邮箱前缀">
+          <label class="auth-label" for="auth-register-password">密码</label>
+          <input id="auth-register-password" class="auth-input" type="password" autocomplete="new-password" placeholder="至少 6 位密码">
+          <label class="auth-label" for="auth-register-password-confirm">确认密码</label>
+          <input id="auth-register-password-confirm" class="auth-input" type="password" autocomplete="new-password" placeholder="请再次输入密码">
+          <button type="submit" class="form-submit-btn auth-submit-btn">注册并进入</button>
+        </form>
+
+        <div class="auth-divider"><span>或</span></div>
+        <button type="button" class="auth-guest-btn" id="auth-enter-guest-btn">游客模式</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app-layout">
 
     <!-- 左侧导航栏 -->
@@ -579,6 +618,7 @@
             <div class="community-board-toolbar">
               <button type="button" class="form-submit-btn" id="community-new-post-btn">新建帖子</button>
             </div>
+            <p class="community-board-auth-tip" id="community-board-auth-tip"></p>
             <div class="community-board-list" id="community-board-list"></div>
             <div class="community-board-pagination" id="community-board-pagination"></div>
           </div>
@@ -588,8 +628,7 @@
               <h3 class="community-modal-title" id="community-post-modal-title">新建帖子</h3>
               <label class="community-modal-label" for="community-post-title-input">标题</label>
               <input id="community-post-title-input" class="community-modal-input" type="text" maxlength="120" placeholder="请输入帖子标题">
-              <label class="community-modal-label" for="community-post-author-input">发帖人昵称</label>
-              <input id="community-post-author-input" class="community-modal-input" type="text" maxlength="40" placeholder="请输入发帖人昵称">
+              <p class="community-modal-current-user" id="community-post-current-user"></p>
               <label class="community-modal-label" for="community-post-content-input">帖子内容</label>
               <textarea id="community-post-content-input" class="community-modal-textarea" maxlength="5000" placeholder="请输入帖子内容"></textarea>
               <div class="community-modal-actions">
@@ -621,8 +660,7 @@
             <div class="community-bottom-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="community-reply-sheet-title">
               <h3 class="community-modal-title" id="community-reply-sheet-title">回复评论</h3>
               <p class="community-reply-target-text" id="community-reply-target-text"></p>
-              <label class="community-modal-label" for="community-reply-author-input">回复人昵称</label>
-              <input id="community-reply-author-input" class="community-modal-input" type="text" maxlength="40" placeholder="请输入回复人昵称">
+              <p class="community-modal-current-user" id="community-reply-current-user"></p>
               <label class="community-modal-label" for="community-reply-content-input">回复内容</label>
               <textarea id="community-reply-content-input" class="community-modal-textarea" maxlength="2000" placeholder="请输入回复内容"></textarea>
               <div class="community-modal-actions">
@@ -680,6 +718,20 @@
             <div class="settings-top-actions">
               <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden>编辑</button>
               <button class="settings-back-btn" id="settings-back-btn" type="button" hidden>返回</button>
+            </div>
+            <div class="settings-item-card settings-account-card" id="settings-account-card">
+              <div class="settings-account-head">
+                <div>
+                  <p class="settings-account-title">账号状态</p>
+                  <p class="settings-account-subtitle" id="settings-account-subtitle">未登录</p>
+                </div>
+                <span class="settings-account-badge" id="settings-account-badge">未登录</span>
+              </div>
+              <div class="settings-account-info" id="settings-account-info">登录后可将我的背景与社区身份绑定到账号。</div>
+              <div class="settings-account-actions">
+                <button class="settings-save-btn" id="settings-account-primary-btn" type="button">登录 / 注册</button>
+                <button class="settings-cancel-btn" id="settings-account-logout-btn" type="button" hidden>退出登录</button>
+              </div>
             </div>
             <div class="settings-main-list" id="settings-main-list">
               <button class="settings-profile-card settings-nav-item" id="settings-profile-trigger" data-settings-route="profile" type="button">
@@ -753,8 +805,6 @@
     </main>
   </div>
 
-  <script src="../node_modules/echarts/dist/echarts.min.js"></script>
-  <script src="../node_modules/echarts-gl/dist/echarts-gl.min.js"></script>
-  <script src="app.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>

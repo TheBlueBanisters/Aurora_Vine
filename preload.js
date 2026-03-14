@@ -1,6 +1,16 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
+  authGetCurrentUser: () =>
+    ipcRenderer.invoke('auth:getCurrentUser'),
+  authEnterGuest: () =>
+    ipcRenderer.invoke('auth:enterGuest'),
+  authRegister: (payload) =>
+    ipcRenderer.invoke('auth:register', payload),
+  authLogin: (payload) =>
+    ipcRenderer.invoke('auth:login', payload),
+  authLogout: () =>
+    ipcRenderer.invoke('auth:logout'),
   schoolsList: (page = 1, pageSize = 10) =>
     ipcRenderer.invoke('schools:list', page, pageSize),
   schoolsGetById: (schoolId) =>

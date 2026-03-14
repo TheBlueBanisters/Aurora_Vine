@@ -1,3 +1,9 @@
+import * as echarts from 'echarts'
+import 'echarts-gl'
+
+import logoLight from '../image/logo.png'
+import logoDark from '../image/logo_n.png'
+
 document.addEventListener('DOMContentLoaded', () => {
   const navItems = document.querySelectorAll('.nav-item[data-page]');
   const pages = document.querySelectorAll('.page');
@@ -8,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let sidebarLogoTransitionTimer = null;
 
   const TARGET_SCHOOLS_KEY = 'targetSchools';
-  const SCHOOL_PLANNING_PROFILE_KEY = 'schoolPlanningProfile';
+  const LEGACY_SCHOOL_PLANNING_PROFILE_KEY = 'schoolPlanningProfile';
+  const GUEST_SCHOOL_PLANNING_PROFILE_KEY = 'schoolPlanningProfile:guest';
   const THEME_KEY = 'theme';
   const SETTINGS_PROFILE_KEY = 'settingsProfileInfo';
   const SETTINGS_DEFAULT_PROFILE = {
@@ -16,6 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     phone: '未公开',
     email: '未公开',
     region: '未公开'
+  };
+  let currentAuthState = {
+    mode: 'none',
+    user: null
   };
 
   function getTheme() {
@@ -28,13 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function transitionSidebarLogo(isDark, animate = true) {
     if (!sidebarLogo) return;
-    const darkLogoSrc = '../image/logo_n.png';
-    const lightLogoSrc = '../image/logo.png';
+    const darkLogoSrc = logoDark;
+    const lightLogoSrc = logoLight;
     const targetSrc = isDark ? darkLogoSrc : lightLogoSrc;
     const fallbackSrc = lightLogoSrc;
     const currentSrc = sidebarLogo.getAttribute('src') || '';
 
-    if (currentSrc.endsWith(targetSrc.replace('../image/', ''))) {
+    if (currentSrc === targetSrc) {
       return;
     }
 
@@ -123,6 +134,140 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  function normalizeAuthState(payload) {
+    return {
+      mode: payload?.mode || 'none',
+      user: payload?.user || null
+    };
+  }
+
+  function isAccountMode() {
+    return currentAuthState.mode === 'account' && !!currentAuthState.user?.id;
+  }
+
+  function isGuestMode() {
+    return currentAuthState.mode === 'guest';
+  }
+
+  function getCurrentAccountId() {
+    return isAccountMode() ? Number(currentAuthState.user.id) : null;
+  }
+
+  function getCurrentUserDisplayName() {
+    if (isAccountMode()) {
+      return currentAuthState.user?.nickname || currentAuthState.user?.email || 'Aurora 用户';
+    }
+    if (isGuestMode()) {
+      return '游客';
+    }
+    return '未登录';
+  }
+
+  function getCurrentUserMetaText() {
+    if (isAccountMode()) {
+      return currentAuthState.user?.email || '已登录账号';
+    }
+    if (isGuestMode()) {
+      return '当前为游客模式，可继续浏览与填写背景';
+    }
+    return '登录后可绑定背景与社区身份';
+  }
+
+  function switchAuthTab(tab) {
+    const nextTab = tab === 'register' ? 'register' : 'login';
+    document.querySelectorAll('.auth-tab').forEach((button) => {
+      button.classList.toggle('active', button.dataset.authTab === nextTab);
+    });
+    const loginForm = document.getElementById('auth-login-form');
+    const registerForm = document.getElementById('auth-register-form');
+    loginForm?.classList.toggle('active', nextTab === 'login');
+    registerForm?.classList.toggle('active', nextTab === 'register');
+  }
+
+  function openAuthGate(preferredTab = 'login', message = '') {
+    if (message) {
+      window.alert(message);
+    }
+    document.body.classList.add('auth-only');
+    switchAuthTab(preferredTab);
+  }
+
+  function hideAuthGate() {
+    document.body.classList.remove('auth-only');
+  }
+
+  function applyAuthState(payload) {
+    currentAuthState = normalizeAuthState(payload);
+  }
+
+  function readJsonStorage(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeJsonStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function getSchoolPlanningStorageKey(accountId = getCurrentAccountId()) {
+    if (accountId) return `${LEGACY_SCHOOL_PLANNING_PROFILE_KEY}:account:${accountId}`;
+    return GUEST_SCHOOL_PLANNING_PROFILE_KEY;
+  }
+
+  function getGuestSchoolPlanningProfile() {
+    const guestProfile = readJsonStorage(GUEST_SCHOOL_PLANNING_PROFILE_KEY);
+    if (guestProfile) return guestProfile;
+    const legacyProfile = readJsonStorage(LEGACY_SCHOOL_PLANNING_PROFILE_KEY);
+    if (!legacyProfile) return null;
+    writeJsonStorage(GUEST_SCHOOL_PLANNING_PROFILE_KEY, legacyProfile);
+    return legacyProfile;
+  }
+
+  function getSchoolPlanningProfile(accountId = getCurrentAccountId()) {
+    if (accountId) {
+      return readJsonStorage(getSchoolPlanningStorageKey(accountId));
+    }
+    return getGuestSchoolPlanningProfile();
+  }
+
+  function setSchoolPlanningProfile(data, accountId = getCurrentAccountId()) {
+    writeJsonStorage(getSchoolPlanningStorageKey(accountId), data);
+    if (!accountId) {
+      writeJsonStorage(LEGACY_SCHOOL_PLANNING_PROFILE_KEY, data);
+    }
+  }
+
+  function promptGuestProfileMigrationForAccount(accountId) {
+    const guestProfile = getGuestSchoolPlanningProfile();
+    if (!guestProfile || !accountId) return;
+    const targetProfile = getSchoolPlanningProfile(accountId);
+    const message = targetProfile
+      ? '检测到当前设备有游客背景数据。是否用游客背景覆盖当前账号已保存的背景信息？'
+      : '检测到当前设备有游客背景数据。是否将这份背景信息迁移绑定到当前账号？';
+    const shouldMigrate = window.confirm(message);
+    if (shouldMigrate) {
+      setSchoolPlanningProfile(guestProfile, accountId);
+    }
+  }
+
+  function applyAuthStateAndRefresh(payload, options = {}) {
+    const { previousMode = currentAuthState.mode, shouldPromptGuestMigration = false } = options;
+    applyAuthState(payload);
+    if (shouldPromptGuestMigration && isAccountMode() && (previousMode === 'guest' || !!getGuestSchoolPlanningProfile())) {
+      promptGuestProfileMigrationForAccount(getCurrentAccountId());
+    }
+    if (currentAuthState.mode === 'none') {
+      openAuthGate('login');
+    } else {
+      hideAuthGate();
+    }
+    refreshAuthBoundUI();
+  }
+
   const SETTINGS_ANIMATION = {
     fadeOut: 220,
     moveAndCollapse: 320,
@@ -192,6 +337,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setProfileInfo(profile) {
     localStorage.setItem(SETTINGS_PROFILE_KEY, JSON.stringify(profile));
+  }
+
+  function updateSettingsAccountState() {
+    const subtitleEl = document.getElementById('settings-account-subtitle');
+    const badgeEl = document.getElementById('settings-account-badge');
+    const infoEl = document.getElementById('settings-account-info');
+    const primaryBtn = document.getElementById('settings-account-primary-btn');
+    const logoutBtn = document.getElementById('settings-account-logout-btn');
+    const profileAvatar = document.querySelector('.settings-profile-avatar');
+    const profileName = document.querySelector('.settings-profile-name');
+    const profileTip = document.querySelector('.settings-profile-tip');
+
+    if (subtitleEl) subtitleEl.textContent = getCurrentUserDisplayName();
+    if (badgeEl) {
+      badgeEl.textContent = isAccountMode() ? '已登录' : (isGuestMode() ? '游客' : '未登录');
+      badgeEl.dataset.mode = currentAuthState.mode || 'none';
+    }
+    if (infoEl) infoEl.textContent = getCurrentUserMetaText();
+    if (primaryBtn) {
+      primaryBtn.textContent = isAccountMode() ? '切换账号' : '登录 / 注册';
+    }
+    if (logoutBtn) {
+      logoutBtn.hidden = !isAccountMode();
+    }
+    if (profileAvatar) {
+      profileAvatar.textContent = getCurrentUserDisplayName().slice(0, 1) || 'A';
+    }
+    if (profileName) {
+      profileName.textContent = getCurrentUserDisplayName();
+    }
+    if (profileTip) {
+      profileTip.textContent = isAccountMode()
+        ? '点击查看并编辑个人资料'
+        : '当前身份可继续浏览，登录后将绑定到账号';
+    }
   }
 
   function populateProfileForm(profileForm, profile) {
@@ -424,8 +604,114 @@ document.addEventListener('DOMContentLoaded', () => {
       formActions: document.getElementById('settings-form-actions'),
       cancelBtn: document.getElementById('settings-profile-cancel')
     });
+
+    const primaryBtn = document.getElementById('settings-account-primary-btn');
+    const logoutBtn = document.getElementById('settings-account-logout-btn');
+
+    primaryBtn?.addEventListener('click', () => {
+      openAuthGate('login', isGuestMode() ? '登录或注册后即可把当前使用内容绑定到账号。' : '');
+    });
+    logoutBtn?.addEventListener('click', async () => {
+      if (!window.api?.authLogout) return;
+      const res = await window.api.authLogout();
+      if (!res?.success) {
+        window.alert(res?.error || '退出登录失败，请稍后重试');
+        return;
+      }
+      applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode });
+    });
+    updateSettingsAccountState();
   }
 
+  function initAuthGate() {
+    document.querySelectorAll('.auth-tab').forEach((button) => {
+      button.addEventListener('click', () => {
+        switchAuthTab(button.dataset.authTab);
+      });
+    });
+
+    document.getElementById('auth-enter-guest-btn')?.addEventListener('click', async () => {
+      if (!window.api?.authEnterGuest) return;
+      const res = await window.api.authEnterGuest();
+      if (!res?.success) {
+        window.alert(res?.error || '进入游客模式失败');
+        return;
+      }
+      applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode });
+    });
+
+    document.getElementById('auth-login-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!window.api?.authLogin) return;
+      const email = document.getElementById('auth-login-email')?.value?.trim() || '';
+      const password = document.getElementById('auth-login-password')?.value || '';
+      if (!email) {
+        window.alert('请输入邮箱地址');
+        return;
+      }
+      if (!password) {
+        window.alert('请输入密码');
+        return;
+      }
+      const previousMode = currentAuthState.mode;
+      const res = await window.api.authLogin({ email, password });
+      if (!res?.success) {
+        window.alert(res?.error || '登录失败，请稍后重试');
+        return;
+      }
+      applyAuthStateAndRefresh(res, {
+        previousMode,
+        shouldPromptGuestMigration: true
+      });
+    });
+
+    document.getElementById('auth-register-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!window.api?.authRegister) return;
+      const email = document.getElementById('auth-register-email')?.value?.trim() || '';
+      const nickname = document.getElementById('auth-register-nickname')?.value?.trim() || '';
+      const password = document.getElementById('auth-register-password')?.value || '';
+      const passwordConfirm = document.getElementById('auth-register-password-confirm')?.value || '';
+      if (!email) {
+        window.alert('请输入邮箱地址');
+        return;
+      }
+      if (password.length < 6) {
+        window.alert('密码至少需要 6 位');
+        return;
+      }
+      if (password !== passwordConfirm) {
+        window.alert('两次输入的密码不一致');
+        return;
+      }
+      const previousMode = currentAuthState.mode;
+      const res = await window.api.authRegister({ email, nickname, password });
+      if (!res?.success) {
+        window.alert(res?.error || '注册失败，请稍后重试');
+        return;
+      }
+      applyAuthStateAndRefresh(res, {
+        previousMode,
+        shouldPromptGuestMigration: true
+      });
+    });
+  }
+
+  async function initAuthState() {
+    if (!window.api?.authGetCurrentUser) {
+      openAuthGate('login');
+      return;
+    }
+    const res = await window.api.authGetCurrentUser();
+    applyAuthState(res);
+    if (currentAuthState.mode === 'guest' || currentAuthState.mode === 'account') {
+      hideAuthGate();
+    } else {
+      openAuthGate('login');
+    }
+  }
+
+  initAuthGate();
   initTheme();
   initSettingsPanel();
 
@@ -444,19 +730,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { value: '#B4BEFE', label: '雾蓝' }
   ];
   const DAILY_GRID_FILL_ORDER = [0, 3, 6, 1, 4, 7, 2, 5, 8];
-
-  function getSchoolPlanningProfile() {
-    try {
-      const raw = localStorage.getItem(SCHOOL_PLANNING_PROFILE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  function setSchoolPlanningProfile(data) {
-    localStorage.setItem(SCHOOL_PLANNING_PROFILE_KEY, JSON.stringify(data));
-  }
 
   function getTargetSchools() {
     try {
@@ -547,6 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (overlay?.classList.contains('active')) closeSchoolDetail();
         navigateTo(pageId);
+        if (pageId === 'school-planning') syncSchoolPlanningIdentityState();
         if (pageId === 'university-explorer') loadSchoolListExplorer();
         if (pageId === 'target-universities') loadSchoolListTarget();
         if (pageId === 'my-profile') loadMyProfile();
@@ -1093,6 +1367,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }
 
+  function syncSchoolPlanningIdentityState() {
+    const currentProfile = getSchoolPlanningProfile();
+    setSchoolPlanningView(!!currentProfile);
+  }
+
+  function updateCommunityComposerState() {
+    const authTip = document.getElementById('community-board-auth-tip');
+    const newPostBtn = document.getElementById('community-new-post-btn');
+    const replyBtn = document.getElementById('community-open-reply-btn');
+    const postCurrentUser = document.getElementById('community-post-current-user');
+    const replyCurrentUser = document.getElementById('community-reply-current-user');
+    const userText = isAccountMode()
+      ? `当前发布身份：${getCurrentUserDisplayName()}`
+      : '游客模式下仅可浏览，登录后可发帖和回复';
+
+    if (authTip) {
+      authTip.textContent = isAccountMode()
+        ? `当前社区身份：${getCurrentUserDisplayName()}`
+        : '游客模式下可浏览社区内容，但不能发帖、回复或删除内容。';
+    }
+    if (newPostBtn) {
+      newPostBtn.textContent = isAccountMode() ? '新建帖子' : '登录后发帖';
+    }
+    if (replyBtn) {
+      replyBtn.textContent = isAccountMode() ? '回复评论' : '登录后回复';
+    }
+    if (postCurrentUser) postCurrentUser.textContent = userText;
+    if (replyCurrentUser) replyCurrentUser.textContent = userText;
+  }
+
+  function refreshAuthBoundUI() {
+    updateSettingsAccountState();
+    updateCommunityComposerState();
+    syncSchoolPlanningIdentityState();
+    const activePage = document.querySelector('.page.active');
+    if (activePage?.id === 'page-my-profile') {
+      loadMyProfile();
+    }
+    if (activePage?.id === 'page-community-messages') {
+      initCommunityMessagesPage();
+      if (communityDetailPostId) {
+        loadCommunityDetail(communityDetailPostId);
+      }
+    }
+  }
+
   document.getElementById('my-profile-go-planning')?.addEventListener('click', () => navigateTo('school-planning'));
 
   function setSchoolPlanningView(showThanks) {
@@ -1135,17 +1455,20 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeCommunityPostModal() {
     const modal = document.getElementById('community-post-modal');
     const titleInput = document.getElementById('community-post-title-input');
-    const authorInput = document.getElementById('community-post-author-input');
     const contentInput = document.getElementById('community-post-content-input');
-    if (!modal || !titleInput || !authorInput || !contentInput) return;
+    if (!modal || !titleInput || !contentInput) return;
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     titleInput.value = '';
-    authorInput.value = '';
     contentInput.value = '';
   }
 
   function openCommunityPostModal() {
+    if (!isAccountMode()) {
+      window.alert('游客模式下暂不支持发帖，请先登录或注册账号。');
+      openAuthGate('login', '登录后即可绑定社区身份并发布帖子。');
+      return;
+    }
     const modal = document.getElementById('community-post-modal');
     const titleInput = document.getElementById('community-post-title-input');
     if (!modal || !titleInput) return;
@@ -1172,34 +1495,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeCommunityReplySheet() {
     const sheet = document.getElementById('community-reply-sheet');
-    const authorInput = document.getElementById('community-reply-author-input');
     const contentInput = document.getElementById('community-reply-content-input');
     const targetTextEl = document.getElementById('community-reply-target-text');
-    if (!sheet || !authorInput || !contentInput || !targetTextEl) return;
+    if (!sheet || !contentInput || !targetTextEl) return;
     sheet.classList.remove('active');
     sheet.setAttribute('aria-hidden', 'true');
-    authorInput.value = '';
     contentInput.value = '';
     communityReplyTarget = null;
     targetTextEl.textContent = '回复对象：楼主';
   }
 
   function openCommunityReplySheet(targetReply = null) {
+    if (!isAccountMode()) {
+      window.alert('游客模式下暂不支持回复，请先登录或注册账号。');
+      openAuthGate('login', '登录后即可绑定社区身份并参与讨论。');
+      return;
+    }
     const sheet = document.getElementById('community-reply-sheet');
-    const authorInput = document.getElementById('community-reply-author-input');
     const contentInput = document.getElementById('community-reply-content-input');
     const targetTextEl = document.getElementById('community-reply-target-text');
-    if (!sheet || !authorInput || !contentInput || !targetTextEl || !communityDetailPostId) return;
+    if (!sheet || !contentInput || !targetTextEl || !communityDetailPostId) return;
     communityReplyTarget = targetReply && targetReply.replyId ? targetReply : null;
     targetTextEl.textContent = communityReplyTarget
       ? `回复对象：${communityReplyTarget.authorName || '匿名用户'}`
       : '回复对象：楼主';
     sheet.classList.add('active');
     sheet.setAttribute('aria-hidden', 'false');
-    setTimeout(() => {
-      const hasAuthor = authorInput.value.trim().length > 0;
-      (hasAuthor ? contentInput : authorInput).focus();
-    }, 0);
+    setTimeout(() => contentInput.focus(), 0);
   }
 
   function renderCommunityPagination() {
@@ -1251,7 +1573,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const metaEl = document.getElementById('community-detail-meta');
     const contentEl = document.getElementById('community-detail-content');
     const repliesEl = document.getElementById('community-replies-list');
-    if (!titleEl || !metaEl || !contentEl || !repliesEl) return;
+    const deletePostBtn = document.getElementById('community-delete-post-btn');
+    const replyBtn = document.getElementById('community-open-reply-btn');
+    if (!titleEl || !metaEl || !contentEl || !repliesEl || !deletePostBtn || !replyBtn) return;
 
     const post = res.post;
     const replies = res.replies || [];
@@ -1259,6 +1583,8 @@ document.addEventListener('DOMContentLoaded', () => {
     titleEl.textContent = post.title || '';
     metaEl.textContent = `${post.author_name || '-'} · ${formatDateTime(post.created_at)}`;
     contentEl.textContent = post.content || '';
+    deletePostBtn.style.display = post.canDelete ? '' : 'none';
+    replyBtn.textContent = isAccountMode() ? '回复评论' : '登录后回复';
 
     if (replies.length === 0) {
       repliesEl.innerHTML = '<p class="community-reply-empty">暂无回复，来抢沙发吧~</p>';
@@ -1272,7 +1598,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span>${escapeHtml(reply.parent_author_name ? `${reply.author_name || '-'} 回复 ${reply.parent_author_name}` : (reply.author_name || '-'))} · ${escapeHtml(formatDateTime(reply.created_at))}</span>
           <div class="community-reply-actions">
             <button type="button" class="community-reply-action-btn" data-reply-id="${Number(reply.id || 0)}" data-reply-author="${escapeHtml(reply.author_name || '')}">回复TA</button>
-            <button type="button" class="community-reply-delete-btn" data-reply-id="${Number(reply.id || 0)}">删除</button>
+            ${reply.canDelete ? `<button type="button" class="community-reply-delete-btn" data-reply-id="${Number(reply.id || 0)}">删除</button>` : ''}
           </div>
         </div>
       </div>
@@ -1370,6 +1696,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function initCommunityMessagesPage() {
+    updateCommunityComposerState();
     if (!communityInitialized) {
       const newPostBtn = document.getElementById('community-new-post-btn');
       const postModal = document.getElementById('community-post-modal');
@@ -1392,12 +1719,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       postSubmitBtn?.addEventListener('click', async () => {
         const titleInput = document.getElementById('community-post-title-input');
-        const authorInput = document.getElementById('community-post-author-input');
         const contentInput = document.getElementById('community-post-content-input');
-        if (!titleInput || !authorInput || !contentInput) return;
+        if (!titleInput || !contentInput) return;
 
         const title = titleInput.value.trim();
-        const authorName = authorInput.value.trim();
         const content = contentInput.value.trim();
 
         if (!title) {
@@ -1405,19 +1730,19 @@ document.addEventListener('DOMContentLoaded', () => {
           titleInput.focus();
           return;
         }
-        if (!authorName) {
-          window.alert('请填写发帖人昵称');
-          authorInput.focus();
-          return;
-        }
         if (!content) {
           window.alert('请填写帖子内容');
           contentInput.focus();
           return;
         }
+        if (!isAccountMode()) {
+          window.alert('请先登录账号后再发帖');
+          openAuthGate('login', '登录后即可绑定社区身份并发布帖子。');
+          return;
+        }
         if (!window.api?.communityCreatePost) return;
 
-        const res = await window.api.communityCreatePost({ title, content, authorName });
+        const res = await window.api.communityCreatePost({ title, content });
         if (!res?.success) {
           window.alert(res?.error || '发帖失败，请稍后再试');
           return;
@@ -1454,27 +1779,24 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       replySubmitBtn?.addEventListener('click', async () => {
-        const authorInput = document.getElementById('community-reply-author-input');
         const contentInput = document.getElementById('community-reply-content-input');
-        if (!authorInput || !contentInput || !communityDetailPostId) return;
+        if (!contentInput || !communityDetailPostId) return;
 
-        const authorName = authorInput.value.trim();
         const content = contentInput.value.trim();
-        if (!authorName) {
-          window.alert('请填写回复人昵称');
-          authorInput.focus();
-          return;
-        }
         if (!content) {
           window.alert('请填写回复内容');
           contentInput.focus();
+          return;
+        }
+        if (!isAccountMode()) {
+          window.alert('请先登录账号后再回复');
+          openAuthGate('login', '登录后即可绑定社区身份并参与讨论。');
           return;
         }
         if (!window.api?.communityCreateReply) return;
 
         const res = await window.api.communityCreateReply({
           postId: communityDetailPostId,
-          authorName,
           content,
           parentReplyId: communityReplyTarget?.replyId || null
         });
@@ -2069,14 +2391,21 @@ document.addEventListener('DOMContentLoaded', () => {
     refillBtn?.addEventListener('click', () => {
       setSchoolPlanningView(false);
     });
+
+    syncSchoolPlanningIdentityState();
   }
 
   initSchoolPlanningForm();
 
-  // 初始化：进入院校大全或目标院校时加载
-  const activePage = document.querySelector('.page.active');
-  if (activePage?.id === 'page-university-explorer') loadSchoolListExplorer();
-  if (activePage?.id === 'page-target-universities') loadSchoolListTarget();
-  if (activePage?.id === 'page-daily-checkin') initDailyCheckinPage();
-  if (activePage?.id === 'page-community-messages') initCommunityMessagesPage();
+  initAuthState().then(() => {
+    refreshAuthBoundUI();
+    const activePage = document.querySelector('.page.active');
+    if (activePage?.id === 'page-university-explorer') loadSchoolListExplorer();
+    if (activePage?.id === 'page-target-universities') loadSchoolListTarget();
+    if (activePage?.id === 'page-daily-checkin') initDailyCheckinPage();
+    if (activePage?.id === 'page-community-messages') initCommunityMessagesPage();
+  }).catch((err) => {
+    console.error('initAuthState:', err);
+    openAuthGate('login', '账号状态初始化失败，请重新登录。');
+  });
 });
