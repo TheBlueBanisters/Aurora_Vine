@@ -204,6 +204,13 @@
             </svg>
             <span>设置</span>
           </a>
+          <a class="nav-item" data-page="usage-guide" id="nav-item-usage-guide">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <span>使用指南</span>
+          </a>
         </div>
       </nav>
     </aside>
@@ -691,6 +698,28 @@
           <div class="school-detail-lightbox" id="school-detail-lightbox">
             <button class="school-detail-lightbox-close" id="school-detail-lightbox-close">×</button>
             <img class="school-detail-lightbox-img" id="school-detail-lightbox-img" alt="">
+          </div>
+        </div>
+      </div>
+
+      <!-- 使用指南引导层 -->
+      <div class="usage-guide-overlay" id="usage-guide-overlay" aria-hidden="true" role="dialog" aria-labelledby="usage-guide-title">
+        <div class="usage-guide-backdrop"></div>
+        <div class="usage-guide-spotlight" id="usage-guide-spotlight"></div>
+        <div class="usage-guide-arrow" id="usage-guide-arrow"></div>
+        <div class="usage-guide-card" id="usage-guide-card" tabindex="-1">
+          <h3 class="usage-guide-title" id="usage-guide-title"></h3>
+          <p class="usage-guide-desc" id="usage-guide-desc"></p>
+          <div class="usage-guide-progress" id="usage-guide-progress"></div>
+          <div class="usage-guide-actions">
+            <button type="button" class="usage-guide-skip" id="usage-guide-skip">跳过指南，直接开始~</button>
+            <button type="button" class="usage-guide-btn usage-guide-prev" id="usage-guide-prev">上一步</button>
+            <button type="button" class="usage-guide-btn usage-guide-next" id="usage-guide-next">下一步</button>
+            <button type="button" class="usage-guide-btn usage-guide-done" id="usage-guide-done" style="display: none;">完成</button>
+            <label class="usage-guide-no-more" id="usage-guide-no-more-wrap" style="display: none;">
+              <input type="checkbox" id="usage-guide-no-more" checked>
+              <span>不再出现</span>
+            </label>
           </div>
         </div>
       </div>

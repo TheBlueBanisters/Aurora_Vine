@@ -3574,3 +3574,156 @@ body.school-detail-open .main-content {
 [data-theme="dark"] .notifyx:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25) !important;
 }
+
+/* ============================================
+   使用指南引导层
+   ============================================ */
+
+.usage-guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+.usage-guide-overlay.active {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.usage-guide-overlay.active .usage-guide-backdrop,
+.usage-guide-overlay.active .usage-guide-spotlight,
+.usage-guide-overlay.active .usage-guide-arrow,
+.usage-guide-overlay.active .usage-guide-card {
+  pointer-events: auto;
+}
+
+.usage-guide-backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.usage-guide-spotlight {
+  position: fixed;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  pointer-events: none;
+  transition: top 200ms ease, left 200ms ease, width 200ms ease, height 200ms ease;
+  background: transparent;
+}
+
+.usage-guide-arrow {
+  display: none;
+}
+
+.usage-guide-card {
+  position: fixed;
+  width: min(360px, calc(100vw - 48px));
+  padding: 20px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow), 0 4px 24px rgba(0, 0, 0, 0.12);
+  pointer-events: auto;
+  outline: none;
+  transition: top 200ms ease, left 200ms ease;
+}
+
+.usage-guide-card:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.usage-guide-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-text);
+  margin-bottom: 8px;
+}
+
+.usage-guide-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--content-text-secondary);
+  margin-bottom: 16px;
+}
+
+.usage-guide-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.usage-guide-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--content-border);
+  transition: background 150ms ease;
+}
+
+.usage-guide-progress-dot.is-active {
+  background: var(--accent);
+  transform: scale(1.2);
+}
+
+.usage-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.usage-guide-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--btn-primary-text);
+  background: var(--btn-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.usage-guide-btn:hover {
+  background: var(--btn-primary-hover);
+}
+
+.usage-guide-no-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--content-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.usage-guide-no-more input {
+  cursor: pointer;
+}
+
+.usage-guide-skip {
+  font-size: 13px;
+  color: var(--btn-primary);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-right: auto;
+}
+
+.usage-guide-skip:hover {
+  opacity: 0.9;
+}
