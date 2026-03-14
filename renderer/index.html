@@ -703,14 +703,20 @@
         </div>
         <div class="page-body">
           <div class="settings-layout" id="settings-layout">
-            <div class="settings-top-actions">
-              <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden>编辑</button>
-              <button class="settings-back-btn" id="settings-back-btn" type="button" hidden>返回</button>
-            </div>
             <div class="settings-main-list" id="settings-main-list">
               <div class="settings-profile-card settings-nav-item" id="settings-profile-trigger-wrap">
+                <div class="settings-profile-avatar-wrap">
+                  <div class="settings-profile-avatar" id="settings-profile-avatar" role="button" tabindex="0" aria-label="更换头像"></div>
+                  <div class="settings-profile-avatar-camera" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                      <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                  </div>
+                  <input type="file" id="settings-avatar-input" accept="image/jpeg,image/png,image/webp" hidden>
+                  <span class="settings-profile-badge settings-profile-badge--blue" id="settings-avatar-badge" aria-hidden="true">V</span>
+                </div>
                 <button class="settings-profile-card-clickable" id="settings-profile-trigger" data-settings-route="profile" type="button">
-                  <div class="settings-profile-avatar" aria-hidden="true">测</div>
                   <div class="settings-profile-meta">
                     <p class="settings-profile-name">测试用户</p>
                     <p class="settings-profile-tip">点击查看并编辑个人信息</p>
@@ -722,25 +728,17 @@
                 </div>
               </div>
 
-              <div class="settings-item-card settings-nav-item" id="settings-night-mode-item">
-                <label class="settings-item">
-                  <span class="settings-item-label">夜间模式 Night Mode</span>
-                  <span class="settings-toggle">
-                    <input type="checkbox" id="night-mode-toggle" aria-label="夜间模式">
-                  </span>
-                </label>
-              </div>
-
-              <button class="settings-item-card settings-item-button settings-nav-item" id="settings-about-trigger" data-settings-route="about" type="button">
-                <span class="settings-item-label">关于</span>
-              </button>
-            </div>
-
-            <div class="settings-subviews" id="settings-subviews">
               <section class="settings-subview" id="settings-subview-profile">
                 <div class="settings-detail-card settings-form-card">
-                  <h3 class="settings-subview-title">个人信息</h3>
+                  <div class="settings-form-card-header">
+                    <h3 class="settings-subview-title">个人信息</h3>
+                    <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden>编辑</button>
+                  </div>
                   <form class="settings-profile-form" id="settings-profile-form">
+                    <label class="settings-form-row">
+                      <span class="settings-form-label">昵称</span>
+                      <input class="settings-form-input" id="settings-profile-nickname" name="nickname" type="text" maxlength="40" placeholder="请输入昵称">
+                    </label>
                     <label class="settings-form-row">
                       <span class="settings-form-label">性别</span>
                       <input class="settings-form-input" id="settings-profile-gender" name="gender" type="text" placeholder="请输入性别">
@@ -765,6 +763,38 @@
                 </div>
               </section>
 
+              <div class="settings-item-card settings-nav-item" id="settings-night-mode-item">
+                <label class="settings-item">
+                  <span class="settings-item-label">夜间模式 Night Mode</span>
+                  <span class="settings-toggle">
+                    <input type="checkbox" id="night-mode-toggle" aria-label="夜间模式">
+                  </span>
+                </label>
+              </div>
+
+              <div class="settings-item-card settings-certify-card" id="settings-certify-item">
+                <button type="button" class="settings-certify-header" id="settings-certify-trigger">
+                  <span class="settings-item-label">账户认证 Account Verification</span>
+                  <span class="settings-certify-status" id="settings-certify-status">未认证</span>
+                </button>
+                <div class="settings-certify-body" id="settings-certify-body" hidden>
+                  <div class="settings-certify-input-row">
+                    <input id="settings-certify-code" class="settings-certify-input" type="text" placeholder="请输入邀请码" autocomplete="off">
+                    <button type="button" class="settings-certify-hint-btn" id="settings-certify-hint-btn" title="输入邀请码可认证为「认证学长/学姐」" aria-label="帮助">?</button>
+                  </div>
+                  <button id="settings-certify-submit" class="form-submit-btn settings-certify-btn" type="button">认证</button>
+                </div>
+                <div class="settings-certify-guest-hint" id="settings-certify-guest-hint" hidden>
+                  请先登录后使用认证功能
+                </div>
+              </div>
+
+              <button class="settings-item-card settings-item-button settings-nav-item" id="settings-about-trigger" data-settings-route="about" type="button">
+                <span class="settings-item-label">关于</span>
+              </button>
+            </div>
+
+            <div class="settings-subviews" id="settings-subviews">
               <section class="settings-subview" id="settings-subview-about">
                 <div class="settings-detail-card settings-info-card">
                   <div class="settings-detail-row">

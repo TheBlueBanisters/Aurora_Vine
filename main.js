@@ -1,9 +1,15 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, protocol } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { pathToFileURL } = require('url');
 const Database = require('better-sqlite3');
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'avatar', privileges: { standard: true, secure: true } }
+]);
+
+const INVITE_CODE = 'ABDAUV';
 
 const appRoot = app.getAppPath();
 const dbPath = path.join(appRoot, 'data', 'school_item.db');
@@ -118,10 +124,22 @@ function verifyPassword(password, storedPassword) {
 
 function serializeAccount(row) {
   if (!row) return null;
+  let avatar_url = null;
+  if (row.avatar_path) {
+    const userDataPath = app.getPath('userData');
+    const fullPath = path.join(userDataPath, row.avatar_path);
+    const exists = fs.existsSync(fullPath);
+    if (exists) {
+      avatar_url = `avatar://account/${row.id}`;
+    }
+  }
   return {
     id: Number(row.id),
     email: row.email,
-    nickname: row.nickname
+    nickname: row.nickname,
+    is_certified: Number(row.is_certified || 0) === 1,
+    senior_type: row.senior_type || null,
+    avatar_url
   };
 }
 
@@ -168,6 +186,18 @@ function ensureAccountTables() {
     if (!hasNickname) {
       db.exec(`ALTER TABLE accounts ADD COLUMN nickname TEXT NOT NULL DEFAULT 'Aurora用户';`);
     }
+    const hasIsCertified = accountColumns.some((col) => col.name === 'is_certified');
+    if (!hasIsCertified) {
+      db.exec(`ALTER TABLE accounts ADD COLUMN is_certified INTEGER NOT NULL DEFAULT 0;`);
+    }
+    const hasSeniorType = accountColumns.some((col) => col.name === 'senior_type');
+    if (!hasSeniorType) {
+      db.exec(`ALTER TABLE accounts ADD COLUMN senior_type TEXT;`);
+    }
+    const hasAvatarPath = accountColumns.some((col) => col.name === 'avatar_path');
+    if (!hasAvatarPath) {
+      db.exec(`ALTER TABLE accounts ADD COLUMN avatar_path TEXT;`);
+    }
   } finally {
     db.close();
   }
@@ -186,7 +216,7 @@ function getCurrentSession() {
     if (session.mode === 'guest') return { mode: 'guest', user: null };
     if (!session.account_id) return { mode: 'none', user: null };
     const user = db.prepare(`
-      SELECT id, email, nickname
+      SELECT id, email, nickname, is_certified, senior_type, avatar_path
       FROM accounts
       WHERE id = ?
     `).get(session.account_id);
@@ -450,6 +480,146 @@ ipcMain.handle('auth:logout', async () => {
   }
 });
 
+ipcMain.handle('auth:updateNickname', async (event, nickname) => {
+  const session = requireAccountSession();
+  if (session.error) return { success: false, error: session.error };
+  const normalized = normalizeNickname(nickname, session.user?.email || '');
+  if (!normalized) return { success: false, error: '昵称不能为空，长度需为 1 到 40 个字符' };
+
+  try {
+    const db = getWritableDb();
+    db.prepare(`
+      UPDATE accounts
+      SET nickname = ?, updated_at = datetime('now', 'localtime')
+      WHERE id = ?
+    `).run(normalized, session.user.id);
+    db.close();
+    return { success: true };
+  } catch (err) {
+    console.error('auth:updateNickname error:', err);
+    return { success: false, error: err.message || '更新昵称失败' };
+  }
+});
+
+ipcMain.handle('auth:certify', async (event, payload = {}) => {
+  const session = requireAccountSession();
+  if (session.error) return { success: false, error: session.error };
+
+  const inviteCode = String(payload?.inviteCode ?? '').trim();
+  const gender = String(payload?.gender ?? '').trim();
+  if (!inviteCode) return { success: false, error: '请输入邀请码' };
+  if (inviteCode.toUpperCase() !== INVITE_CODE.toUpperCase()) {
+    return { success: false, error: '邀请码错误' };
+  }
+
+  const seniorType = /女/.test(gender) ? '学姐' : '学长';
+
+  try {
+    const db = getWritableDb();
+    db.prepare(`
+      UPDATE accounts
+      SET is_certified = 1, senior_type = ?, updated_at = datetime('now', 'localtime')
+      WHERE id = ?
+    `).run(seniorType, session.user.id);
+    db.close();
+    const updatedSession = getCurrentSession();
+    return { success: true, ...buildAuthResponse(updatedSession) };
+  } catch (err) {
+    console.error('auth:certify error:', err);
+    return { success: false, error: err.message || '认证失败' };
+  }
+});
+
+const AVATAR_MAX_BYTES = 512 * 1024; // 500KB
+const AVATAR_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+function resolveAvatarUrl(authorId, avatarPath) {
+  if (!authorId || !avatarPath || typeof avatarPath !== 'string') return null;
+  const userDataPath = app.getPath('userData');
+  const fullPath = path.join(userDataPath, avatarPath.trim());
+  if (!fs.existsSync(fullPath)) return null;
+  return `avatar://account/${authorId}`;
+}
+
+ipcMain.handle('auth:uploadAvatar', async (event, base64DataUrl) => {
+  const session = requireAccountSession();
+  if (session.error) return { success: false, error: session.error };
+
+  const raw = String(base64DataUrl ?? '').trim();
+  const m = raw.match(/^data:(image\/[a-z]+);base64,(.+)$/i);
+  if (!m) return { success: false, error: '图片格式不正确，请上传 JPEG、PNG 或 WebP 格式' };
+  const mime = m[1].toLowerCase();
+  const b64 = m[2];
+  if (!AVATAR_ALLOWED_TYPES.includes(mime)) {
+    return { success: false, error: '仅支持 JPEG、PNG、WebP 格式' };
+  }
+
+  let buffer;
+  try {
+    buffer = Buffer.from(b64, 'base64');
+  } catch {
+    return { success: false, error: '图片数据无效' };
+  }
+  if (buffer.length > AVATAR_MAX_BYTES) {
+    return { success: false, error: '图片过大，请选择 500KB 以内的图片' };
+  }
+
+  const accountId = Number(session.user.id);
+  const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/png' ? 'png' : 'webp';
+  const avatarsDir = path.join(app.getPath('userData'), 'avatars');
+  const relativePath = `avatars/${accountId}.${ext}`;
+  const fullPath = path.join(avatarsDir, `${accountId}.${ext}`);
+
+  try {
+    if (!fs.existsSync(avatarsDir)) fs.mkdirSync(avatarsDir, { recursive: true });
+
+    ensureAccountTables();
+    const db = getWritableDb();
+    const row = db.prepare('SELECT avatar_path FROM accounts WHERE id = ?').get(accountId);
+    const oldPath = row?.avatar_path ? path.join(app.getPath('userData'), row.avatar_path) : null;
+    if (oldPath && oldPath !== fullPath && fs.existsSync(oldPath)) {
+      try { fs.unlinkSync(oldPath); } catch {}
+    }
+
+    fs.writeFileSync(fullPath, buffer, { flag: 'w' });
+    db.prepare(`
+      UPDATE accounts SET avatar_path = ?, updated_at = datetime('now', 'localtime') WHERE id = ?
+    `).run(relativePath, accountId);
+    db.close();
+
+    return { success: true };
+  } catch (err) {
+    console.error('auth:uploadAvatar error:', err);
+    return { success: false, error: err.message || '头像上传失败' };
+  }
+});
+
+function getAvatarDataUrlForAccount(accountId) {
+  const aid = normalizePositiveInt(accountId);
+  if (!aid) return null;
+  const db = getReadOnlyDb();
+  if (!db) return null;
+  try {
+    const row = db.prepare('SELECT avatar_path FROM accounts WHERE id = ?').get(aid);
+    const fullPath = row?.avatar_path ? path.join(app.getPath('userData'), row.avatar_path) : null;
+    const exists = fullPath ? fs.existsSync(fullPath) : false;
+    const result = row?.avatar_path && exists ? (() => {
+      const buf = fs.readFileSync(fullPath);
+      const ext = path.extname(fullPath).slice(1).toLowerCase();
+      const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : ext === 'png' ? 'image/png' : 'image/webp';
+      return `data:${mime};base64,${buf.toString('base64')}`;
+    })() : null;
+    return result;
+  } finally {
+    db.close();
+  }
+}
+
+ipcMain.handle('avatar:getDataUrl', async (event, accountId) => {
+  const dataUrl = getAvatarDataUrlForAccount(accountId);
+  return { dataUrl };
+});
+
 // IPC: 分页查询院校列表
 ipcMain.handle('schools:list', async (event, page = 1, pageSize = 10) => {
   const db = getReadOnlyDb();
@@ -615,9 +785,13 @@ ipcMain.handle('community:listPosts', async (event, page = 1, pageSize = 10) => 
         p.author_name,
         p.author_id,
         p.created_at,
-        COUNT(r.id) AS reply_count
+        COUNT(r.id) AS reply_count,
+        MAX(a.is_certified) AS author_is_certified,
+        MAX(a.senior_type) AS author_senior_type,
+        MAX(a.avatar_path) AS author_avatar_path
       FROM community_posts p
       LEFT JOIN community_replies r ON r.post_id = p.id
+      LEFT JOIN accounts a ON a.id = p.author_id
       GROUP BY p.id
       ORDER BY p.created_at DESC, p.id DESC
       LIMIT ? OFFSET ?
@@ -626,6 +800,9 @@ ipcMain.handle('community:listPosts', async (event, page = 1, pageSize = 10) => 
 
     const items = listStmt.all(normalizedSize, offset).map((item) => ({
       ...item,
+      author_is_certified: Number(item.author_is_certified || 0) === 1,
+      author_senior_type: item.author_senior_type || null,
+      author_avatar_url: resolveAvatarUrl(item.author_id, item.author_avatar_path) || null,
       canDelete: !!(currentAccountId && item.author_id && Number(item.author_id) === currentAccountId)
     }));
     const countRow = countStmt.get();
@@ -649,9 +826,13 @@ ipcMain.handle('community:getPostDetail', async (event, postId) => {
     if (!db) return { post: null, replies: [], error: '数据库文件不存在' };
 
     const postStmt = db.prepare(`
-      SELECT id, title, content, author_name, author_id, created_at
-      FROM community_posts
-      WHERE id = ?
+      SELECT p.id, p.title, p.content, p.author_name, p.author_id, p.created_at,
+        a.is_certified AS author_is_certified,
+        a.senior_type AS author_senior_type,
+        a.avatar_path AS author_avatar_path
+      FROM community_posts p
+      LEFT JOIN accounts a ON a.id = p.author_id
+      WHERE p.id = ?
     `);
     const repliesStmt = db.prepare(`
       SELECT
@@ -662,9 +843,13 @@ ipcMain.handle('community:getPostDetail', async (event, postId) => {
         r.author_id,
         r.parent_reply_id,
         pr.author_name AS parent_author_name,
-        r.created_at
+        r.created_at,
+        a.is_certified AS author_is_certified,
+        a.senior_type AS author_senior_type,
+        a.avatar_path AS author_avatar_path
       FROM community_replies r
       LEFT JOIN community_replies pr ON pr.id = r.parent_reply_id
+      LEFT JOIN accounts a ON a.id = r.author_id
       WHERE r.post_id = ?
       ORDER BY r.created_at ASC, r.id ASC
     `);
@@ -673,12 +858,18 @@ ipcMain.handle('community:getPostDetail', async (event, postId) => {
     const post = rawPost
       ? {
           ...rawPost,
+          author_is_certified: Number(rawPost.author_is_certified || 0) === 1,
+          author_senior_type: rawPost.author_senior_type || null,
+          author_avatar_url: resolveAvatarUrl(rawPost.author_id, rawPost.author_avatar_path) || null,
           canDelete: !!(currentAccountId && rawPost.author_id && Number(rawPost.author_id) === currentAccountId)
         }
       : null;
     const replies = post
       ? repliesStmt.all(normalizedPostId).map((reply) => ({
           ...reply,
+          author_is_certified: Number(reply.author_is_certified || 0) === 1,
+          author_senior_type: reply.author_senior_type || null,
+          author_avatar_url: resolveAvatarUrl(reply.author_id, reply.author_avatar_path) || null,
           canDelete: !!(currentAccountId && reply.author_id && Number(reply.author_id) === currentAccountId)
         }))
       : [];
@@ -856,6 +1047,27 @@ app.whenReady()
     ensureAccountTables();
     ensureDailyCheckinTable();
     ensureCommunityTables();
+
+    protocol.handle('avatar', (request) => {
+      const url = new URL(request.url);
+      const accountId = url.pathname.replace(/^\/+/, '').split('/')[0];
+      if (!/^\d+$/.test(accountId)) return new Response('', { status: 400 });
+      const db = getReadOnlyDb();
+      if (!db) return new Response('', { status: 404 });
+      try {
+        const row = db.prepare('SELECT avatar_path FROM accounts WHERE id = ?').get(accountId);
+        if (!row?.avatar_path) return new Response('', { status: 404 });
+        const fullPath = path.join(app.getPath('userData'), row.avatar_path);
+        if (!fs.existsSync(fullPath)) return new Response('', { status: 404 });
+        const buf = fs.readFileSync(fullPath);
+        const ext = path.extname(fullPath).slice(1).toLowerCase();
+        const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : ext === 'png' ? 'image/png' : 'image/webp';
+        return new Response(buf, { headers: { 'Content-Type': mime } });
+      } finally {
+        db.close();
+      }
+    });
+
     createWindow();
   })
   .catch((err) => {

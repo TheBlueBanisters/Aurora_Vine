@@ -11,6 +11,14 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('auth:login', payload),
   authLogout: () =>
     ipcRenderer.invoke('auth:logout'),
+  authUpdateNickname: (nickname) =>
+    ipcRenderer.invoke('auth:updateNickname', nickname),
+  authCertify: (payload) =>
+    ipcRenderer.invoke('auth:certify', payload),
+  authUploadAvatar: (base64DataUrl) =>
+    ipcRenderer.invoke('auth:uploadAvatar', base64DataUrl),
+  avatarGetDataUrl: (accountId) =>
+    ipcRenderer.invoke('avatar:getDataUrl', accountId),
   schoolsList: (page = 1, pageSize = 10) =>
     ipcRenderer.invoke('schools:list', page, pageSize),
   schoolsGetById: (schoolId) =>

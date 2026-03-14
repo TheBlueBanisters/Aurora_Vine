@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const THEME_KEY = 'theme';
   const SETTINGS_PROFILE_KEY = 'settingsProfileInfo';
   const SETTINGS_DEFAULT_PROFILE = {
+    nickname: '未设置',
     gender: '未公开',
     phone: '未公开',
     email: '未公开',
@@ -375,6 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!raw) return { ...SETTINGS_DEFAULT_PROFILE };
       const parsed = JSON.parse(raw);
       return {
+        nickname: parsed.nickname || SETTINGS_DEFAULT_PROFILE.nickname,
         gender: parsed.gender || SETTINGS_DEFAULT_PROFILE.gender,
         phone: parsed.phone || SETTINGS_DEFAULT_PROFILE.phone,
         email: parsed.email || SETTINGS_DEFAULT_PROFILE.email,
@@ -389,12 +391,22 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(SETTINGS_PROFILE_KEY, JSON.stringify(profile));
   }
 
+  function updateProfileTipText(profileExpanded = false) {
+    const profileTip = document.querySelector('.settings-profile-tip');
+    if (!profileTip) return;
+    profileTip.textContent = profileExpanded
+      ? '收起'
+      : (isAccountMode()
+        ? '点击查看个人资料'
+        : '当前身份可继续浏览，登录后将绑定到账号');
+  }
+
   function updateSettingsAccountState() {
     const primaryBtn = document.getElementById('settings-account-primary-btn');
     const logoutBtn = document.getElementById('settings-account-logout-btn');
-    const profileAvatar = document.querySelector('.settings-profile-avatar');
+    const profileAvatar = document.getElementById('settings-profile-avatar');
     const profileName = document.querySelector('.settings-profile-name');
-    const profileTip = document.querySelector('.settings-profile-tip');
+    const avatarWrap = document.querySelector('.settings-profile-avatar-wrap');
 
     if (primaryBtn) {
       primaryBtn.textContent = isAccountMode() ? '切换账号' : '登录 / 注册';
@@ -403,20 +415,82 @@ document.addEventListener('DOMContentLoaded', () => {
       logoutBtn.hidden = !isAccountMode();
     }
     if (profileAvatar) {
-      profileAvatar.textContent = getCurrentUserDisplayName().slice(0, 1) || 'A';
+      const initial = getCurrentUserDisplayName().slice(0, 1) || 'A';
+      const hasAvatar = isAccountMode() && currentAuthState.user?.avatar_url;
+      const accountId = isAccountMode() ? currentAuthState.user?.id : null;
+      profileAvatar.innerHTML = '';
+      if (hasAvatar && accountId && window.api?.avatarGetDataUrl) {
+        const img = document.createElement('img');
+        img.alt = '';
+        profileAvatar.appendChild(img);
+        window.api.avatarGetDataUrl(accountId).then((res) => {
+          if (res?.dataUrl && img.parentNode) img.src = res.dataUrl;
+          else if (img.parentNode) {
+            profileAvatar.innerHTML = '';
+            profileAvatar.textContent = initial;
+          }
+        }).catch((err) => {
+          if (profileAvatar.contains(img)) {
+            profileAvatar.innerHTML = '';
+            profileAvatar.textContent = initial;
+          }
+        });
+      } else {
+        profileAvatar.textContent = initial;
+      }
+    }
+    if (avatarWrap) {
+      avatarWrap.classList.toggle('avatar-readonly', !isAccountMode());
     }
     if (profileName) {
       profileName.textContent = getCurrentUserDisplayName();
     }
-    if (profileTip) {
-      profileTip.textContent = isAccountMode()
-        ? '点击查看并编辑个人资料'
-        : '当前身份可继续浏览，登录后将绑定到账号';
+    updateProfileTipText(false);
+    updateSettingsCertifyState();
+    updateSettingsAvatarBadge();
+  }
+
+  function updateSettingsCertifyState() {
+    const certifyBody = document.getElementById('settings-certify-body');
+    const certifyGuestHint = document.getElementById('settings-certify-guest-hint');
+    const certifyStatus = document.getElementById('settings-certify-status');
+    const codeInput = document.getElementById('settings-certify-code');
+    const certifyTrigger = document.getElementById('settings-certify-trigger');
+    if (!certifyBody || !certifyGuestHint || !certifyStatus) return;
+
+    if (!isAccountMode()) {
+      certifyGuestHint.hidden = false;
+      certifyBody.hidden = true;
+      certifyStatus.textContent = '-';
+      if (certifyTrigger) certifyTrigger.disabled = true;
+      if (codeInput) codeInput.value = '';
+      return;
     }
+    certifyGuestHint.hidden = true;
+    if (certifyTrigger) certifyTrigger.disabled = false;
+    const isCertified = !!currentAuthState.user?.is_certified;
+    if (isCertified) {
+      certifyBody.hidden = true;
+      certifyStatus.textContent = '已认证';
+    } else {
+      certifyBody.hidden = true;
+      certifyStatus.textContent = '未认证';
+      if (codeInput) codeInput.value = '';
+    }
+  }
+
+  function updateSettingsAvatarBadge() {
+    const badge = document.getElementById('settings-avatar-badge');
+    if (!badge) return;
+    const isCertified = isAccountMode() && !!currentAuthState.user?.is_certified;
+    badge.classList.remove('settings-profile-badge--gold', 'settings-profile-badge--blue');
+    badge.classList.add(isCertified ? 'settings-profile-badge--gold' : 'settings-profile-badge--blue');
+    badge.hidden = false;
   }
 
   function populateProfileForm(profileForm, profile) {
     if (!profileForm) return;
+    profileForm.elements.nickname.value = profile.nickname ?? '';
     profileForm.elements.gender.value = profile.gender;
     profileForm.elements.phone.value = profile.phone;
     profileForm.elements.email.value = profile.email;
@@ -430,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return nextValue || fallback;
     };
     return {
+      nickname: normalize(profileForm.elements.nickname?.value, SETTINGS_DEFAULT_PROFILE.nickname),
       gender: normalize(profileForm.elements.gender.value, SETTINGS_DEFAULT_PROFILE.gender),
       phone: normalize(profileForm.elements.phone.value, SETTINGS_DEFAULT_PROFILE.phone),
       email: normalize(profileForm.elements.email.value, SETTINGS_DEFAULT_PROFILE.email),
@@ -441,7 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const {
       layout,
       mainList,
-      backBtn,
       editBtn,
       profileTrigger,
       aboutTrigger,
@@ -452,12 +526,10 @@ document.addEventListener('DOMContentLoaded', () => {
       cancelBtn
     } = settingsNodes;
 
-    if (!layout || !mainList || !backBtn || !editBtn || !profileTrigger || !aboutTrigger || !profileView || !aboutView) {
+    if (!layout || !mainList || !editBtn || !profileTrigger || !aboutTrigger || !profileView || !aboutView) {
       return;
     }
 
-    const profileWrap = document.getElementById('settings-profile-trigger-wrap') || profileTrigger;
-    const navItems = [profileWrap, document.getElementById('settings-night-mode-item'), aboutTrigger].filter(Boolean);
     const subviews = {
       profile: profileView,
       about: aboutView
@@ -472,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setProfileEditable(editable) {
       profileEditable = editable;
       if (!profileForm) return;
-      ['gender', 'phone', 'email', 'region'].forEach((field) => {
+      ['nickname', 'gender', 'phone', 'email', 'region'].forEach((field) => {
         if (profileForm.elements[field]) {
           profileForm.elements[field].disabled = !editable;
         }
@@ -496,51 +568,18 @@ document.addEventListener('DOMContentLoaded', () => {
       button.hidden = true;
     }
 
-    function setFadeState(selected) {
-      mainList.classList.add('is-fading');
-      navItems.forEach(item => {
-        item.classList.remove('is-selected', 'is-fading-out', 'is-collapsed');
-        if (item === selected) return;
-        item.classList.add('is-fading-out');
-      });
-    }
-
-    function collapseOthers(selected) {
-      navItems.forEach(item => {
-        if (item === selected) return;
-        item.classList.add('is-collapsed');
-      });
-    }
-
-    function expandAllItems() {
-      navItems.forEach(item => item.classList.remove('is-collapsed'));
-    }
-
-    function clearFadeState() {
-      mainList.classList.remove('is-fading', 'is-focused');
-      navItems.forEach(item => item.classList.remove('is-selected', 'is-fading-out', 'is-collapsed'));
-    }
-
-    async function openSubView(route, selected) {
-      if (transitioning || currentRoute !== 'main') return;
+    async function openSubView(route) {
+      if (transitioning) return;
+      if (currentRoute === route) {
+        closeSubView();
+        return;
+      }
+      if (currentRoute !== 'main') {
+        closeSubView();
+        await waitMs(SETTINGS_ANIMATION.revealSubview);
+      }
       transitioning = true;
       layout.classList.add('is-transitioning');
-
-      setFadeState(selected);
-      await waitMs(SETTINGS_ANIMATION.fadeOut);
-
-      if (route === 'about') {
-        await animateItemMoveByLayout(selected, () => {
-          selected.classList.add('is-selected');
-          mainList.classList.add('is-focused');
-          collapseOthers(selected);
-        }, SETTINGS_ANIMATION.aboutMoveAndCollapse);
-      } else {
-        selected.classList.add('is-selected');
-        mainList.classList.add('is-focused');
-        collapseOthers(selected);
-        await waitMs(SETTINGS_ANIMATION.moveAndCollapse);
-      }
 
       const targetView = subviews[route];
       if (targetView) {
@@ -552,18 +591,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (route === 'profile') {
         const profileToShow = getProfileInfo();
-        if (isAccountMode() && currentAuthState.user?.email) {
-          profileToShow.email = currentAuthState.user.email;
+        if (isAccountMode() && currentAuthState.user) {
+          if (currentAuthState.user.email) profileToShow.email = currentAuthState.user.email;
+          if (currentAuthState.user.nickname) profileToShow.nickname = currentAuthState.user.nickname;
         }
         populateProfileForm(profileForm, profileToShow);
         setProfileEditable(false);
         showActionButton(editBtn);
+        updateProfileTipText(true);
       } else {
         editBtn.classList.remove('is-visible');
         editBtn.hidden = true;
+        updateProfileTipText(false);
       }
-      showActionButton(backBtn);
-      await waitMs(SETTINGS_ANIMATION.showTopActions);
 
       currentRoute = route;
       layout.classList.remove('is-transitioning');
@@ -579,8 +619,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await hideActionButton(editBtn);
         setProfileEditable(false);
         populateProfileForm(profileForm, getProfileInfo());
+        updateProfileTipText(false);
       }
-      await hideActionButton(backBtn);
 
       const activeView = subviews[currentRoute];
       if (activeView) {
@@ -589,51 +629,55 @@ document.addEventListener('DOMContentLoaded', () => {
         activeView.classList.remove('is-visible');
       }
 
-      if (currentRoute === 'about') {
-        await animateItemMoveByLayout(aboutTrigger, () => {
-          mainList.classList.remove('is-focused');
-          expandAllItems();
-        }, SETTINGS_ANIMATION.aboutMoveAndCollapse);
-      } else {
-        mainList.classList.remove('is-focused');
-        expandAllItems();
-        await waitMs(SETTINGS_ANIMATION.moveAndCollapse);
-      }
-      clearFadeState();
-
       currentRoute = 'main';
       layout.classList.remove('is-transitioning');
       transitioning = false;
     }
 
     profileTrigger.addEventListener('click', () => {
-      openSubView('profile', profileWrap);
+      openSubView('profile');
     });
     aboutTrigger.addEventListener('click', () => {
-      openSubView('about', aboutTrigger);
+      openSubView('about');
     });
-    backBtn.addEventListener('click', closeSubView);
     editBtn.addEventListener('click', () => {
       if (currentRoute !== 'profile') return;
       if (profileEditable) return;
       setProfileEditable(true);
-      if (profileForm?.elements.gender) {
+      if (profileForm?.elements.nickname) {
+        profileForm.elements.nickname.focus();
+      } else if (profileForm?.elements.gender) {
         profileForm.elements.gender.focus();
       }
     });
     cancelBtn?.addEventListener('click', () => {
       if (currentRoute !== 'profile') return;
       setProfileEditable(false);
-      populateProfileForm(profileForm, getProfileInfo());
+      const profileToShow = getProfileInfo();
+      if (isAccountMode() && currentAuthState.user) {
+        if (currentAuthState.user.email) profileToShow.email = currentAuthState.user.email;
+        if (currentAuthState.user.nickname) profileToShow.nickname = currentAuthState.user.nickname;
+      }
+      populateProfileForm(profileForm, profileToShow);
     });
 
-    profileForm?.addEventListener('submit', (event) => {
+    profileForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!profileEditable) return;
       const latestProfile = collectProfileForm(profileForm);
+      if (isAccountMode() && latestProfile.nickname && window.api?.authUpdateNickname) {
+        const res = await window.api.authUpdateNickname(latestProfile.nickname);
+        if (!res?.success) {
+          showToast(res?.error || '更新昵称失败，请稍后重试', 'error');
+          return;
+        }
+        const authRes = await window.api.authGetCurrentUser();
+        if (authRes) applyAuthState(authRes);
+      }
       setProfileInfo(latestProfile);
       populateProfileForm(profileForm, latestProfile);
       setProfileEditable(false);
+      refreshAuthBoundUI();
     });
   }
 
@@ -641,7 +685,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSettingsPanel({
       layout: document.getElementById('settings-layout'),
       mainList: document.getElementById('settings-main-list'),
-      backBtn: document.getElementById('settings-back-btn'),
       editBtn: document.getElementById('settings-edit-btn'),
       profileTrigger: document.getElementById('settings-profile-trigger'),
       aboutTrigger: document.getElementById('settings-about-trigger'),
@@ -667,6 +710,85 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode, successToast: '已退出登录' });
     });
+
+    const profileAvatar = document.getElementById('settings-profile-avatar');
+    const avatarInput = document.getElementById('settings-avatar-input');
+    profileAvatar?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isAccountMode() || !avatarInput) return;
+      avatarInput.click();
+    });
+    avatarInput?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file || !window.api?.authUploadAvatar) return;
+      if (!file.type.match(/^image\/(jpeg|png|webp)$/i)) {
+        showToast('仅支持 JPEG、PNG、WebP 格式', 'warning');
+        return;
+      }
+      if (file.size > 512 * 1024) {
+        showToast('图片过大，请选择 500KB 以内的图片', 'warning');
+        return;
+      }
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64 = reader.result;
+          if (typeof base64 !== 'string') {
+            showToast('图片读取失败', 'error');
+            resolve();
+            return;
+          }
+          const res = await window.api.authUploadAvatar(base64);
+          if (!res?.success) {
+            showToast(res?.error || '头像上传失败', 'error');
+          } else {
+            const authRes = await window.api.authGetCurrentUser();
+            if (authRes) applyAuthState(authRes);
+            updateSettingsAccountState();
+            showToast('头像已更新', 'success');
+          }
+          resolve();
+        };
+        reader.onerror = () => {
+          showToast('图片读取失败', 'error');
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const certifyTrigger = document.getElementById('settings-certify-trigger');
+    const certifyBody = document.getElementById('settings-certify-body');
+    certifyTrigger?.addEventListener('click', () => {
+      if (!certifyBody || certifyTrigger.disabled) return;
+      if (!isAccountMode()) return;
+      const isCertified = !!currentAuthState.user?.is_certified;
+      if (isCertified) return;
+      certifyBody.hidden = !certifyBody.hidden;
+    });
+
+    const certifySubmit = document.getElementById('settings-certify-submit');
+    const certifyCodeInput = document.getElementById('settings-certify-code');
+    certifySubmit?.addEventListener('click', async () => {
+      if (!window.api?.authCertify) return;
+      const inviteCode = certifyCodeInput?.value?.trim() || '';
+      if (!inviteCode) {
+        showToast('请输入邀请码', 'warning');
+        return;
+      }
+      const gender = getProfileInfo().gender || '';
+      const res = await window.api.authCertify({ inviteCode, gender });
+      if (!res?.success) {
+        showToast(res?.error || '认证失败', 'error');
+        return;
+      }
+      applyAuthState(res);
+      updateSettingsCertifyState();
+      updateSettingsAvatarBadge();
+      showToast('认证成功', 'success');
+    });
+
     updateSettingsAccountState();
   }
 
@@ -1002,6 +1124,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const e = en ? escapeHtml(en) : '';
     if (z && e) return z + ' / ' + e;
     return z || e || '-';
+  }
+
+  function renderAuthorWithBadgeAndAvatar(authorName, isCertified, authorId, hasAvatar) {
+    const name = escapeHtml(authorName || '-');
+    const badgeClass = isCertified ? 'community-author-badge--gold' : 'community-author-badge--blue';
+    const avatarHtml = hasAvatar && authorId
+      ? `<img class="community-author-avatar" data-account-id="${escapeHtml(String(authorId))}" alt="" loading="lazy">`
+      : '';
+    return `${avatarHtml}<span>${name}</span><span class="community-author-badge ${badgeClass}">V</span>`;
+  }
+
+  async function fillCommunityAvatarImages(container) {
+    if (!container || !window.api?.avatarGetDataUrl) return;
+    const imgs = container.querySelectorAll('.community-author-avatar[data-account-id]');
+    for (const img of imgs) {
+      const id = img.getAttribute('data-account-id');
+      if (!id) continue;
+      try {
+        const res = await window.api.avatarGetDataUrl(Number(id));
+        if (res?.dataUrl && img.getAttribute('data-account-id') === id) {
+          img.src = res.dataUrl;
+          img.removeAttribute('data-account-id');
+        }
+      } catch (_) {}
+    }
   }
 
   // ---------- 院校大全列表（分页） ----------
@@ -1656,28 +1803,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const replies = res.replies || [];
 
     titleEl.textContent = post.title || '';
-    metaEl.textContent = `${post.author_name || '-'} · ${formatDateTime(post.created_at)}`;
+    const postAuthorHtml = renderAuthorWithBadgeAndAvatar(post.author_name, !!post.author_is_certified, post.author_id, !!post.author_avatar_url);
+    metaEl.innerHTML = `<span class="community-detail-author">${postAuthorHtml}</span> · ${escapeHtml(formatDateTime(post.created_at))}`;
     contentEl.textContent = post.content || '';
     deletePostBtn.style.display = post.canDelete ? '' : 'none';
     replyBtn.textContent = isAccountMode() ? '评论' : '登录后回复';
 
     if (replies.length === 0) {
       repliesEl.innerHTML = '<p class="community-reply-empty">暂无回复，来抢沙发吧~</p>';
+      const detailModal = document.getElementById('community-detail-modal');
+      if (detailModal) fillCommunityAvatarImages(detailModal);
       return;
     }
 
-    repliesEl.innerHTML = replies.map((reply) => `
+    repliesEl.innerHTML = replies.map((reply) => {
+      const replyAuthorHtml = renderAuthorWithBadgeAndAvatar(reply.author_name, !!reply.author_is_certified, reply.author_id, !!reply.author_avatar_url);
+      const authorBlock = `<span class="community-detail-author">${replyAuthorHtml}</span>`;
+      const replyMetaText = reply.parent_author_name
+        ? `${authorBlock} 回复 ${escapeHtml(reply.parent_author_name)}`
+        : authorBlock;
+      return `
       <div class="community-reply-item">
         <div class="community-reply-main">${escapeHtml(reply.content || '')}</div>
         <div class="community-reply-meta">
-          <span>${escapeHtml(reply.parent_author_name ? `${reply.author_name || '-'} 回复 ${reply.parent_author_name}` : (reply.author_name || '-'))} · ${escapeHtml(formatDateTime(reply.created_at))}</span>
+          <span>${replyMetaText} · ${escapeHtml(formatDateTime(reply.created_at))}</span>
           <div class="community-reply-actions">
             <button type="button" class="community-reply-action-btn" data-reply-id="${Number(reply.id || 0)}" data-reply-author="${escapeHtml(reply.author_name || '')}">回复TA</button>
             ${reply.canDelete ? `<button type="button" class="community-reply-delete-btn" data-reply-id="${Number(reply.id || 0)}">删除</button>` : ''}
           </div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
+
+    const detailModal = document.getElementById('community-detail-modal');
+    if (detailModal) fillCommunityAvatarImages(detailModal);
 
     const actionBtns = repliesEl.querySelectorAll('.community-reply-action-btn');
     actionBtns.forEach((btn) => {
@@ -1752,10 +1912,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'community-post-card';
+      const authorHtml = renderAuthorWithBadgeAndAvatar(item.author_name, !!item.author_is_certified, item.author_id, !!item.author_avatar_url);
       card.innerHTML = `
         <div class="community-post-title">${escapeHtml(item.title || '')}</div>
         <div class="community-post-meta">
-          <span>${escapeHtml(item.author_name || '-')}</span>
+          <span class="community-post-author">${authorHtml}</span>
           <span>${escapeHtml(formatDateTime(item.created_at))}</span>
           <span>回复 ${Number(item.reply_count || 0)}</span>
         </div>
@@ -1768,6 +1929,7 @@ document.addEventListener('DOMContentLoaded', () => {
       listEl.appendChild(card);
     });
 
+    fillCommunityAvatarImages(listEl);
     renderCommunityPagination();
   }
 
