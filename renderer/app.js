@@ -1206,6 +1206,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (targetPage) targetPage.classList.add('active');
     if (targetNav) targetNav.classList.add('active');
+    if (pageId === 'university-explorer' || pageId === 'target-universities') {
+      resetSchoolViewScroll();
+    }
   }
 
   navItems.forEach(item => {
@@ -1312,10 +1315,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (onClick) {
       const main = card.querySelector('.school-card-main');
-      main.addEventListener('click', () => onClick(school));
+      main.addEventListener('click', () => {
+        main.blur();
+        onClick(school);
+      });
       main.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
+          main.blur();
           onClick(school);
         }
       });
@@ -1466,15 +1473,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const nameEl = document.getElementById('school-detail-name');
   const metaEl = document.getElementById('school-detail-meta');
   const introEl = document.getElementById('school-detail-intro');
+  const detailBody = overlay?.querySelector('.school-detail-body');
   const carouselTrack = document.getElementById('school-detail-carousel-track');
+
+  function resetSchoolViewScroll() {
+    const mainContent = document.querySelector('.main-content');
+    const applyReset = () => {
+      if (mainContent) mainContent.scrollTop = 0;
+      if (detailBody) detailBody.scrollTop = 0;
+    };
+
+    applyReset();
+    requestAnimationFrame(() => {
+      applyReset();
+      requestAnimationFrame(applyReset);
+    });
+  }
 
   function openSchoolDetail(school, fromPage) {
     if (fromPage) detailBackPage = fromPage;
     currentDetailSchool = school;
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) mainContent.scrollTop = 0;
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    resetSchoolViewScroll();
     overlay.classList.add('active');
     document.body.classList.add('school-detail-open');
+    requestAnimationFrame(() => {
+      resetSchoolViewScroll();
+    });
 
     titleEl.textContent = school.school_name_zh || school.school_name_en || '';
 
@@ -1598,6 +1625,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeLightbox();
     overlay.classList.remove('active');
     document.body.classList.remove('school-detail-open');
+    resetSchoolViewScroll();
     if (detailBackPage === 'university-explorer') loadSchoolListExplorer();
     if (detailBackPage === 'target-universities') loadSchoolListTarget();
   }
