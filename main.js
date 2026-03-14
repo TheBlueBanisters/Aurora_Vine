@@ -6,7 +6,8 @@ const { pathToFileURL } = require('url');
 const Database = require('better-sqlite3');
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'avatar', privileges: { standard: true, secure: true } }
+  { scheme: 'avatar', privileges: { standard: true, secure: true } },
+  { scheme: 'school', privileges: { standard: true, secure: true } }
 ]);
 
 const INVITE_CODE = 'ABDAUV';
@@ -675,8 +676,25 @@ ipcMain.handle('schools:getAssetPath', async (event, rankingQs, filename) => {
   const safeFilename = normalizeFilename(filename);
   if (!safeFilename) return null;
   const assetPath = resolveSchoolPath(rankingQs, safeFilename);
-  if (!assetPath) return null;
-  return pathToFileURL(assetPath).href;
+  const rank = normalizeRankingQs(rankingQs);
+  return assetPath && rank ? `school://No.${rank}/${safeFilename}` : null;
+});
+
+// IPC: 返回院校素材的 base64 Data URL（用于 img 显示，规避 custom protocol 问题）
+ipcMain.handle('schools:getAssetDataUrl', async (event, rankingQs, filename) => {
+  const safeFilename = normalizeFilename(filename);
+  if (!safeFilename) return { dataUrl: null };
+  const assetPath = resolveSchoolPath(rankingQs, safeFilename);
+  if (!assetPath || !fs.existsSync(assetPath)) return { dataUrl: null };
+  try {
+    const buf = fs.readFileSync(assetPath);
+    const ext = path.extname(assetPath).slice(1).toLowerCase();
+    const mimeMap = { svg: 'image/svg+xml', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+    const mime = mimeMap[ext] || 'application/octet-stream';
+    return { dataUrl: `data:${mime};base64,${buf.toString('base64')}` };
+  } catch {
+    return { dataUrl: null };
+  }
 });
 
 ipcMain.handle('dailyCheckin:getByDate', async (event, dateKey) => {
@@ -1047,6 +1065,20 @@ app.whenReady()
     ensureAccountTables();
     ensureDailyCheckinTable();
     ensureCommunityTables();
+
+    protocol.handle('school', (request) => {
+      const raw = String(request.url || '').replace(/^school:\/\/?/i, '').replace(/^\/+/, '');
+      const match = raw.match(/^No\.(\d+)\/([A-Za-z0-9._-]+)$/);
+      if (!match) return new Response('', { status: 400 });
+      const [, rank, filename] = match;
+      const assetPath = resolveSchoolPath(rank, filename);
+      if (!assetPath || !fs.existsSync(assetPath)) return new Response('', { status: 404 });
+      const buf = fs.readFileSync(assetPath);
+      const ext = path.extname(assetPath).slice(1).toLowerCase();
+      const mimeMap = { svg: 'image/svg+xml', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+      const mime = mimeMap[ext] || 'application/octet-stream';
+      return new Response(buf, { headers: { 'Content-Type': mime } });
+    });
 
     protocol.handle('avatar', (request) => {
       const url = new URL(request.url);

@@ -27,6 +27,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('schools:getIntro', rankingQs),
   schoolsGetAssetPath: (rankingQs, filename) =>
     ipcRenderer.invoke('schools:getAssetPath', rankingQs, filename),
+  schoolsGetAssetDataUrl: (rankingQs, filename) =>
+    ipcRenderer.invoke('schools:getAssetDataUrl', rankingQs, filename),
   dailyCheckinGetByDate: (dateKey) =>
     ipcRenderer.invoke('dailyCheckin:getByDate', dateKey),
   dailyCheckinListByMonth: (monthKey) =>

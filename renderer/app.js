@@ -1297,9 +1297,9 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
     const logoImg = card.querySelector('.school-card-logo');
-    if (window.api?.schoolsGetAssetPath && school.ranking_qs) {
-      window.api.schoolsGetAssetPath(school.ranking_qs, 'logo.svg').then((url) => {
-        if (url) logoImg.src = url;
+    if (window.api?.schoolsGetAssetDataUrl && school.ranking_qs) {
+      window.api.schoolsGetAssetDataUrl(school.ranking_qs, 'logo.svg').then((res) => {
+        if (res?.dataUrl && logoImg.parentNode) logoImg.src = res.dataUrl;
       });
     }
     const starBtn = card.querySelector('.school-card-star');
@@ -1482,14 +1482,14 @@ document.addEventListener('DOMContentLoaded', () => {
     starBtn.classList.toggle('favorited', fav);
 
     const rq = school.ranking_qs;
-    if (window.api.schoolsGetAssetPath) {
-      window.api.schoolsGetAssetPath(rq, '1.jpg').then((url) => {
-        if (url) heroBg.style.backgroundImage = `url(${url})`;
+    if (window.api.schoolsGetAssetDataUrl) {
+      window.api.schoolsGetAssetDataUrl(rq, '1.jpg').then((res) => {
+        if (res?.dataUrl) heroBg.style.backgroundImage = `url(${res.dataUrl})`;
         else heroBg.style.backgroundImage = '';
       });
-      window.api.schoolsGetAssetPath(rq, 'logo.svg').then((url) => {
-        if (url) {
-          logoEl.src = url;
+      window.api.schoolsGetAssetDataUrl(rq, 'logo.svg').then((res) => {
+        if (res?.dataUrl) {
+          logoEl.src = res.dataUrl;
           logoEl.style.display = '';
         } else logoEl.style.display = 'none';
       });
@@ -1533,18 +1533,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     carouselTrack.innerHTML = '';
     delete carouselTrack.dataset.duplicated;
-    for (let i = 2; i <= 5; i++) {
-      const f = `${i}.jpg`;
-      window.api.schoolsGetAssetPath(rq, f).then((url) => {
-        if (url) {
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = '';
-          img.addEventListener('click', () => openLightbox(url));
-          carouselTrack.appendChild(img);
-          updateCarousel();
-        }
-      });
+    if (window.api.schoolsGetAssetDataUrl) {
+      for (let i = 2; i <= 5; i++) {
+        const f = `${i}.jpg`;
+        window.api.schoolsGetAssetDataUrl(rq, f).then((res) => {
+          if (res?.dataUrl) {
+            const img = document.createElement('img');
+            img.src = res.dataUrl;
+            img.alt = '';
+            img.addEventListener('click', () => openLightbox(res.dataUrl));
+            carouselTrack.appendChild(img);
+            updateCarousel();
+          }
+        });
+      }
     }
   }
 
