@@ -1,8 +1,18 @@
 import * as echarts from 'echarts'
 import 'echarts-gl'
+import NotifyX from 'notifyx'
+import 'notifyx/style.css'
 
 import logoLight from '../image/logo.png'
 import logoDark from '../image/logo_n.png'
+
+function showToast(message, type = 'info') {
+  const options = { position: 'top-center', duration: 3000, showProgress: false }
+  if (type === 'success') NotifyX.success(message, options)
+  else if (type === 'error') NotifyX.error(message, options)
+  else if (type === 'warning') NotifyX.warning(message, options)
+  else NotifyX.info(message, options)
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const navItems = document.querySelectorAll('.nav-item[data-page]');
@@ -184,16 +194,50 @@ document.addEventListener('DOMContentLoaded', () => {
     registerForm?.classList.toggle('active', nextTab === 'register');
   }
 
-  function openAuthGate(preferredTab = 'login', message = '') {
+  function openAuthModal(preferredTab = 'login', message = '') {
     if (message) {
-      window.alert(message);
+      showToast(message, 'info');
     }
-    document.body.classList.add('auth-only');
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+    }
     switchAuthTab(preferredTab);
   }
 
+  function closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function showLanding() {
+    document.body.classList.add('landing-mode');
+    document.body.classList.remove('app-mode');
+    const landing = document.getElementById('landing-page');
+    const appLayout = document.querySelector('.app-layout');
+    if (landing) landing.style.display = '';
+    if (appLayout) appLayout.style.display = 'none';
+  }
+
+  function showMainApp() {
+    document.body.classList.remove('landing-mode');
+    document.body.classList.add('app-mode');
+    const landing = document.getElementById('landing-page');
+    const appLayout = document.querySelector('.app-layout');
+    if (landing) landing.style.display = 'none';
+    if (appLayout) appLayout.style.display = '';
+  }
+
+  function openAuthGate(preferredTab = 'login', message = '') {
+    openAuthModal(preferredTab, message);
+  }
+
   function hideAuthGate() {
-    document.body.classList.remove('auth-only');
+    closeAuthModal();
   }
 
   function applyAuthState(payload) {
@@ -255,17 +299,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applyAuthStateAndRefresh(payload, options = {}) {
-    const { previousMode = currentAuthState.mode, shouldPromptGuestMigration = false } = options;
+    const { previousMode = currentAuthState.mode, shouldPromptGuestMigration = false, successToast } = options;
     applyAuthState(payload);
+    if (successToast) showToast(successToast, 'success');
     if (shouldPromptGuestMigration && isAccountMode() && (previousMode === 'guest' || !!getGuestSchoolPlanningProfile())) {
       promptGuestProfileMigrationForAccount(getCurrentAccountId());
     }
     if (currentAuthState.mode === 'none') {
-      openAuthGate('login');
+      closeAuthModal();
+      showLanding();
     } else {
-      hideAuthGate();
+      closeAuthModal();
+      if (document.body.classList.contains('landing-mode')) {
+        showMainApp();
+        navigateTo('school-planning');
+      }
+      refreshAuthBoundUI();
     }
-    refreshAuthBoundUI();
   }
 
   const SETTINGS_ANIMATION = {
@@ -340,21 +390,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateSettingsAccountState() {
-    const subtitleEl = document.getElementById('settings-account-subtitle');
-    const badgeEl = document.getElementById('settings-account-badge');
-    const infoEl = document.getElementById('settings-account-info');
     const primaryBtn = document.getElementById('settings-account-primary-btn');
     const logoutBtn = document.getElementById('settings-account-logout-btn');
     const profileAvatar = document.querySelector('.settings-profile-avatar');
     const profileName = document.querySelector('.settings-profile-name');
     const profileTip = document.querySelector('.settings-profile-tip');
 
-    if (subtitleEl) subtitleEl.textContent = getCurrentUserDisplayName();
-    if (badgeEl) {
-      badgeEl.textContent = isAccountMode() ? '已登录' : (isGuestMode() ? '游客' : '未登录');
-      badgeEl.dataset.mode = currentAuthState.mode || 'none';
-    }
-    if (infoEl) infoEl.textContent = getCurrentUserMetaText();
     if (primaryBtn) {
       primaryBtn.textContent = isAccountMode() ? '切换账号' : '登录 / 注册';
     }
@@ -415,7 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const navItems = [profileTrigger, document.getElementById('settings-night-mode-item'), aboutTrigger].filter(Boolean);
+    const profileWrap = document.getElementById('settings-profile-trigger-wrap') || profileTrigger;
+    const navItems = [profileWrap, document.getElementById('settings-night-mode-item'), aboutTrigger].filter(Boolean);
     const subviews = {
       profile: profileView,
       about: aboutView
@@ -509,6 +551,11 @@ document.addEventListener('DOMContentLoaded', () => {
       await waitMs(SETTINGS_ANIMATION.revealSubview);
 
       if (route === 'profile') {
+        const profileToShow = getProfileInfo();
+        if (isAccountMode() && currentAuthState.user?.email) {
+          profileToShow.email = currentAuthState.user.email;
+        }
+        populateProfileForm(profileForm, profileToShow);
         setProfileEditable(false);
         showActionButton(editBtn);
       } else {
@@ -560,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     profileTrigger.addEventListener('click', () => {
-      openSubView('profile', profileTrigger);
+      openSubView('profile', profileWrap);
     });
     aboutTrigger.addEventListener('click', () => {
       openSubView('about', aboutTrigger);
@@ -615,15 +662,33 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!window.api?.authLogout) return;
       const res = await window.api.authLogout();
       if (!res?.success) {
-        window.alert(res?.error || '退出登录失败，请稍后重试');
+        showToast(res?.error || '退出登录失败，请稍后重试', 'error');
         return;
       }
-      applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode });
+      applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode, successToast: '已退出登录' });
     });
     updateSettingsAccountState();
   }
 
   function initAuthGate() {
+    document.getElementById('landing-auth-btn')?.addEventListener('click', () => {
+      openAuthModal('login');
+    });
+
+    const authModal = document.getElementById('auth-modal');
+    const authModalPanel = document.querySelector('.auth-modal-panel');
+    const authModalBackdrop = document.getElementById('auth-modal-backdrop');
+    const authModalClose = document.getElementById('auth-modal-close');
+
+    authModalBackdrop?.addEventListener('click', () => closeAuthModal());
+    authModalClose?.addEventListener('click', () => closeAuthModal());
+
+    authModal?.addEventListener('click', (e) => {
+      if (!authModalPanel?.contains(e.target)) {
+        closeAuthModal();
+      }
+    });
+
     document.querySelectorAll('.auth-tab').forEach((button) => {
       button.addEventListener('click', () => {
         switchAuthTab(button.dataset.authTab);
@@ -634,10 +699,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!window.api?.authEnterGuest) return;
       const res = await window.api.authEnterGuest();
       if (!res?.success) {
-        window.alert(res?.error || '进入游客模式失败');
+        showToast(res?.error || '进入游客模式失败', 'error');
         return;
       }
-      applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode });
+      applyAuthStateAndRefresh(res, { previousMode: currentAuthState.mode, successToast: '已进入游客模式' });
     });
 
     document.getElementById('auth-login-form')?.addEventListener('submit', async (event) => {
@@ -646,22 +711,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('auth-login-email')?.value?.trim() || '';
       const password = document.getElementById('auth-login-password')?.value || '';
       if (!email) {
-        window.alert('请输入邮箱地址');
+        showToast('请输入邮箱地址', 'warning');
         return;
       }
       if (!password) {
-        window.alert('请输入密码');
+        showToast('请输入密码', 'warning');
         return;
       }
       const previousMode = currentAuthState.mode;
       const res = await window.api.authLogin({ email, password });
       if (!res?.success) {
-        window.alert(res?.error || '登录失败，请稍后重试');
+        showToast(res?.error || '登录失败，请稍后重试', 'error');
         return;
       }
       applyAuthStateAndRefresh(res, {
         previousMode,
-        shouldPromptGuestMigration: true
+        shouldPromptGuestMigration: true,
+        successToast: '登录成功，欢迎回来'
       });
     });
 
@@ -673,41 +739,45 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('auth-register-password')?.value || '';
       const passwordConfirm = document.getElementById('auth-register-password-confirm')?.value || '';
       if (!email) {
-        window.alert('请输入邮箱地址');
+        showToast('请输入邮箱地址', 'warning');
         return;
       }
       if (password.length < 6) {
-        window.alert('密码至少需要 6 位');
+        showToast('密码至少需要 6 位', 'warning');
         return;
       }
       if (password !== passwordConfirm) {
-        window.alert('两次输入的密码不一致');
+        showToast('两次输入的密码不一致', 'warning');
         return;
       }
       const previousMode = currentAuthState.mode;
       const res = await window.api.authRegister({ email, nickname, password });
       if (!res?.success) {
-        window.alert(res?.error || '注册失败，请稍后重试');
+        showToast(res?.error || '注册失败，请稍后重试', 'error');
         return;
       }
       applyAuthStateAndRefresh(res, {
         previousMode,
-        shouldPromptGuestMigration: true
+        shouldPromptGuestMigration: true,
+        successToast: '注册成功，欢迎使用'
       });
     });
   }
 
   async function initAuthState() {
     if (!window.api?.authGetCurrentUser) {
-      openAuthGate('login');
+      showLanding();
+      openAuthModal('login');
       return;
     }
     const res = await window.api.authGetCurrentUser();
     applyAuthState(res);
-    if (currentAuthState.mode === 'guest' || currentAuthState.mode === 'account') {
-      hideAuthGate();
+    if (currentAuthState.mode === 'account') {
+      showMainApp();
+      closeAuthModal();
+      navigateTo('school-planning');
     } else {
-      openAuthGate('login');
+      showLanding();
     }
   }
 
@@ -1190,6 +1260,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    const authModal = document.getElementById('auth-modal');
+    if (authModal?.classList.contains('active')) {
+      closeAuthModal();
+      return;
+    }
     if (lightbox?.classList.contains('active')) closeLightbox();
     else if (overlay?.classList.contains('active')) closeSchoolDetail();
   });
@@ -1391,7 +1466,7 @@ document.addEventListener('DOMContentLoaded', () => {
       newPostBtn.textContent = isAccountMode() ? '新建帖子' : '登录后发帖';
     }
     if (replyBtn) {
-      replyBtn.textContent = isAccountMode() ? '回复评论' : '登录后回复';
+      replyBtn.textContent = isAccountMode() ? '评论' : '登录后回复';
     }
     if (postCurrentUser) postCurrentUser.textContent = userText;
     if (replyCurrentUser) replyCurrentUser.textContent = userText;
@@ -1465,7 +1540,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openCommunityPostModal() {
     if (!isAccountMode()) {
-      window.alert('游客模式下暂不支持发帖，请先登录或注册账号。');
+      showToast('游客模式下暂不支持发帖，请先登录或注册账号。', 'info');
       openAuthGate('login', '登录后即可绑定社区身份并发布帖子。');
       return;
     }
@@ -1507,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openCommunityReplySheet(targetReply = null) {
     if (!isAccountMode()) {
-      window.alert('游客模式下暂不支持回复，请先登录或注册账号。');
+      showToast('游客模式下暂不支持回复，请先登录或注册账号。', 'info');
       openAuthGate('login', '登录后即可绑定社区身份并参与讨论。');
       return;
     }
@@ -1565,7 +1640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.api?.communityGetPostDetail) return;
     const res = await window.api.communityGetPostDetail(postId);
     if (res?.error || !res?.post) {
-      window.alert(res?.error || '读取帖子详情失败');
+      showToast(res?.error || '读取帖子详情失败', 'error');
       return;
     }
 
@@ -1584,7 +1659,7 @@ document.addEventListener('DOMContentLoaded', () => {
     metaEl.textContent = `${post.author_name || '-'} · ${formatDateTime(post.created_at)}`;
     contentEl.textContent = post.content || '';
     deletePostBtn.style.display = post.canDelete ? '' : 'none';
-    replyBtn.textContent = isAccountMode() ? '回复评论' : '登录后回复';
+    replyBtn.textContent = isAccountMode() ? '评论' : '登录后回复';
 
     if (replies.length === 0) {
       repliesEl.innerHTML = '<p class="community-reply-empty">暂无回复，来抢沙发吧~</p>';
@@ -1630,9 +1705,10 @@ document.addEventListener('DOMContentLoaded', () => {
           replyId
         });
         if (!res?.success) {
-          window.alert(res?.error || '删除评论失败，请稍后重试');
+          showToast(res?.error || '删除评论失败，请稍后重试', 'error');
           return;
         }
+        showToast('评论已删除', 'success');
         await loadCommunityDetail(communityDetailPostId);
         await loadCommunityMessageList();
       });
@@ -1726,17 +1802,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = contentInput.value.trim();
 
         if (!title) {
-          window.alert('请填写标题');
+          showToast('请填写标题', 'warning');
           titleInput.focus();
           return;
         }
         if (!content) {
-          window.alert('请填写帖子内容');
+          showToast('请填写帖子内容', 'warning');
           contentInput.focus();
           return;
         }
         if (!isAccountMode()) {
-          window.alert('请先登录账号后再发帖');
+          showToast('请先登录账号后再发帖', 'info');
           openAuthGate('login', '登录后即可绑定社区身份并发布帖子。');
           return;
         }
@@ -1744,9 +1820,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await window.api.communityCreatePost({ title, content });
         if (!res?.success) {
-          window.alert(res?.error || '发帖失败，请稍后再试');
+          showToast(res?.error || '发帖失败，请稍后再试', 'error');
           return;
         }
+        showToast('发帖成功', 'success');
         closeCommunityPostModal();
         communityCurrentPage = 1;
         await loadCommunityMessageList();
@@ -1766,9 +1843,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await window.api.communityDeletePost(communityDetailPostId);
         if (!res?.success) {
-          window.alert(res?.error || '删除帖子失败，请稍后重试');
+          showToast(res?.error || '删除帖子失败，请稍后重试', 'error');
           return;
         }
+        showToast('帖子已删除', 'success');
         closeCommunityDetailModal();
         await loadCommunityMessageList();
       });
@@ -1784,12 +1862,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const content = contentInput.value.trim();
         if (!content) {
-          window.alert('请填写回复内容');
+          showToast('请填写回复内容', 'warning');
           contentInput.focus();
           return;
         }
         if (!isAccountMode()) {
-          window.alert('请先登录账号后再回复');
+          showToast('请先登录账号后再回复', 'info');
           openAuthGate('login', '登录后即可绑定社区身份并参与讨论。');
           return;
         }
@@ -1801,9 +1879,10 @@ document.addEventListener('DOMContentLoaded', () => {
           parentReplyId: communityReplyTarget?.replyId || null
         });
         if (!res?.success) {
-          window.alert(res?.error || '回复失败，请稍后再试');
+          showToast(res?.error || '回复失败，请稍后再试', 'error');
           return;
         }
+        showToast('回复已发送', 'success');
 
         closeCommunityReplySheet();
         await loadCommunityDetail(communityDetailPostId);
@@ -2093,7 +2172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.api?.dailyCheckinSaveByDate) return;
     const res = await window.api.dailyCheckinSaveByDate(dailySelectedDateKey, payload);
     if (!res?.success) {
-      window.alert(res?.error || '保存失败，请稍后重试');
+      showToast(res?.error || '保存失败，请稍后重试', 'error');
       return;
     }
     await loadDailyMonthData(dailyCurrentMonth);
@@ -2154,7 +2233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalConfirm.addEventListener('click', () => {
       const content = modalInput.value.trim();
       if (!content) {
-        window.alert('请先填写任务内容');
+        showToast('请先填写任务内容', 'warning');
         return;
       }
       if (dailyTaskItems.length >= DAILY_MAX_TASKS) {
@@ -2406,6 +2485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activePage?.id === 'page-community-messages') initCommunityMessagesPage();
   }).catch((err) => {
     console.error('initAuthState:', err);
-    openAuthGate('login', '账号状态初始化失败，请重新登录。');
+    showLanding();
+    openAuthModal('login', '账号状态初始化失败，请重新登录。');
   });
 });

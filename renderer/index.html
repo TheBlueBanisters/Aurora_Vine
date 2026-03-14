@@ -15,10 +15,43 @@
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="auth-only">
-  <div class="auth-gate" id="auth-gate">
-    <div class="auth-gate-panel">
+<body class="landing-mode">
+  <!-- 启动页：功能简介 -->
+  <div class="landing-page" id="landing-page">
+    <button type="button" class="landing-auth-btn" id="landing-auth-btn">登录 / 注册 / 游客</button>
+    <div class="landing-content">
+      <div class="feature-intro-box">
+        <img src="../image/welcome.png" alt="Welcome" class="feature-intro-image">
+        <h2 class="feature-intro-title">极光藤 · Aurora Vine</h2>
+        <p class="feature-intro-subtitle">— 让留学规划更清晰 · A Clearer Path to Studying Abroad</p>
+        <p class="feature-intro-text">
+          Aurora Vine 是一款为留学申请者设计的规划工具，致力于帮助每一位正在准备申请的学生更从容地整理信息、探索院校，并逐步构建属于自己的申请路径。在这里，你可以记录和管理自己的学术背景与标化成绩，获得定校建议与申请方向参考；浏览世界各地的大学信息，了解院校环境并建立自己的目标院校列表；同时通过留学时间规划与每日打卡功能，将长期目标拆解为清晰可执行的步骤。Aurora Vine 还整合了院校数据库、真实申请案例、留学资源与交流社区，帮助你在信息纷繁的申请过程中保持方向与节奏。我们希望 Aurora Vine 能成为你留学旅程中的一个安静而可靠的伙伴，陪伴你从最初的探索，到最终抵达理想的校园。
+        </p>
+        <p class="feature-intro-text feature-intro-text-en">
+          Aurora Vine is a planning tool designed for students preparing for international study. It helps applicants organize their information, explore universities, and gradually build a clear application path. Within Aurora Vine, you can record and manage your academic background and test scores, receive guidance for school selection, and explore universities around the world while building your own list of target institutions. With integrated study planning timelines and daily progress tracking, long-term goals become clear and manageable steps. Aurora Vine also brings together a university database, real application cases, study resources, and a community for discussion, helping you stay informed and focused throughout the complex application journey. Our hope is that Aurora Vine becomes a quiet and reliable companion on your path-supporting you from the first stage of exploration all the way to your arrival at the campus you aspire to join.
+        </p>
+        <div class="feature-intro-carousel-wrap" id="feature-intro-carousel-wrap">
+          <div class="feature-intro-carousel">
+            <div class="feature-intro-carousel-track" id="feature-intro-carousel-track">
+              <img src="../image/intro/1.jpg" alt="Aurora Vine intro 1">
+              <img src="../image/intro/2.jpg" alt="Aurora Vine intro 2">
+              <img src="../image/intro/3.jpg" alt="Aurora Vine intro 3">
+              <img src="../image/intro/4.jpg" alt="Aurora Vine intro 4">
+              <img src="../image/intro/5.jpg" alt="Aurora Vine intro 5">
+              <img src="../image/intro/6.jpg" alt="Aurora Vine intro 6">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登录弹窗 -->
+  <div class="auth-modal" id="auth-modal" aria-hidden="true">
+    <div class="auth-modal-backdrop" id="auth-modal-backdrop" role="button" tabindex="-1" aria-label="点击关闭"></div>
+    <div class="auth-modal-panel">
       <div class="auth-gate-card">
+        <button type="button" class="auth-modal-close" id="auth-modal-close" aria-label="关闭">×</button>
         <img src="../image/welcome.png" alt="" class="auth-gate-sprite auth-gate-sprite-corner auth-gate-sprite-hi">
         <img src="../image/plan.png" alt="" class="auth-gate-sprite auth-gate-sprite-corner auth-gate-sprite-plan">
         <div class="auth-gate-brand">
@@ -67,22 +100,10 @@
       </div>
 
       <nav class="sidebar-nav" style="-webkit-app-region: no-drag;">
-        <!-- 功能简介（第一级之下） -->
-        <div class="nav-group">
-          <a class="nav-item" data-page="feature-intro">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <span>功能简介</span>
-          </a>
-        </div>
-
         <!-- 第一组：核心入口 -->
         <div class="nav-group">
           <div class="nav-group-label">核心入口</div>
-          <a class="nav-item" data-page="school-planning">
+          <a class="nav-item active" data-page="school-planning">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -191,41 +212,8 @@
     <main class="main-content">
       <div class="main-content-titlebar-shield" style="-webkit-app-region: drag;" aria-hidden="true"></div>
 
-      <!-- 功能简介 -->
-      <section class="page active" id="page-feature-intro">
-        <div class="page-header">
-          <h1 class="page-title">功能简介</h1>
-          <p class="page-subtitle">Feature Introduction</p>
-        </div>
-        <div class="page-body">
-          <div class="feature-intro-box">
-            <img src="../image/welcome.png" alt="Welcome" class="feature-intro-image">
-            <h2 class="feature-intro-title">极光藤 · Aurora Vine</h2>
-            <p class="feature-intro-subtitle">— 让留学规划更清晰 · A Clearer Path to Studying Abroad</p>
-            <p class="feature-intro-text">
-              Aurora Vine 是一款为留学申请者设计的规划工具，致力于帮助每一位正在准备申请的学生更从容地整理信息、探索院校，并逐步构建属于自己的申请路径。在这里，你可以记录和管理自己的学术背景与标化成绩，获得定校建议与申请方向参考；浏览世界各地的大学信息，了解院校环境并建立自己的目标院校列表；同时通过留学时间规划与每日打卡功能，将长期目标拆解为清晰可执行的步骤。Aurora Vine 还整合了院校数据库、真实申请案例、留学资源与交流社区，帮助你在信息纷繁的申请过程中保持方向与节奏。我们希望 Aurora Vine 能成为你留学旅程中的一个安静而可靠的伙伴，陪伴你从最初的探索，到最终抵达理想的校园。
-            </p>
-            <p class="feature-intro-text feature-intro-text-en">
-              Aurora Vine is a planning tool designed for students preparing for international study. It helps applicants organize their information, explore universities, and gradually build a clear application path. Within Aurora Vine, you can record and manage your academic background and test scores, receive guidance for school selection, and explore universities around the world while building your own list of target institutions. With integrated study planning timelines and daily progress tracking, long-term goals become clear and manageable steps. Aurora Vine also brings together a university database, real application cases, study resources, and a community for discussion, helping you stay informed and focused throughout the complex application journey. Our hope is that Aurora Vine becomes a quiet and reliable companion on your path-supporting you from the first stage of exploration all the way to your arrival at the campus you aspire to join.
-            </p>
-            <div class="feature-intro-carousel-wrap" id="feature-intro-carousel-wrap">
-              <div class="feature-intro-carousel">
-                <div class="feature-intro-carousel-track" id="feature-intro-carousel-track">
-                  <img src="../image/intro/1.jpg" alt="Aurora Vine intro 1">
-                  <img src="../image/intro/2.jpg" alt="Aurora Vine intro 2">
-                  <img src="../image/intro/3.jpg" alt="Aurora Vine intro 3">
-                  <img src="../image/intro/4.jpg" alt="Aurora Vine intro 4">
-                  <img src="../image/intro/5.jpg" alt="Aurora Vine intro 5">
-                  <img src="../image/intro/6.jpg" alt="Aurora Vine intro 6">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- 定校规划 -->
-      <section class="page" id="page-school-planning">
+      <section class="page active" id="page-school-planning">
         <div class="page-header">
           <h1 class="page-title">定校规划</h1>
           <p class="page-subtitle">School Planning</p>
@@ -649,7 +637,7 @@
                 <div class="community-replies-list" id="community-replies-list"></div>
               </div>
               <div class="community-detail-actions">
-                <button type="button" class="form-submit-btn" id="community-open-reply-btn">回复评论</button>
+                <button type="button" class="form-submit-btn" id="community-open-reply-btn">评论</button>
                 <button type="button" class="form-submit-btn community-btn-danger" id="community-delete-post-btn">删除帖子</button>
               </div>
             </div>
@@ -658,14 +646,14 @@
           <div class="community-bottom-sheet" id="community-reply-sheet" aria-hidden="true">
             <div class="community-bottom-sheet-mask" id="community-reply-sheet-mask"></div>
             <div class="community-bottom-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="community-reply-sheet-title">
-              <h3 class="community-modal-title" id="community-reply-sheet-title">回复评论</h3>
+              <h3 class="community-modal-title" id="community-reply-sheet-title">评论</h3>
               <p class="community-reply-target-text" id="community-reply-target-text"></p>
               <p class="community-modal-current-user" id="community-reply-current-user"></p>
               <label class="community-modal-label" for="community-reply-content-input">回复内容</label>
               <textarea id="community-reply-content-input" class="community-modal-textarea" maxlength="2000" placeholder="请输入回复内容"></textarea>
               <div class="community-modal-actions">
                 <button type="button" class="form-submit-btn community-btn-ghost" id="community-reply-cancel-btn">取消</button>
-                <button type="button" class="form-submit-btn" id="community-reply-submit-btn">发送回复</button>
+                <button type="button" class="form-submit-btn" id="community-reply-submit-btn">发布评论</button>
               </div>
             </div>
           </div>
@@ -719,28 +707,20 @@
               <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden>编辑</button>
               <button class="settings-back-btn" id="settings-back-btn" type="button" hidden>返回</button>
             </div>
-            <div class="settings-item-card settings-account-card" id="settings-account-card">
-              <div class="settings-account-head">
-                <div>
-                  <p class="settings-account-title">账号状态</p>
-                  <p class="settings-account-subtitle" id="settings-account-subtitle">未登录</p>
-                </div>
-                <span class="settings-account-badge" id="settings-account-badge">未登录</span>
-              </div>
-              <div class="settings-account-info" id="settings-account-info">登录后可将我的背景与社区身份绑定到账号。</div>
-              <div class="settings-account-actions">
-                <button class="settings-save-btn" id="settings-account-primary-btn" type="button">登录 / 注册</button>
-                <button class="settings-cancel-btn" id="settings-account-logout-btn" type="button" hidden>退出登录</button>
-              </div>
-            </div>
             <div class="settings-main-list" id="settings-main-list">
-              <button class="settings-profile-card settings-nav-item" id="settings-profile-trigger" data-settings-route="profile" type="button">
-                <div class="settings-profile-avatar" aria-hidden="true">测</div>
-                <div class="settings-profile-meta">
-                  <p class="settings-profile-name">测试用户</p>
-                  <p class="settings-profile-tip">点击查看并编辑个人信息</p>
+              <div class="settings-profile-card settings-nav-item" id="settings-profile-trigger-wrap">
+                <button class="settings-profile-card-clickable" id="settings-profile-trigger" data-settings-route="profile" type="button">
+                  <div class="settings-profile-avatar" aria-hidden="true">测</div>
+                  <div class="settings-profile-meta">
+                    <p class="settings-profile-name">测试用户</p>
+                    <p class="settings-profile-tip">点击查看并编辑个人信息</p>
+                  </div>
+                </button>
+                <div class="settings-profile-actions">
+                  <button class="settings-save-btn" id="settings-account-primary-btn" type="button">登录 / 注册</button>
+                  <button class="settings-cancel-btn" id="settings-account-logout-btn" type="button" hidden>退出登录</button>
                 </div>
-              </button>
+              </div>
 
               <div class="settings-item-card settings-nav-item" id="settings-night-mode-item">
                 <label class="settings-item">
