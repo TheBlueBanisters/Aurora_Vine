@@ -13,7 +13,10 @@ export default defineConfig({
       lib: {
         entry: resolve(__dirname, 'main.js')
       },
-      outDir: 'out/main'
+      outDir: 'out/main',
+      rollupOptions: {
+        external: ['better-sqlite3']
+      }
     }
   },
   preload: {
