@@ -1,6 +1,7 @@
 import { showToast } from './utils.js'
 import { getSchoolPlanningProfile, setSchoolPlanningProfile } from './storage.js'
-import { setSchoolPlanningView, syncSchoolPlanningIdentityState } from './profile.js'
+import { setSchoolPlanningView, syncSchoolPlanningIdentityState, renderScoreResult } from './profile.js'
+import { computeStudentScore, profileToScoreInput } from './scoring.js'
 
 export function initSchoolPlanningForm() {
   const form = document.getElementById('school-planning-form')
@@ -134,7 +135,10 @@ export function initSchoolPlanningForm() {
     if (valid) {
       const profile = collectSchoolPlanningData()
       setSchoolPlanningProfile(profile)
+      const scoreInput = profileToScoreInput(profile)
+      const result = computeStudentScore(scoreInput)
       setSchoolPlanningView(true)
+      renderScoreResult(result)
     }
   })
 

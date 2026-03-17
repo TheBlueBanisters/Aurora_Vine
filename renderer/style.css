@@ -1675,6 +1675,23 @@ textarea {
   margin-bottom: 0;
 }
 
+/* 简历区科研/实习/论文数量 并行 */
+.form-resume-counts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 20px;
+  margin-bottom: 18px;
+}
+
+.form-resume-counts-row .form-field {
+  margin-bottom: 0;
+}
+
+.form-resume-counts-row .form-select {
+  width: 100%;
+  min-width: 0;
+}
+
 .form-field {
   margin-bottom: 18px;
 }
@@ -1867,15 +1884,125 @@ textarea {
   transform: scale(0.98);
 }
 
-.school-planning-thanks .placeholder-card {
-  min-height: 280px;
+.school-planning-score-view {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+.score-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 40px 36px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 32px;
+}
+
+.score-ring-wrapper {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.score-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+  fill: none;
+  stroke: var(--content-border);
+  stroke-width: 10;
+}
+
+.score-ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-ring-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.score-ring-value span:first-child {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--content-text);
+  line-height: 1;
+}
+
+.score-ring-label {
+  font-size: 12px;
+  color: var(--content-text-secondary);
+  margin-top: 4px;
+}
+
+.score-breakdown {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.score-bar-item {
+  display: grid;
+  grid-template-columns: 90px 1fr 42px;
+  align-items: center;
+  gap: 10px;
+}
+
+.score-bar-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--content-text-secondary);
+  text-align: right;
+}
+
+.score-bar-track {
+  height: 10px;
+  background: var(--content-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  width: 0;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-bar-item[data-dim="gpa"] .score-bar-fill { background: #89b4fa; }
+.score-bar-item[data-dim="lang"] .score-bar-fill { background: #74c7ec; }
+.score-bar-item[data-dim="bg"] .score-bar-fill { background: #a6e3a1; }
+.score-bar-item[data-dim="school"] .score-bar-fill { background: #f9e2af; }
+
+.score-bar-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--content-text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .school-planning-refill-btn {
-  margin-top: 24px;
+  margin-top: 8px;
 }
 
 /* ============================================

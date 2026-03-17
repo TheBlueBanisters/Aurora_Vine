@@ -3,6 +3,7 @@ import { escapeHtml } from './utils.js'
 import { isAccountMode, getCurrentUserDisplayName } from './state.js'
 import { getSchoolPlanningProfile } from './storage.js'
 import { getTheme } from './theme.js'
+import { computeStudentScore, profileToScoreInput } from './scoring.js'
 
 let myProfileChartInstance = null
 
@@ -146,18 +147,60 @@ export function loadMyProfile() {
   }
 }
 
-export function setSchoolPlanningView(showThanks) {
+export function setSchoolPlanningView(showScore) {
   const introBox = document.querySelector('#page-school-planning .planning-intro-box')
   const form = document.getElementById('school-planning-form')
-  const thanksView = document.getElementById('school-planning-thanks')
-  if (introBox) introBox.style.display = showThanks ? 'none' : ''
-  if (form) form.style.display = showThanks ? 'none' : ''
-  if (thanksView) thanksView.style.display = showThanks ? '' : 'none'
+  const scoreView = document.getElementById('school-planning-thanks')
+  if (introBox) introBox.style.display = showScore ? 'none' : ''
+  if (form) form.style.display = showScore ? 'none' : ''
+  if (scoreView) scoreView.style.display = showScore ? '' : 'none'
+}
+
+export function renderScoreResult(result) {
+  const { totalScore, detail } = result
+  const CIRCUMFERENCE = 2 * Math.PI * 70
+
+  const numberEl = document.getElementById('score-total-number')
+  if (numberEl) numberEl.textContent = totalScore.toFixed(1)
+
+  const ringFill = document.querySelector('.score-ring-fill')
+  if (ringFill) {
+    const offset = CIRCUMFERENCE * (1 - totalScore / 100)
+    ringFill.style.strokeDasharray = String(CIRCUMFERENCE)
+    ringFill.style.strokeDashoffset = String(CIRCUMFERENCE)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        ringFill.style.strokeDashoffset = String(offset)
+      })
+    })
+  }
+
+  const dims = ['gpa', 'lang', 'bg', 'school']
+  dims.forEach((dim) => {
+    const raw = detail[dim] ?? 0
+    const pct = Math.max(0, Math.min(100, raw))
+    const bar = document.getElementById(`score-bar-${dim}`)
+    const val = document.getElementById(`score-val-${dim}`)
+    if (bar) {
+      bar.style.width = '0'
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          bar.style.width = `${pct}%`
+        })
+      })
+    }
+    if (val) val.textContent = raw.toFixed(1)
+  })
 }
 
 export function syncSchoolPlanningIdentityState() {
   const currentProfile = getSchoolPlanningProfile()
   setSchoolPlanningView(!!currentProfile)
+  if (currentProfile) {
+    const scoreInput = profileToScoreInput(currentProfile)
+    const result = computeStudentScore(scoreInput)
+    renderScoreResult(result)
+  }
 }
 
 export function initProfile(navigateTo) {
