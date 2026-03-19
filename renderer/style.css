@@ -2587,6 +2587,142 @@ body.school-detail-open .main-content {
    每日打卡
    ============================================ */
 
+/* ---- 日历面板内翘角删除 ---- */
+.daily-checkin-calendar-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-checkin-peel-triangle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 76px;
+  height: 76px;
+  z-index: 3;
+}
+
+.daily-checkin-peel-tri-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 76px 76px 0;
+  border-color: transparent var(--content-border) transparent transparent;
+  opacity: 0.35;
+  transition: opacity 0.25s ease, border-width 0.3s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+
+.daily-checkin-peel-triangle:hover .daily-checkin-peel-tri-fold {
+  border-width: 0 90px 90px 0;
+  opacity: 0.18;
+}
+
+.daily-checkin-peel-tri-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-size: 19px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translate(8px, -8px) scale(0.7);
+  transition: opacity 0.2s ease 0.08s, transform 0.25s cubic-bezier(.4,0,.2,1) 0.08s,
+              background 0.15s ease, border-color 0.15s ease;
+  z-index: 4;
+}
+
+.daily-checkin-peel-triangle:hover .daily-checkin-peel-tri-btn {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+.daily-checkin-peel-tri-btn:hover {
+  background: #FDE8EC;
+  border-color: #F38BA8;
+}
+
+[data-theme="dark"] .daily-checkin-peel-tri-btn:hover {
+  background: rgba(243, 139, 168, 0.15);
+  border-color: rgba(243, 139, 168, 0.5);
+}
+
+/* ---- 确认弹窗 ---- */
+.daily-checkin-confirm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.35);
+  align-items: center;
+  justify-content: center;
+}
+
+.daily-checkin-confirm-modal[aria-hidden="false"] {
+  display: flex;
+}
+
+.daily-checkin-confirm-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 32px 40px 28px;
+  max-width: 460px;
+  width: 90%;
+  text-align: center;
+}
+
+.daily-checkin-confirm-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--content-text);
+  margin-bottom: 10px;
+}
+
+.daily-checkin-confirm-desc {
+  font-size: 13px;
+  color: var(--content-text-secondary);
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.daily-checkin-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.daily-checkin-confirm-actions .form-submit-btn {
+  flex: 1;
+  max-width: 180px;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.daily-checkin-confirm-danger {
+  background: #F38BA8 !important;
+  color: #fff !important;
+  border-color: #F38BA8 !important;
+}
+
+.daily-checkin-confirm-danger:hover {
+  background: #E06B8A !important;
+  border-color: #E06B8A !important;
+}
+
 .daily-checkin-layout {
   display: grid;
   grid-template-columns: minmax(520px, 1.2fr) minmax(360px, 0.8fr);
@@ -2608,6 +2744,7 @@ body.school-detail-open .main-content {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  padding: 0 80px;
 }
 
 .daily-checkin-month-title {
@@ -2617,13 +2754,13 @@ body.school-detail-open .main-content {
 }
 
 .daily-checkin-month-btn {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border: 1px solid var(--content-border);
   border-radius: var(--radius-sm);
   background: var(--card-bg);
   color: var(--content-text);
-  font-size: 24px;
+  font-size: 26px;
   line-height: 1;
   cursor: pointer;
   transition: border-color var(--transition-fast), color var(--transition-fast);
@@ -2739,9 +2876,32 @@ body.school-detail-open .main-content {
   color: var(--content-text);
 }
 
+.daily-checkin-task-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .daily-checkin-task-count {
   font-size: 12px;
   color: var(--content-text-secondary);
+}
+
+.daily-checkin-clear-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 3px 5px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast), border-color var(--transition-fast);
+}
+
+.daily-checkin-clear-btn:hover {
+  opacity: 1;
+  border-color: #F38BA8;
 }
 
 .daily-checkin-task-list {
@@ -3008,6 +3168,222 @@ body.school-detail-open .main-content {
 
 .daily-checkin-modal-actions .form-submit-btn {
   padding: 10px 16px;
+}
+
+/* ============================================
+   留学规划
+   ============================================ */
+
+.study-planning-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+}
+
+.study-planning-outline-panel {
+  grid-row: 1 / 3;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  min-height: 400px;
+}
+
+.study-planning-smart-panel,
+.study-planning-custom-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+}
+
+.study-planning-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-text);
+  margin-bottom: 14px;
+}
+
+.study-planning-panel-title-en {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--content-text-secondary);
+  margin-left: 6px;
+  letter-spacing: 0.3px;
+}
+
+.study-planning-smart-placeholder {
+  border: none;
+  box-shadow: none;
+  padding: 24px 0 8px;
+}
+
+.study-planning-outline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.study-planning-outline-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  color: var(--content-text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.study-planning-outline-empty-hint {
+  font-size: 12px;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+.study-planning-entry {
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  position: relative;
+  transition: border-color var(--transition-fast);
+}
+
+.study-planning-entry:hover {
+  border-color: var(--accent-soft);
+}
+
+.study-planning-entry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.study-planning-entry-color {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  margin-top: 7px;
+  margin-right: 6px;
+}
+
+.study-planning-entry-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--content-text);
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.study-planning-entry-delete {
+  background: none;
+  border: none;
+  color: var(--content-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.study-planning-entry:hover .study-planning-entry-delete {
+  opacity: 1;
+}
+
+.study-planning-entry-delete:hover {
+  color: #F38BA8;
+}
+
+.study-planning-entry-desc {
+  font-size: 12.5px;
+  color: var(--content-text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
+  padding-left: 18px;
+  font-style: italic;
+}
+
+.study-planning-entry-tasks {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.study-planning-entry-task {
+  font-size: 13px;
+  color: var(--content-text);
+  padding: 4px 0 4px 14px;
+  position: relative;
+}
+
+.study-planning-entry-task::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--task-dot-color, var(--accent));
+}
+
+.study-planning-custom-input {
+  width: 100%;
+  min-height: 160px;
+  max-height: 320px;
+  resize: vertical;
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--content-text);
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  padding: 12px;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast);
+}
+
+.study-planning-custom-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.study-planning-custom-hint {
+  font-size: 12px;
+  color: var(--content-text-secondary);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+.study-planning-custom-hint-en {
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+.study-planning-custom-hint code {
+  background: var(--content-border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11.5px;
+}
+
+.study-planning-custom-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* ============================================

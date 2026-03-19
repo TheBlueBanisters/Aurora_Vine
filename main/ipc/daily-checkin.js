@@ -73,6 +73,64 @@ export function registerDailyCheckinIpc() {
     }
   });
 
+  ipcMain.handle('dailyCheckin:appendTasks', async (_event, dateKey, newTasks = []) => {
+    const normalizedDateKey = normalizeDateKey(dateKey);
+    if (!normalizedDateKey) return { success: false, error: '日期格式不正确' };
+    if (!Array.isArray(newTasks) || newTasks.length === 0) return { success: true, appended: 0 };
+
+    try {
+      ensureDailyCheckinTable();
+      const db = getWritableDb();
+
+      const existing = db.prepare(
+        'SELECT content, color, completed, sort_order FROM daily_checkin WHERE date_key = ? ORDER BY sort_order ASC'
+      ).all(normalizedDateKey);
+
+      const remaining = 9 - existing.length;
+      if (remaining <= 0) { db.close(); return { success: true, appended: 0 }; }
+
+      const toInsert = newTasks
+        .map((t) => {
+          const content = String(t?.content ?? '').trim();
+          if (!content) return null;
+          return { content, color: sanitizeTaskColor(t?.color), completed: t?.completed ? 1 : 0 };
+        })
+        .filter(Boolean)
+        .slice(0, remaining);
+
+      if (toInsert.length === 0) { db.close(); return { success: true, appended: 0 }; }
+
+      const startOrder = existing.length;
+      const insertStmt = db.prepare(
+        'INSERT INTO daily_checkin (date_key, content, color, completed, sort_order) VALUES (?, ?, ?, ?, ?)'
+      );
+      const appendAll = db.transaction((items) => {
+        items.forEach((item, idx) => {
+          insertStmt.run(normalizedDateKey, item.content, item.color, item.completed, startOrder + idx);
+        });
+      });
+      appendAll(toInsert);
+      db.close();
+      return { success: true, appended: toInsert.length };
+    } catch (err) {
+      console.error('dailyCheckin:appendTasks error:', err);
+      return { success: false, error: err.message || '追加失败' };
+    }
+  });
+
+  ipcMain.handle('dailyCheckin:clearAll', async () => {
+    try {
+      ensureDailyCheckinTable();
+      const db = getWritableDb();
+      db.prepare('DELETE FROM daily_checkin').run();
+      db.close();
+      return { success: true };
+    } catch (err) {
+      console.error('dailyCheckin:clearAll error:', err);
+      return { success: false, error: err.message || '清空失败' };
+    }
+  });
+
   ipcMain.handle('dailyCheckin:saveByDate', async (event, dateKey, items = []) => {
     const normalizedDateKey = normalizeDateKey(dateKey);
     if (!normalizedDateKey) return { success: false, error: '日期格式不正确' };

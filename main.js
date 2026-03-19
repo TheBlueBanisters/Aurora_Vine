@@ -5,6 +5,7 @@ import { registerAuthIpc, ensureAccountTables } from './main/ipc/auth';
 import { registerAvatarIpc, registerAvatarProtocol } from './main/ipc/avatar';
 import { registerSchoolsIpc, registerSchoolProtocol } from './main/ipc/schools';
 import { registerDailyCheckinIpc, ensureDailyCheckinTable } from './main/ipc/daily-checkin';
+import { registerStudyPlanIpc, ensureStudyPlanTable } from './main/ipc/study-planning';
 import { registerCommunityIpc, ensureCommunityTables } from './main/ipc/community';
 
 protocol.registerSchemesAsPrivileged([
@@ -68,12 +69,14 @@ registerAuthIpc();
 registerAvatarIpc();
 registerSchoolsIpc();
 registerDailyCheckinIpc();
+registerStudyPlanIpc();
 registerCommunityIpc();
 
 app.whenReady()
   .then(() => {
     ensureAccountTables();
     ensureDailyCheckinTable();
+    ensureStudyPlanTable();
     ensureCommunityTables();
 
     registerSchoolProtocol(protocol);

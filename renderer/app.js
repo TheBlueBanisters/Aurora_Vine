@@ -8,6 +8,7 @@ import { initSchools, loadSchoolListExplorer, loadSchoolListTarget, closeSchoolD
 import { loadMyProfile, syncSchoolPlanningIdentityState, initProfile } from './modules/profile.js'
 import { initCommunityMessagesPage, updateCommunityComposerState, communityDetailPostId, loadCommunityDetail, closeCommunityReplySheet, closeCommunityDetailModal } from './modules/community.js'
 import { initDailyCheckinPage } from './modules/daily-checkin.js'
+import { initStudyPlanningPage } from './modules/study-planning.js'
 import { initSchoolPlanningForm } from './modules/planning.js'
 import { showToast } from './modules/utils.js'
 import { applyAuthState } from './modules/state.js'
@@ -64,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pageId === 'university-explorer') loadSchoolListExplorer()
       if (pageId === 'target-universities') loadSchoolListTarget()
       if (pageId === 'my-profile') loadMyProfile()
+      if (pageId === 'study-planning') initStudyPlanningPage()
       if (pageId === 'daily-checkin') initDailyCheckinPage()
       if (pageId === 'community-messages') initCommunityMessagesPage()
     })
@@ -81,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const activePage = document.querySelector('.page.active')
     if (activePage?.id === 'page-university-explorer') loadSchoolListExplorer()
     if (activePage?.id === 'page-target-universities') loadSchoolListTarget()
+    if (activePage?.id === 'page-study-planning') initStudyPlanningPage()
     if (activePage?.id === 'page-daily-checkin') initDailyCheckinPage()
     if (activePage?.id === 'page-community-messages') initCommunityMessagesPage()
   }).catch((err) => {

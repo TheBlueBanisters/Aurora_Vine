@@ -35,6 +35,16 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('dailyCheckin:listByMonth', monthKey),
   dailyCheckinSaveByDate: (dateKey, items) =>
     ipcRenderer.invoke('dailyCheckin:saveByDate', dateKey, items),
+  dailyCheckinClearAll: () =>
+    ipcRenderer.invoke('dailyCheckin:clearAll'),
+  studyPlanSave: (entries) =>
+    ipcRenderer.invoke('studyPlan:save', entries),
+  studyPlanList: () =>
+    ipcRenderer.invoke('studyPlan:list'),
+  studyPlanDelete: (id) =>
+    ipcRenderer.invoke('studyPlan:delete', id),
+  dailyCheckinAppendTasks: (dateKey, tasks) =>
+    ipcRenderer.invoke('dailyCheckin:appendTasks', dateKey, tasks),
   communityListPosts: (page = 1, pageSize = 10) =>
     ipcRenderer.invoke('community:listPosts', page, pageSize),
   communityGetPostDetail: (postId) =>

@@ -234,7 +234,49 @@ export async function initDailyCheckinPage() {
   const nextBtn = document.getElementById('daily-checkin-next-month')
   initDailyTaskModal()
 
+  const clearAllBtn = document.getElementById('daily-checkin-clear-all')
+  const clearGlobalBtn = document.getElementById('daily-checkin-clear-global')
+  const confirmModal = document.getElementById('daily-checkin-confirm-modal')
+  const confirmCancel = document.getElementById('daily-checkin-confirm-cancel')
+  const confirmOk = document.getElementById('daily-checkin-confirm-ok')
+
   if (!dailyInitialized) {
+    clearAllBtn?.addEventListener('click', async () => {
+      if (dailyTaskItems.length === 0) return
+      dailyTaskItems = []
+      dailyActiveTaskIndex = -1
+      renderDailyTaskList()
+      await persistDailyTasks()
+    })
+
+    clearGlobalBtn?.addEventListener('click', () => {
+      confirmModal?.classList.add('active')
+      confirmModal?.setAttribute('aria-hidden', 'false')
+    })
+    confirmCancel?.addEventListener('click', () => {
+      confirmModal?.classList.remove('active')
+      confirmModal?.setAttribute('aria-hidden', 'true')
+    })
+    confirmModal?.addEventListener('click', (e) => {
+      if (e.target === confirmModal) {
+        confirmModal.classList.remove('active')
+        confirmModal.setAttribute('aria-hidden', 'true')
+      }
+    })
+    confirmOk?.addEventListener('click', async () => {
+      confirmModal?.classList.remove('active')
+      confirmModal?.setAttribute('aria-hidden', 'true')
+      if (!window.api?.dailyCheckinClearAll) return
+      const res = await window.api.dailyCheckinClearAll()
+      if (!res?.success) { showToast(res?.error || '清空失败', 'error'); return }
+      dailyTaskItems = []
+      dailyActiveTaskIndex = -1
+      await loadDailyMonthData(dailyCurrentMonth)
+      renderDailyCalendar()
+      renderDailyTaskList()
+      showToast('已清空全部日程', 'success')
+    })
+
     prevBtn?.addEventListener('click', async () => {
       await persistDailyTasks()
       dailyCurrentMonth = new Date(dailyCurrentMonth.getFullYear(), dailyCurrentMonth.getMonth() - 1, 1)
