@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "剑桥大学（University of Cambridge）成立于1209年，位于英国剑桥市，是英语世界第二古老的大学，采用书院联邦制，由31个独立自治的书院组成，各书院隶属于剑桥大学同时拥有独立的行政、招生与教学体系。\r\n剑桥大学被誉为“科学的摇篮”，在数学、物理、医学、生物科学、经济学、文学等领域拥有卓越的学术成就，诞生了92位诺贝尔奖得主、15位英国首相、116位菲尔兹奖得主、7位图灵奖得主。著名的卡文迪许实验室坐落于此，DNA双螺旋结构、胰岛素、青霉素等重大科学发现均诞生于该校。学校教学注重培养学生的独立思考与创新能力，学术传统深厚。2026QS世界大学排名中，剑桥大学位列世界第6位。"
+    ],
+    "en": [
+      "The University of Cambridge is a public research university in Cambridge, England. Founded in 1209, it is the second-oldest university in the English-speaking world. Cambridge operates under a collegiate system comprising 31 independent, self-governing colleges, all part of the University. Known as the 'cradle of science', Cambridge excels in mathematics, physics, medicine, biological sciences, economics, and literature, and has produced 92 Nobel Prize winners, 15 UK prime ministers, 116 Fields Medalists, and 7 Turing Award winners. The world-famous Cavendish Laboratory is located here, where groundbreaking discoveries including the DNA double helix structure were made. Ranked No.6 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.cam.ac.uk/",
+  "address": {
+    "zh": "英国剑桥市三一街",
+    "en": "University of Cambridge, Trinity Street, Cambridge CB2 1TQ, United Kingdom"
+  }
+}

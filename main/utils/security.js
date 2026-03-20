@@ -20,7 +20,8 @@ export function normalizeRankingQs(rankingQs) {
 export function normalizeFilename(filename) {
   const value = String(filename ?? '').trim();
   if (!value) return null;
-  if (!/^[A-Za-z0-9._-]+$/.test(value)) return null;
+  if (/[\/\\]/.test(value) || value.includes('..')) return null;
+  if (!/^[\w\u4e00-\u9fff\u3400-\u4dbf\u00c0-\u024f\u1e00-\u1eff._-]+$/u.test(value)) return null;
   return value;
 }
 

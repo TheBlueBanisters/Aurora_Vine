@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "香港中文大学（The Chinese University of Hong Kong，简称CUHK）成立于1963年，位于中国香港新界沙田区，是香港顶尖的公立研究型大学，也是香港唯一实行书院联邦制的大学。学校下设9个学院与8所书院，覆盖医学、法律、商学、工程、人文社科等领域，在校生超22000人，其中研究生约10000名。\r\n香港中文大学以“结合传统与现代，融会中国与西方”为办学理念，采用中英文双语教学，培养了多位诺贝尔奖得主、菲尔兹奖得主，包括首位华人诺贝尔奖得主杨振宁教授。学校在中文研究、生物医学、人工智能、经济学等领域稳居亚洲领先地位，拥有多个国家级重点实验室。2026QS世界大学排名中，香港中文大学位列世界第32位。"
+    ],
+    "en": [
+      "The Chinese University of Hong Kong (CUHK) is a top public research university in Hong Kong. Founded in 1963, it is located in Shatin, New Territories, Hong Kong, and is the only collegiate university in Hong Kong. The University comprises 9 faculties and 8 colleges, covering medicine, law, business, engineering, and humanities and social sciences, with over 22,000 enrolled students, including 10,000 graduate students. Guided by the philosophy of 'combining tradition and modernity, bridging China and the West', CUHK adopts bilingual teaching in Chinese and English, and has produced multiple Nobel Prize winners and Fields Medalists, including the first Chinese Nobel laureate, Professor Chen-Ning Yang. Ranked No.32 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.cuhk.edu.hk/",
+  "address": {
+    "zh": "中国香港新界沙田区",
+    "en": "The Chinese University of Hong Kong, Shatin, New Territories, Hong Kong"
+  }
+}

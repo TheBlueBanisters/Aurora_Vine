@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "海德堡大学（Ruprecht-Karls-Universität Heidelberg）成立于1386年，位于德国巴登-符腾堡州海德堡市，是德国历史最悠久的大学之一，也是欧洲顶尖的研究型大学。学校在医学、自然科学、法学、社会科学、人文艺术等领域享有盛誉，其学术研究水平位居世界前列。海德堡大学以其深厚的学术传统和优美的校园环境，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "Ruprecht-Karls-Universität Heidelberg, founded in 1386, is one of Germany's oldest universities and a leading European research institution in Heidelberg, Baden-Württemberg. It excels in medicine, natural sciences, law, social sciences, humanities, and more, with world-leading academic research. Known for its profound academic tradition and beautiful campus, Heidelberg University has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.uni-heidelberg.de",
+  "address": {
+    "zh": "德国巴登-符腾堡州海德堡市老城大学广场1号",
+    "en": "Universitätsplatz 1, 69117 Heidelberg, Germany"
+  }
+}

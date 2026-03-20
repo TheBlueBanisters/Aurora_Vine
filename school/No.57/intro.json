@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "京都大学（Kyoto University）成立于1897年，位于日本京都市左京区，是日本顶尖的国立研究型大学，也是日本旧帝国大学之一。学校在物理学、化学、医学、数学、工学等领域享有盛誉，其学术研究注重基础研究和自由探索，培养了大量诺贝尔奖得主和学术大师。京都大学以其严谨的学术传统和优美的校园环境，成为日本高等教育的重要支柱。"
+    ],
+    "en": [
+      "Kyoto University, founded in 1897, is a leading national research university in Sakyo-ku, Kyoto, Japan, and one of Japan's former imperial universities. It excels in physics, chemistry, medicine, mathematics, engineering, and more, emphasizing basic research and free exploration. It has produced numerous Nobel laureates and academic leaders. With its rigorous academic tradition and beautiful campus, Kyoto University is a pillar of Japanese higher education."
+    ]
+  },
+  "contact": "https://www.kyoto-u.ac.jp",
+  "address": {
+    "zh": "日本京都市左京区吉田本町",
+    "en": "Yoshida-honmachi, Sakyo-ku, Kyoto 606-8501, Japan"
+  }
+}

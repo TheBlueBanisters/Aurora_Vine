@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "华盛顿大学（University of Washington）成立于1861年，位于美国华盛顿州西雅图市，是世界顶尖的公立研究型大学。学校在医学、计算机科学、工程、自然科学、社会科学等领域享有盛誉，其学术研究水平位居世界前列。华盛顿大学以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of Washington, founded in 1861, is a world-leading public research university in Seattle, Washington. It excels in medicine, computer science, engineering, natural sciences, social sciences, and more, with world-leading academic research. Known for its excellent teaching quality and rich academic resources, the University of Washington has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.washington.edu",
+  "address": {
+    "zh": "美国华盛顿州西雅图市15th大道东北4000号",
+    "en": "4000 15th Ave NE, Seattle, WA 98105, United States"
+  }
+}

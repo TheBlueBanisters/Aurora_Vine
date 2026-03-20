@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "马德里康普顿斯大学（Universidad Complutense de Madrid，简称UCM）成立于1293年，位于西班牙首都马德里大学城，是西班牙历史最悠久、声誉卓著的公立大学之一，在2026年QS世界大学排名中位列全球第187位，西班牙第三。学校特别在人文与社会科学领域享有盛誉，拥有50,490名学生和5,958名教员，国际学生人数达6,129人，是西班牙规模最大的大学之一。"
+    ],
+    "en": [
+      "The Complutense University of Madrid (UCM), founded in 1293, is located in the University City of Madrid, Spain. It is one of the oldest and most prestigious public universities in Spain, ranked 187th in the QS World University Rankings 2026 and 3rd in Spain. The university enjoys high reputation especially in humanities and social sciences, with 50,490 students, 5,958 faculty members, and 6,129 international students, making it one of the largest universities in Spain."
+    ]
+  },
+  "contact": "https://www.ucm.es/",
+  "address": {
+    "zh": "西班牙马德里市大学城",
+    "en": "Ciudad Universitaria, Madrid, Spain"
+  }
+}

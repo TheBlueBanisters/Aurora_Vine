@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "台湾大学（National Taiwan University，简称NTU）成立于1928年，位于中国台湾省台北市，是台湾地区最顶尖的公立研究型大学。学校在医学、工程、自然科学、社会科学、人文艺术等领域享有盛誉，其学术研究水平位居台湾地区首位。台湾大学以其优秀的教学质量和丰富的学术资源，培养了大量台湾地区各领域的杰出人才。"
+    ],
+    "en": [
+      "National Taiwan University (NTU), founded in 1928, is the leading public research university in Taipei, Taiwan. It excels in medicine, engineering, natural sciences, social sciences, humanities, and more, with top academic research in Taiwan. Known for its excellent teaching quality and rich academic resources, NTU has produced numerous talents across fields in Taiwan."
+    ]
+  },
+  "contact": "https://www.ntu.edu.tw",
+  "address": {
+    "zh": "中国台湾省台北市罗斯福路四段1号",
+    "en": "No. 1, Sec. 4, Roosevelt Rd, Da'an District, Taipei City, Taiwan"
+  }
+}

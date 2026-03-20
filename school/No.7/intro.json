@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "苏黎世联邦理工大学（ETH Zurich，全称瑞士联邦理工学院苏黎世）成立于1855年，位于瑞士苏黎世市，是瑞士两所联邦理工大学之一，也是瑞士规模最大、声誉最高的理工大学，被誉为“欧洲大陆的MIT”。学校下设16个系，覆盖从基础科学到应用技术的全领域，在校生超24000人。\r\n苏黎世联邦理工大学以卓越的科研与教学质量享誉全球，在工程技术、自然科学、计算机科学、建筑等领域稳居世界前列，培养了32位诺贝尔奖得主、4位图灵奖得主，包括著名物理学家爱因斯坦。学校在机器人技术、纳米科学、能源技术、信息技术等前沿领域持续引领全球创新。2026QS世界大学排名中，苏黎世联邦理工大学位列世界第7位。"
+    ],
+    "en": [
+      "ETH Zurich (Swiss Federal Institute of Technology in Zurich) is one of two Swiss federal institutes of technology, located in Zurich, Switzerland. Founded in 1855, ETH Zurich is Switzerland's largest and most prestigious technical university, known as the 'MIT of Europe'. The Institute comprises 16 departments covering a wide range from basic sciences to applied technologies, with over 24,000 enrolled students. ETH Zurich has produced 32 Nobel Prize winners and 4 Turing Award winners, including Albert Einstein, and leads the world in robotics, nanoscience, energy technology, and information technology. Ranked No.7 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.ethz.ch/",
+  "address": {
+    "zh": "瑞士苏黎世市大学街16号",
+    "en": "ETH Zurich, Universitätstrasse 16, 8092 Zurich, Switzerland"
+  }
+}

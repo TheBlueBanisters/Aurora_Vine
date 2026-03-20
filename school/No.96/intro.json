@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "悉尼科技大学（University of Technology Sydney，简称UTS）成立于1988年，位于澳大利亚新南威尔士州悉尼市，是澳大利亚著名的公立研究型大学。学校在护理、计算机科学、艺术设计、工程、商学等领域享有盛誉，注重实践导向的教育和应用研究。悉尼科技大学以其创新的教学理念和优秀的教学质量，培养了大量各领域的专业人才。"
+    ],
+    "en": [
+      "The University of Technology Sydney (UTS), founded in 1988, is a renowned public research university in Sydney, New South Wales, Australia. It excels in nursing, computer science, art and design, engineering, business, and more, emphasizing practice-oriented education and applied research. Known for its innovative teaching philosophy and excellent teaching quality, UTS has produced numerous professionals across fields."
+    ]
+  },
+  "contact": "https://www.uts.edu.au",
+  "address": {
+    "zh": "澳大利亚新南威尔士州悉尼市百老汇15号",
+    "en": "15 Broadway, Ultimo NSW 2007, Australia"
+  }
+}

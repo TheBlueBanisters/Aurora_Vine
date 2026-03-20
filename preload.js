@@ -23,6 +23,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('schools:list', page, pageSize),
   schoolsGetById: (schoolId) =>
     ipcRenderer.invoke('schools:getById', schoolId),
+  schoolsGetByIds: (schoolIds) =>
+    ipcRenderer.invoke('schools:getByIds', schoolIds),
   schoolsGetIntro: (rankingQs) =>
     ipcRenderer.invoke('schools:getIntro', rankingQs),
   schoolsGetAssetPath: (rankingQs, filename) =>

@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "伯尔尼大学（University of Bern）建于1834年，其创建历史可以追溯到十六世纪早期建立的神学院，位于瑞士首都伯尔尼，是欧洲传统的综合类大学，同时也是瑞士中等规模大学之一。学校在2026年QS世界大学排名中位列全球第184位，在空间研究、气候科学、医学和兽医学方面具有领先地位。学校物理学院曾经参与了人类首次月球探险，如今仍继续为美国宇航局（NASA）和欧洲航天局（ESA）的项目提供研究仪器和实验分析数据。"
+    ],
+    "en": [
+      "The University of Bern, founded in 1834 with roots dating back to a theological school established in the early 16th century, is located in Bern, the capital of Switzerland. It is a traditional comprehensive university in Europe and one of Switzerland's medium-sized universities. Ranked 184th in the QS World University Rankings 2026, the university leads in space research, climate science, medicine, and veterinary medicine. Its physics department participated in humanity's first lunar expedition and continues to provide research instruments and experimental analysis data for NASA and ESA projects."
+    ]
+  },
+  "contact": "https://www.unibe.ch/",
+  "address": {
+    "zh": "瑞士伯尔尼州伯尔尼市霍赫舒勒大街6号",
+    "en": "Hochschulstrasse 6, CH-3012 Bern, Switzerland"
+  }
+}

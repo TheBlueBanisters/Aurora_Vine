@@ -1,17 +1,15 @@
 {
   "intro": {
     "zh": [
-      "麻省理工学院（Massachusetts Institute of Technology，简称 MIT）成立于1861年，位于美国马萨诸塞州剑桥市，是世界顶尖的研究型大学之一。学校创立之初旨在回应工业化时代对工程与科学人才的需求，经过一个多世纪的发展，MIT已成为全球科技创新与工程教育的重要中心。学校在工程、计算机科学、人工智能、物理学、数学、材料科学以及经济学等多个领域长期处于世界领先地位。",
-      "MIT以强调实践与创新的教育理念著称，其校训“Mens et Manus”（心与手）体现了理论知识与实践能力并重的教学传统。学校拥有众多世界知名研究机构，例如 MIT 林肯实验室（MIT Lincoln Laboratory）、MIT 媒体实验室（MIT Media Lab）以及计算机科学与人工智能实验室（CSAIL）。MIT 的校友、教授与研究人员中产生了大量诺贝尔奖得主、图灵奖得主以及全球知名科技企业创始人，对现代科技发展、工程创新与产业变革产生了深远影响。"
+      "哈佛大学（Harvard University）成立于1636年，位于美国马萨诸塞州剑桥市，是美国历史最悠久的高等教育机构，也是常春藤盟校核心成员之一。学校下设13个学院，覆盖本科、研究生及专业教育全阶段，包括哈佛学院、文理研究生院、医学院、法学院、商学院等顶尖学院。\r\n哈佛大学以卓越的学术成就和全球影响力闻名于世，校训为“Veritas（真理）”，体现了对知识与真理的不懈追求。学校在校生超33000人，培养了8位美国总统、161位诺贝尔奖得主、18位菲尔兹奖得主、14位图灵奖得主，在医学、法学、商学、公共政策、工程技术等领域长期处于世界领先地位。2026QS世界大学排名中，哈佛大学位列世界第5位。"
     ],
     "en": [
-      "The Massachusetts Institute of Technology (MIT), founded in 1861 and located in Cambridge, Massachusetts, is one of the world’s leading research universities. Established during the rise of industrialization in the United States, MIT was designed to advance education in science and engineering and to address the technological needs of modern society. Over the past century and a half, MIT has developed into a global center for technological innovation and scientific research, with particular strengths in engineering, computer science, artificial intelligence, physics, mathematics, materials science, and economics.",
-      "MIT is widely known for its motto 'Mens et Manus' (Mind and Hand), which reflects the institute’s emphasis on the integration of theoretical knowledge and practical application. The university hosts several internationally recognized research institutions, including the MIT Lincoln Laboratory, the MIT Media Lab, and the Computer Science and Artificial Intelligence Laboratory (CSAIL). MIT’s faculty and alumni include numerous Nobel Prize laureates, Turing Award winners, and founders of influential technology companies, and the institute continues to play a major role in shaping global technological innovation and scientific progress."
+      "Harvard University is a private research university in Cambridge, Massachusetts, United States, and a founding member of the Ivy League. Founded in 1636, Harvard is the oldest institution of higher education in the United States. The University comprises 13 schools, including Harvard College, the Graduate School of Arts and Sciences, and top professional schools in medicine, law, and business. Harvard is renowned for its academic excellence and global impact, with the motto Veritas\" (Truth) reflecting its unwavering pursuit of knowledge. The University has over 33"
     ]
   },
-  "contact": "https://www.mit.edu",
+  "contact": "000 students",
   "address": {
-    "zh": "美国马萨诸塞州剑桥市马萨诸塞大道77号",
-    "en": "77 Massachusetts Avenue, Cambridge, MA 02139, United States"
+    "zh": "and has produced 8 U.S. presidents",
+    "en": "161 Nobel Prize winners"
   }
 }

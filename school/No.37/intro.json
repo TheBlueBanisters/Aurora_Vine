@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "东京大学（The University of Tokyo，简称东大、UTokyo）成立于1877年，位于日本东京都文京区，是日本历史最悠久、规模最大的顶尖公立研究型大学，也是日本国立大学联盟核心成员。学校下设10个学院，覆盖医学、法律、商学、工程、自然科学、人文社科等领域，在校生超28000人，其中研究生约15000名。\r\n东京大学是日本最高学术殿堂，2027年将迎来创立150周年，培养了15位诺贝尔奖得主、1位菲尔兹奖得主、18位日本首相，在自然科学、工程技术、医学、法学、经济学等领域长期稳居日本首位、亚洲顶尖水平。学校以“通过对话，在多样性的海洋中创造未来”为核心理念，在人工智能、量子科学、气候变化、生物医药等前沿领域持续产出世界级科研成果。2026QS世界大学排名中，东京大学位列世界第37位。"
+    ],
+    "en": [
+      "The University of Tokyo (UTokyo) is Japan's oldest and top public research university, located in Bunkyo-ku, Tokyo, Japan. Founded in 1877, it is a core member of Japan's National University Corporation, comprising 10 faculties covering medicine, law, business, engineering, natural sciences, and humanities, with over 28,000 enrolled students, including 15,000 graduate students. The University will celebrate its 150th anniversary in 2027, and has produced 15 Nobel Prize winners, 1 Fields Medalist, and 18 Japanese prime ministers. It is Japan's highest academic institution, leading Asia in natural sciences, engineering, and medicine. Ranked No.37 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.u-tokyo.ac.jp/",
+  "address": {
+    "zh": "日本东京都文京区本乡",
+    "en": "The University of Tokyo, Hongo, Bunkyo-ku, Tokyo 113-0033, Japan"
+  }
+}

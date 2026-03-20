@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "巴黎理工学院（Institut Polytechnique de Paris，简称IP Paris）成立于2020年，位于法国巴黎萨克雷高原，是由巴黎综合理工学院、国立高等电信学校、国立高等先进技术学校等5所法国顶尖工程师大学校合并组建的公立研究型大学，是法国顶尖的理工高等学府。\r\n学校下设5个创始学院，覆盖工程、自然科学、管理、人工智能等领域，在校生超11200人，拥有45个实验室、77个讲席教授席位，每年发表超5100篇学术论文。巴黎理工学院在工程、量子科学、人工智能、能源转型、数字技术等领域处于欧洲领先地位，培养了多位诺贝尔奖得主、菲尔兹奖得主，包括2024年诺贝尔物理学奖得主Michel Devoret。2026QS世界大学排名中，巴黎理工学院位列世界第41位。"
+    ],
+    "en": [
+      "Institut Polytechnique de Paris (IP Paris) is a top public research university in France. Founded in 2020, it was formed by the merger of 5 prestigious French engineering grandes écoles, including École Polytechnique, Télécom Paris, and ENSTA Paris. The Institute comprises 5 founding schools, covering engineering, natural sciences, management, and artificial intelligence, with over 11,200 enrolled students, 45 laboratories, and 77 chaired professorships. It has produced multiple Nobel Prize winners and Fields Medalists, including 2024 Nobel laureate in Physics, Michel Devoret. Ranked No.41 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.ip-paris.fr/",
+  "address": {
+    "zh": "法国巴黎市笛卡尔街1号",
+    "en": "Institut Polytechnique de Paris, 1 rue Descartes, 75005 Paris, France"
+  }
+}

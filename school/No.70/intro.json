@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "伊利诺伊大学厄巴纳-香槟分校（University of Illinois Urbana-Champaign，简称UIUC）成立于1867年，位于美国伊利诺伊州厄巴纳和香槟市，是世界顶尖的公立研究型大学。学校在工程、计算机科学、农业科学、物理学、化学等领域享有盛誉，其学术研究水平位居世界前列。UIUC以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of Illinois Urbana-Champaign (UIUC), founded in 1867, is a world-leading public research university in Urbana and Champaign, Illinois. It excels in engineering, computer science, agricultural science, physics, chemistry, and more, with world-leading academic research. Known for its excellent teaching quality and rich academic resources, UIUC has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.illinois.edu",
+  "address": {
+    "zh": "美国伊利诺伊州厄巴纳市赖特街506号",
+    "en": "506 S Wright St, Urbana, IL 61801, United States"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "德克萨斯大学奥斯汀分校（University of Texas at Austin，简称UT Austin）成立于1883年，位于美国德克萨斯州奥斯汀市，是世界顶尖的公立研究型大学，也是德克萨斯大学系统的旗舰机构。学校在工程、商学、法学、自然科学、社会科学等领域享有盛誉，其学术研究水平位居世界前列。UT Austin以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of Texas at Austin (UT Austin), founded in 1883, is a world-leading public research university in Austin, Texas, and the flagship institution of the University of Texas System. It excels in engineering, business, law, natural sciences, social sciences, and more, with world-leading academic research. Known for its excellent teaching quality and rich academic resources, UT Austin has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.utexas.edu",
+  "address": {
+    "zh": "美国德克萨斯州奥斯汀市马丁路德金大道110号",
+    "en": "110 Inner Campus Dr, Austin, TX 78712, United States"
+  }
+}

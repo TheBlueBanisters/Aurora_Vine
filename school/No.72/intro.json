@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "隆德大学（Lund University）成立于1666年，位于瑞典斯科讷省隆德市，是瑞典历史最悠久的大学之一，也是欧洲顶尖的研究型大学。学校在自然科学、医学、工程、社会科学、人文艺术等领域享有盛誉，其学术研究水平位居世界前列。隆德大学以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "Lund University, founded in 1666, is one of Sweden's oldest universities and a leading European research institution in Lund, Skåne. It excels in natural sciences, medicine, engineering, social sciences, humanities, and more, with world-leading academic research. Known for its excellent teaching quality and rich academic resources, Lund University has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.lunduniversity.lu.se",
+  "address": {
+    "zh": "瑞典斯科讷省隆德市大学广场1号",
+    "en": "Universitetshuset, S-221 00 Lund, Sweden"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "伦敦政治经济学院（London School of Economics and Political Science，简称LSE）成立于1895年，位于英国伦敦市中心，是世界顶尖的社会科学研究型大学，也是伦敦大学联盟成员。学校在经济学、政治学、社会学、法学、国际关系等领域位居世界前列，其学术研究对全球政策制定产生了深远影响。LSE培养了大量国家元首、政府官员和学术大师，是社会科学领域的学术殿堂。"
+    ],
+    "en": [
+      "The London School of Economics and Political Science (LSE), founded in 1895, is a world-leading social science research university in central London and a member of the University of London. It excels in economics, political science, sociology, law, international relations, and more, with research profoundly influencing global policy. LSE has produced numerous heads of state, government officials, and academic leaders, serving as a temple for social sciences."
+    ]
+  },
+  "contact": "https://www.lse.ac.uk",
+  "address": {
+    "zh": "英国伦敦市霍顿街",
+    "en": "Houghton St, London WC2A 2AE, United Kingdom"
+  }
+}

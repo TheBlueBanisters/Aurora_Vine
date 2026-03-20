@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "纽约大学（New York University，简称NYU）成立于1831年，位于美国纽约市曼哈顿，是世界顶尖的私立研究型大学。学校在哲学、数学、经济学、法学、艺术、传媒等领域享有盛誉，其全球校园网络遍布多个国家，体现了国际化的教育理念。NYU以其多元包容的学术氛围和位于世界金融文化中心的地理优势，培养了众多各领域的杰出人才。"
+    ],
+    "en": [
+      "New York University (NYU), founded in 1831, is a world-leading private research university in Manhattan, New York City. It excels in philosophy, mathematics, economics, law, arts, media, and more, with a global campus network spanning multiple countries. Known for its diverse and inclusive environment and prime location in a global financial and cultural hub, NYU has produced outstanding talents across fields."
+    ]
+  },
+  "contact": "https://www.nyu.edu",
+  "address": {
+    "zh": "美国纽约市曼哈顿华盛顿广场东70号",
+    "en": "70 Washington Square S, New York, NY 10012, United States"
+  }
+}

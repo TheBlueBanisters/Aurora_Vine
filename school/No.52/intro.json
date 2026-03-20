@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "卡内基梅隆大学（Carnegie Mellon University，简称CMU）成立于1900年，位于美国宾夕法尼亚州匹兹堡市，是世界顶尖的私立研究型大学。学校在计算机科学、人工智能、机器人、戏剧、艺术管理等领域位居世界领先地位，其校训“我的心在工作”（My Heart is in the Work）体现了务实创新的精神。CMU培养了大量计算机科学和艺术领域的杰出人才，对现代科技和文化发展产生了深远影响。"
+    ],
+    "en": [
+      "Carnegie Mellon University (CMU), founded in 1900, is a world-leading private research university located in Pittsburgh, Pennsylvania. It excels in computer science, artificial intelligence, robotics, drama, arts management, and more. Its motto 'My Heart is in the Work' reflects a pragmatic and innovative spirit. CMU has produced outstanding talents in computer science and the arts, profoundly impacting modern technology and culture."
+    ]
+  },
+  "contact": "https://www.cmu.edu",
+  "address": {
+    "zh": "美国宾夕法尼亚州匹兹堡市福布斯大道5000号",
+    "en": "5000 Forbes Ave, Pittsburgh, PA 15213, United States"
+  }
+}

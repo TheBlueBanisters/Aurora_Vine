@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "蒙特雷科技大学（The Monterrey Institute of Technology and Higher Education，简称ITESM或TEC）成立于1943年，由MIT毕业的工业家Eugenio Garza Sada创立，位于墨西哥新莱昂州蒙特雷市，是拉丁美洲规模最大的私立大学之一，拥有超过90,000名在校学生。在2026年QS世界大学排名中位列全球第187位，其商科在拉丁美洲首屈一指，计算机科学位列全球71-80位，还是拉美首个接入互联网的大学，校友创造超22万家企业，是墨西哥专利申请量最多的高校。"
+    ],
+    "en": [
+      "The Monterrey Institute of Technology and Higher Education (ITESM or TEC), founded in 1943 by MIT graduate industrialist Eugenio Garza Sada, is located in Monterrey, Nuevo León, Mexico. It is one of the largest private universities in Latin America with over 90,000 students. Ranked 187th in the QS World University Rankings 2026, its business school is second to none in Latin America, and its computer science ranks 71-80 globally. It was the first university in Latin America to connect to the Internet, with alumni creating over 220,000 enterprises, making it the university with the most patent applications in Mexico."
+    ]
+  },
+  "contact": "https://tec.mx/",
+  "address": {
+    "zh": "墨西哥新莱昂州蒙特雷市Ave. Eugenio Garza Sada No. 2501",
+    "en": "Ave. Eugenio Garza Sada No. 2501, Monterrey, Nuevo León, Mexico"
+  }
+}

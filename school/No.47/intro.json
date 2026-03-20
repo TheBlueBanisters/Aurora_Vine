@@ -1,0 +1,15 @@
+{
+	"intro": {
+		"zh": [
+			"上海交通大学（Shanghai Jiao Tong University）成立于1896年，坐落于中国上海市，是教育部直属、中央直管副部级建制的全国重点大学，位列国家“双一流”“985工程”“211工程”重点建设高校。学校下设30余个学院，覆盖工学、理学、医学、经济学、管理学、法学、文学、农学等学科门类，在校生超40000人，科研与教学实力位居国内顶尖水平。\r\n上海交通大学在工程学、材料科学、计算机科学、临床医学、船舶海洋工程、人工智能等领域拥有全球领先的学术实力，是国内最具影响力的研究型大学之一，科研成果丰硕，培养了大批行业领军人才。2026QS世界大学排名中，上海交通大学位列世界第43位。"
+		],
+		"en": [
+			"Shanghai Jiao Tong University (SJTU) is a top national research university located in Shanghai, China. Founded in 1896, it is a key national university under the direct administration of the Ministry of Education of China, and part of the national \"Double First-Class\", \"Project 985\" and \"Project 211\" initiatives. The university has more than 30 schools covering engineering, science, medicine, economics, management, law, literature, agriculture and other disciplines, with over 40,000 enrolled students.\r\nSJTU boasts world-class academic strength in engineering, materials science, computer science, clinical medicine, naval architecture, artificial intelligence and other fields. It is ranked 43rd globally in the 2026 QS World University Rankings."
+		]
+	},
+	"contact": "https://www.sjtu.edu.cn/",
+	"address": {
+		"zh": "中国上海市",
+		"en": "Shanghai Jiao Tong University, Shanghai, China"
+	}
+}

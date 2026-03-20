@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "麦吉尔大学（McGill University）成立于1821年，位于加拿大魁北克省蒙特利尔市，是加拿大顶尖的公立研究型大学，也是加拿大历史最悠久的高等学府之一。学校下设11个学院，覆盖医学、法律、商学、工程、自然科学等领域，在校生超40000人。\r\n麦吉尔大学连续21年位列麦克林加拿大大学排名医博类第1位，被誉为“加拿大的哈佛”，培养了12位诺贝尔奖得主、1位图灵奖得主、加拿大国家领导人，以及2025年诺贝尔经济学奖得主Peter Howitt。学校在医学、神经科学、法学、商学等领域长期稳居加拿大首位，在人工智能、科技研发领域拥有深厚的学术积淀。2026QS世界大学排名中，麦吉尔大学位列世界第27位。"
+    ],
+    "en": [
+      "McGill University is a top public research university in Canada. Founded in 1821, it is located in Montreal, Quebec, and one of Canada's oldest higher education institutions. The University comprises 11 faculties, covering medicine, law, business, engineering, and natural sciences, with over 40,000 enrolled students. McGill has ranked No.1 in Canada's Maclean's Medical-Doctoral University Rankings for 21 consecutive years, known as 'Canada's Harvard'. It has produced 12 Nobel Prize winners, 1 Turing Award winner, and the 2025 Nobel laureate in Economics, Peter Howitt. Ranked No.27 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.mcgill.ca/",
+  "address": {
+    "zh": "加拿大魁北克省蒙特利尔市麦克塔维什街3459号",
+    "en": "McGill University, 3459 McTavish Street, Montreal, QC H3A 0C9, Canada"
+  }
+}

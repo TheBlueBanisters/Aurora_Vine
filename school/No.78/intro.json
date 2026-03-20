@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "KTH皇家理工学院（KTH Royal Institute of Technology）成立于1827年，位于瑞典斯德哥尔摩市，是瑞典历史最悠久、规模最大的公立理工大学，也是欧洲顶尖的理工大学之一。学校在工程技术、计算机科学、建筑学、工业设计等领域享有盛誉，其学术研究水平位居世界前列。KTH以其优秀的教学质量和创新的研究成果，培养了大量工程技术领域的杰出人才。"
+    ],
+    "en": [
+      "KTH Royal Institute of Technology, founded in 1827, is Sweden's oldest and largest public technical university in Stockholm, and one of Europe's leading technical universities. It excels in engineering, computer science, architecture, industrial design, and more, with world-leading academic research. Known for its excellent teaching quality and innovative research, KTH has produced numerous talents in engineering and technology."
+    ]
+  },
+  "contact": "https://www.kth.se",
+  "address": {
+    "zh": "瑞典斯德哥尔摩市林德斯泰德街100号",
+    "en": "Teknikringen 10, 114 28 Stockholm, Sweden"
+  }
+}

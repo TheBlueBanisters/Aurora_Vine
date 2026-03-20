@@ -7,9 +7,20 @@ let explorerPage = 1
 let explorerTotal = 0
 let detailBackPage = 'university-explorer'
 let currentDetailSchool = null
+const schoolAssetDataUrlCache = new Map()
 
 let overlay, backBtn, titleEl, starBtn, heroBg, logoEl, nameEl, metaEl, introEl, detailBody, carouselTrack
 let lightbox, lightboxImg, lightboxClose
+
+async function getSchoolAssetDataUrl(rankingQs, filename) {
+  if (!rankingQs || !filename || !window.api?.schoolsGetAssetDataUrl) return null
+  const cacheKey = `${rankingQs}:${filename}`
+  if (schoolAssetDataUrlCache.has(cacheKey)) return schoolAssetDataUrlCache.get(cacheKey)
+  const res = await window.api.schoolsGetAssetDataUrl(rankingQs, filename)
+  const dataUrl = res?.dataUrl || null
+  if (dataUrl) schoolAssetDataUrlCache.set(cacheKey, dataUrl)
+  return dataUrl
+}
 
 function renderSchoolCard(school, container, onClick) {
   const card = document.createElement('div')
@@ -18,7 +29,7 @@ function renderSchoolCard(school, container, onClick) {
   const fav = isFavorite(school.school_id)
   card.innerHTML = `
     <div class="school-card-main" ${onClick ? 'role="button" tabindex="0"' : ''}>
-      <img class="school-card-logo" data-ranking="${school.ranking_qs}" alt="" src="">
+      <img class="school-card-logo" alt="" src="" loading="lazy">
       <div class="school-card-names">
         <span class="school-card-name-zh">${escapeHtml(school.school_name_zh || '')}</span>
         <span class="school-card-name-en">${escapeHtml(school.school_name_en || '')}</span>
@@ -42,10 +53,10 @@ function renderSchoolCard(school, container, onClick) {
     </div>
   `
   const logoImg = card.querySelector('.school-card-logo')
-  if (window.api?.schoolsGetAssetDataUrl && school.ranking_qs) {
-    window.api.schoolsGetAssetDataUrl(school.ranking_qs, 'logo.svg').then((res) => {
-      if (res?.dataUrl && logoImg.parentNode) logoImg.src = res.dataUrl
-    })
+  if (logoImg && school.logo_filename && school.ranking_qs) {
+    getSchoolAssetDataUrl(school.ranking_qs, school.logo_filename).then((dataUrl) => {
+      if (dataUrl && logoImg.isConnected) logoImg.src = dataUrl
+    }).catch(() => {})
   }
   const starBtnEl = card.querySelector('.school-card-star')
   starBtnEl.addEventListener('click', (e) => {
@@ -111,15 +122,23 @@ function openSchoolDetail(school, fromPage) {
   starBtn.classList.toggle('favorited', fav)
 
   const rq = school.ranking_qs
-  if (window.api.schoolsGetAssetDataUrl) {
-    window.api.schoolsGetAssetDataUrl(rq, '1.jpg').then((res) => {
-      if (res?.dataUrl) heroBg.style.backgroundImage = `url(${res.dataUrl})`
-      else heroBg.style.backgroundImage = ''
-    })
-    window.api.schoolsGetAssetDataUrl(rq, 'logo.svg').then((res) => {
-      if (res?.dataUrl) { logoEl.src = res.dataUrl; logoEl.style.display = '' }
-      else logoEl.style.display = 'none'
-    })
+  heroBg.style.backgroundImage = ''
+  if (rq) {
+    getSchoolAssetDataUrl(rq, '1.jpg').then((dataUrl) => {
+      if (dataUrl && currentDetailSchool?.school_id === school.school_id) {
+        heroBg.style.backgroundImage = `url(${dataUrl})`
+      }
+    }).catch(() => {})
+  }
+  if (school.logo_filename && rq) {
+    logoEl.style.display = ''
+    getSchoolAssetDataUrl(rq, school.logo_filename).then((dataUrl) => {
+      if (dataUrl && currentDetailSchool?.school_id === school.school_id) {
+        logoEl.src = dataUrl
+      }
+    }).catch(() => {})
+  } else {
+    logoEl.style.display = 'none'
   }
 
   nameEl.textContent = school.school_name_zh || school.school_name_en || ''
@@ -155,17 +174,27 @@ function openSchoolDetail(school, fromPage) {
 
   carouselTrack.innerHTML = ''
   delete carouselTrack.dataset.duplicated
-  if (window.api.schoolsGetAssetDataUrl) {
+  carouselTrack.classList.remove('carousel-animate')
+  if (rq) {
+    let loadedCount = 0
     for (let i = 2; i <= 5; i++) {
-      const f = `${i}.jpg`
-      window.api.schoolsGetAssetDataUrl(rq, f).then((res) => {
-        if (res?.dataUrl) {
-          const img = document.createElement('img')
-          img.src = res.dataUrl; img.alt = ''
-          img.addEventListener('click', () => openLightbox(res.dataUrl))
-          carouselTrack.appendChild(img)
-          updateCarousel()
+      const filename = `${i}.jpg`
+      const img = document.createElement('img')
+      img.alt = ''
+      img.addEventListener('click', () => {
+        if (img.src) openLightbox(img.src)
+      })
+      img.addEventListener('load', () => { loadedCount++; if (loadedCount > 0) updateCarousel() })
+      img.addEventListener('error', () => img.remove())
+      carouselTrack.appendChild(img)
+      getSchoolAssetDataUrl(rq, filename).then((dataUrl) => {
+        if (dataUrl && currentDetailSchool?.school_id === school.school_id && img.isConnected) {
+          img.src = dataUrl
+        } else if (!dataUrl && img.isConnected) {
+          img.remove()
         }
+      }).catch(() => {
+        if (img.isConnected) img.remove()
       })
     }
   }
@@ -225,11 +254,15 @@ export async function loadSchoolListTarget() {
   grid.innerHTML = ''
   const ids = getTargetSchools()
   emptyEl.style.display = ids.length ? 'none' : 'flex'
-  if (ids.length === 0 || !window.api?.schoolsGetById) return
+  if (ids.length === 0) return
 
-  const schools = []
-  for (const id of ids) {
-    try { const school = await window.api.schoolsGetById(id); if (school) schools.push(school) } catch (_) {}
+  let schools = []
+  if (window.api?.schoolsGetByIds) {
+    try { schools = await window.api.schoolsGetByIds(ids) || [] } catch (_) {}
+  } else if (window.api?.schoolsGetById) {
+    for (const id of ids) {
+      try { const school = await window.api.schoolsGetById(id); if (school) schools.push(school) } catch (_) {}
+    }
   }
   schools.sort((a, b) => (a.ranking_qs || 999) - (b.ranking_qs || 999))
   schools.forEach((school) => renderSchoolCard(school, grid, (s) => openSchoolDetail(s, 'target-universities')))

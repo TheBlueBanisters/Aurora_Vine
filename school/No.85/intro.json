@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "东京工业大学（Tokyo Institute of Technology，简称Tokyo Tech）成立于1881年，位于日本东京都目黑区，是日本顶尖的公立理工大学，也是日本旧帝国大学之一。学校在工程技术、计算机科学、自然科学、建筑学等领域享有盛誉，其学术研究水平位居世界前列。东京工业大学以其优秀的教学质量和创新的研究成果，培养了大量工程技术领域的杰出人才。"
+    ],
+    "en": [
+      "Tokyo Institute of Technology (Tokyo Tech), founded in 1881, is a leading public technical university in Meguro-ku, Tokyo, Japan, and one of Japan's former imperial universities. It excels in engineering, computer science, natural sciences, architecture, and more, with world-leading academic research. Known for its excellent teaching quality and innovative research, Tokyo Tech has produced numerous talents in engineering and technology."
+    ]
+  },
+  "contact": "https://www.titech.ac.jp",
+  "address": {
+    "zh": "日本东京都目黑区大冈山2-12-1",
+    "en": "2-12-1 Ookayama, Meguro-ku, Tokyo 152-8550, Japan"
+  }
+}

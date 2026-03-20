@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "鲁汶大学（KU Leuven）成立于1425年，位于比利时弗拉芒大区鲁汶市，是比利时历史最悠久的大学之一，也是欧洲顶尖的研究型大学。学校在神学、哲学、医学、工程、社会科学等领域享有盛誉，其学术研究注重跨学科合作和国际交流。鲁汶大学以其深厚的学术传统和卓越的研究成果，成为欧洲高等教育的重要中心。"
+    ],
+    "en": [
+      "KU Leuven, founded in 1425, is one of Belgium's oldest universities and a leading European research institution in Leuven, Flanders. It excels in theology, philosophy, medicine, engineering, social sciences, and more, emphasizing interdisciplinary collaboration and international exchange. With its profound academic tradition and outstanding research, KU Leuven is a key center for European higher education."
+    ]
+  },
+  "contact": "https://www.kuleuven.be",
+  "address": {
+    "zh": "比利时鲁汶市老市场1号",
+    "en": "Oude Markt 13, 3000 Leuven, Belgium"
+  }
+}

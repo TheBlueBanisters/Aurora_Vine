@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "清华大学（Tsinghua University）成立于1911年，初名清华学堂，位于中国北京市海淀区，是中国顶尖的公立研究型大学。学校下设20个学院，覆盖工程、计算机科学、材料科学、生命科学、管理、经济、人文社科等全领域，在校生超37000人。\r\n清华大学以“自强不息，厚德载物”为校训，是中国工程教育与科技创新的标杆，培养了多位诺贝尔奖得主、菲尔兹奖得主，以及大批国家领导人、学术大师与产业领军者。学校在工程技术、计算机科学、材料科学、人工智能等领域稳居世界顶尖水平。2026QS世界大学排名中，清华大学位列世界第18位。"
+    ],
+    "en": [
+      "Tsinghua University is a public research university in Beijing, China. Founded in 1911 as Tsinghua College, it is China's top higher education institution. The University comprises 20 colleges, covering engineering, computer science, materials science, life science, management, economics, and humanities and social sciences, with over 37,000 enrolled students. Guided by the motto 'Self-Discipline and Social Commitment', Tsinghua is the benchmark of engineering education and technological innovation in China, having produced multiple Nobel Prize winners, Fields Medalists, and national leaders. Ranked No.18 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.tsinghua.edu.cn/",
+  "address": {
+    "zh": "中国北京市海淀区清华园",
+    "en": "Tsinghua University, Tsinghua Yuan, Haidian District, Beijing 100084, China"
+  }
+}

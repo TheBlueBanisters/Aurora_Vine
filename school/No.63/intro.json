@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "香港城市大学（City University of Hong Kong，简称CityU）成立于1984年，位于中国香港九龙塘，是香港著名的公立研究型大学。学校在工程、计算机科学、商学、社会科学、创意媒体等领域享有盛誉，注重应用研究和国际化教育。香港城市大学以其快速发展的学术成就和创新的教学理念，成为亚洲高等教育的重要力量。"
+    ],
+    "en": [
+      "City University of Hong Kong (CityU), founded in 1984, is a leading public research university in Kowloon Tong, Hong Kong. It excels in engineering, computer science, business, social sciences, creative media, and more, emphasizing applied research and international education. Known for its rapidly growing academic achievements and innovative teaching philosophy, CityU is a key force in Asian higher education."
+    ]
+  },
+  "contact": "https://www.cityu.edu.hk",
+  "address": {
+    "zh": "中国香港九龙塘达之路83号",
+    "en": "83 Tat Chee Ave, Kowloon Tong, Hong Kong"
+  }
+}

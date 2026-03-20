@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { getReadOnlyDb } from '../utils/db';
@@ -13,7 +13,7 @@ export function registerSchoolsIpc() {
     try {
       const offset = Math.max(0, (page - 1) * pageSize);
       const stmt = db.prepare(
-        'SELECT * FROM schools ORDER BY ranking_qs ASC LIMIT ? OFFSET ?'
+        'SELECT school_id, school_name_zh, school_name_en, short_name, country_zh, country_en, city_zh, city_en, ranking_qs, logo_filename FROM schools ORDER BY ranking_qs ASC LIMIT ? OFFSET ?'
       );
       const countStmt = db.prepare('SELECT COUNT(*) as total FROM schools');
       const items = stmt.all(pageSize, offset);
@@ -41,6 +41,22 @@ export function registerSchoolsIpc() {
     }
   });
 
+  ipcMain.handle('schools:getByIds', async (event, schoolIds) => {
+    if (!Array.isArray(schoolIds) || schoolIds.length === 0) return [];
+    try {
+      const db = getReadOnlyDb();
+      if (!db) return [];
+      const placeholders = schoolIds.map(() => '?').join(',');
+      const stmt = db.prepare(`SELECT * FROM schools WHERE school_id IN (${placeholders})`);
+      const rows = stmt.all(...schoolIds);
+      db.close();
+      return rows;
+    } catch (err) {
+      console.error('schools:getByIds error:', err);
+      return [];
+    }
+  });
+
   ipcMain.handle('schools:getIntro', async (event, rankingQs) => {
     const introPath = resolveSchoolPath(rankingQs, 'intro.json');
     if (!introPath) return null;
@@ -57,7 +73,7 @@ export function registerSchoolsIpc() {
     if (!safeFilename) return null;
     const assetPath = resolveSchoolPath(rankingQs, safeFilename);
     const rank = normalizeRankingQs(rankingQs);
-    return assetPath && rank ? `school://No.${rank}/${safeFilename}` : null;
+    return assetPath && rank ? `school://No.${rank}/${encodeURIComponent(safeFilename)}` : null;
   });
 
   ipcMain.handle('schools:getAssetDataUrl', async (event, rankingQs, filename) => {
@@ -79,16 +95,20 @@ export function registerSchoolsIpc() {
 
 export function registerSchoolProtocol(protocol) {
   protocol.handle('school', (request) => {
-    const raw = String(request.url || '').replace(/^school:\/\/?/i, '').replace(/^\/+/, '');
-    const match = raw.match(/^No\.(\d+)\/([A-Za-z0-9._-]+)$/);
+    const rawUrl = String(request.url || '');
+    const decoded = decodeURIComponent(rawUrl);
+    const raw = decoded.replace(/^school:\/\/?/i, '').replace(/^\/+/, '');
+    const match = raw.match(/^No\.(\d+)\/(.+)$/);
     if (!match) return new Response('', { status: 400 });
     const [, rank, filename] = match;
-    const assetPath = resolveSchoolPath(rank, filename);
+    const safeFilename = normalizeFilename(filename);
+    if (!safeFilename) return new Response('', { status: 400 });
+    const assetPath = resolveSchoolPath(rank, safeFilename);
     if (!assetPath || !fs.existsSync(assetPath)) return new Response('', { status: 404 });
     const buf = fs.readFileSync(assetPath);
     const ext = path.extname(assetPath).slice(1).toLowerCase();
     const mimeMap = { svg: 'image/svg+xml', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
     const mime = mimeMap[ext] || 'application/octet-stream';
-    return new Response(buf, { headers: { 'Content-Type': mime } });
+    return new Response(buf, { headers: { 'Content-Type': mime, 'Cache-Control': 'public, max-age=86400' } });
   });
 }

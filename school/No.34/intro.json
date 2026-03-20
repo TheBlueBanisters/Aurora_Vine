@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "爱丁堡大学（The University of Edinburgh）成立于1583年，位于英国苏格兰首府爱丁堡市，是苏格兰最高学府，也是英语世界第六古老的大学，英国罗素大学集团核心成员。学校下设3个大学院，覆盖医学、法律、商学、工程、艺术、人文社科等领域，在校生超40000人，其中研究生约18000名。\r\n爱丁堡大学在英国研究实力排名第4位，培养了23位诺贝尔奖得主、3位图灵奖得主，包括著名生物学家达尔文、物理学家麦克斯韦、电话发明者贝尔等杰出人物。学校在医学、人工智能、数据科学、人文社科等领域长期处于世界领先地位，拥有欧洲最大的AI芯片计算集群。2026QS世界大学排名中，爱丁堡大学位列世界第34位。"
+    ],
+    "en": [
+      "The University of Edinburgh is a public research university in Edinburgh, Scotland, UK. Founded in 1583, it is Scotland's premier university and the sixth-oldest university in the English-speaking world, and a core member of the Russell Group. The University comprises 3 colleges, covering medicine, law, business, engineering, arts, and humanities and social sciences, with over 40,000 enrolled students, including 18,000 graduate students. Ranked 4th in the UK for research power, it has produced 23 Nobel Prize winners and 3 Turing Award winners, including Charles Darwin, James Clerk Maxwell, and Alexander Graham Bell. Ranked No.34 in the world in the 2026 QS World University Rankings."
+    ]
+  },
+  "contact": "https://www.ed.ac.uk/",
+  "address": {
+    "zh": "英国苏格兰爱丁堡市乔治广场",
+    "en": "The University of Edinburgh, Edinburgh EH8 9YL, United Kingdom"
+  }
+}

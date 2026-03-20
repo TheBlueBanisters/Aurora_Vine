@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "格拉斯哥大学（University of Glasgow）成立于1451年，位于英国苏格兰格拉斯哥市，是苏格兰历史最悠久的大学之一，也是英国著名的公立研究型大学。学校在医学、工程、社会科学、自然科学、人文艺术等领域享有盛誉，其学术研究水平位居英国前列。格拉斯哥大学以其深厚的学术传统和优秀的教学质量，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of Glasgow, founded in 1451, is one of Scotland's oldest universities and a renowned public research university in Glasgow, UK. It excels in medicine, engineering, social sciences, natural sciences, humanities, and more, with leading academic research in the UK. Known for its profound academic tradition and excellent teaching quality, the University of Glasgow has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.gla.ac.uk",
+  "address": {
+    "zh": "英国苏格兰格拉斯哥市大学广场",
+    "en": "University Ave, Glasgow G12 8QQ, United Kingdom"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "米兰理工大学（Politecnico di Milano，简称Polimi）成立于1863年，位于意大利伦巴第大区米兰市，是意大利历史最悠久、规模最大的公立理工大学，也是欧洲顶尖的理工大学之一。学校在工程技术、建筑学、工业设计等领域享有盛誉，其学术研究水平位居世界前列。米兰理工大学以其优秀的教学质量和创新的设计理念，培养了大量工程技术和设计领域的杰出人才。"
+    ],
+    "en": [
+      "Politecnico di Milano (Polimi), founded in 1863, is Italy's oldest and largest public technical university in Milan, Lombardy, and one of Europe's leading technical universities. It excels in engineering, architecture, industrial design, and more, with world-leading academic research. Known for its excellent teaching quality and innovative design philosophy, Polimi has produced numerous talents in engineering and design."
+    ]
+  },
+  "contact": "https://www.polimi.it",
+  "address": {
+    "zh": "意大利伦巴第大区米兰市莱昂纳多·达·芬奇广场32号",
+    "en": "Piazza Leonardo da Vinci, 32, 20133 Milano MI, Italy"
+  }
+}

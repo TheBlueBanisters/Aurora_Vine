@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "巴塞罗那大学（Universitat de Barcelona）成立于1450年，位于西班牙加泰罗尼亚自治区巴塞罗那市，是西班牙最古老、最具影响力的公立研究型大学之一，也是伊比利亚半岛顶尖高等学府。学校学科门类齐全，涵盖人文社科、医学、药学、物理学、化学、生物学、法学、经济学、教育学等领域，在基础科学、医学研究、人文艺术等方面长期位居西班牙首位、世界前列。巴塞罗那大学拥有丰富的学术资源与完善的科研设施，与欧洲及全球高校保持广泛合作，是欧洲高等教育与科研体系的重要组成部分。学校不仅在学术领域成果卓越，也为西班牙乃至欧洲培养了大量政治家、科学家、文学家与社会精英，对区域文化与科技发展影响深远。"
+    ],
+    "en": [
+      "The University of Barcelona (Universitat de Barcelona) was founded in 1450 in Barcelona, Catalonia, Spain. It is one of the oldest and most influential public research universities in Spain and a top institution of higher learning on the Iberian Peninsula. The university has a complete range of disciplines, including humanities and social sciences, medicine, pharmacy, physics, chemistry, biology, law, economics, education and other fields. It has long ranked first in Spain and among the top in the world in basic science, medical research, humanities and art. With abundant academic resources and complete research facilities, the University of Barcelona maintains extensive cooperation with universities in Europe and around the world, and is an important part of the European higher education and research system. The university has not only achieved remarkable results in the academic field, but also trained a large number of politicians, scientists, writers and social elites for Spain and even Europe, exerting a profound influence on regional cultural and technological development."
+    ]
+  },
+  "contact": "https://www.ub.edu/",
+  "address": {
+    "zh": "西班牙巴塞罗那市格兰维亚大道585号",
+    "en": "Gran Via de les Corts Catalanes, 585, 08007 Barcelona, Spain"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "阿姆斯特丹大学（University of Amsterdam，简称UvA）成立于1632年，位于荷兰阿姆斯特丹市，是荷兰历史最悠久的大学之一，也是欧洲顶尖的研究型大学。学校在社会科学、传播学、法学、经济学、医学等领域享有盛誉，其学术研究注重跨学科合作和社会影响力。阿姆斯特丹大学以其开放包容的学术氛围和高质量的教学研究吸引了来自世界各地的学生和学者。"
+    ],
+    "en": [
+      "The University of Amsterdam (UvA), founded in 1632, is one of the Netherlands' oldest universities and a leading European research institution. It excels in social sciences, communication, law, economics, medicine, and more, with research emphasizing interdisciplinary collaboration and social impact. Known for its open and inclusive academic environment, UvA attracts students and scholars worldwide."
+    ]
+  },
+  "contact": "https://www.uva.nl",
+  "address": {
+    "zh": "荷兰阿姆斯特丹市辛格运河240号",
+    "en": "Singel 240, 1012 WP Amsterdam, Netherlands"
+  }
+}

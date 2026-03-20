@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "苏黎世大学（University of Zurich）成立于1833年，位于瑞士苏黎世州苏黎世市，是瑞士最大的公立研究型大学。学校在医学、自然科学、社会科学、人文艺术等领域享有盛誉，其学术研究水平位居世界前列。苏黎世大学以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of Zurich, founded in 1833, is Switzerland's largest public research university in Zurich, Zurich Canton. It excels in medicine, natural sciences, social sciences, humanities, and more, with world-leading academic research. Known for its excellent teaching quality and rich academic resources, the University of Zurich has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.uzh.ch",
+  "address": {
+    "zh": "瑞士苏黎世州苏黎世市拉米斯特拉大街76号",
+    "en": "Rämistrasse 76, 8006 Zürich, Switzerland"
+  }
+}

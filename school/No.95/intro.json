@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "阿尔伯塔大学（University of Alberta）成立于1908年，位于加拿大阿尔伯塔省埃德蒙顿市，是加拿大著名的公立研究型大学。学校在医学、工程、自然科学、社会科学、人文艺术等领域享有盛誉，其学术研究水平位居加拿大前列。阿尔伯塔大学以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of Alberta, founded in 1908, is a renowned public research university in Edmonton, Alberta, Canada. It excels in medicine, engineering, natural sciences, social sciences, humanities, and more, with leading academic research in Canada. Known for its excellent teaching quality and rich academic resources, the University of Alberta has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.ualberta.ca",
+  "address": {
+    "zh": "加拿大阿尔伯塔省埃德蒙顿市116街89号",
+    "en": "116 St & 85 Ave, Edmonton, AB T6G 2R3, Canada"
+  }
+}

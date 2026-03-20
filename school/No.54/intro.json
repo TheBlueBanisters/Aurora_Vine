@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "香港理工大学（The Hong Kong Polytechnic University，简称PolyU）成立于1937年，位于中国香港九龙红磡，是香港著名的公立研究型大学。学校在工程、建筑、设计、酒店管理、护理等领域位居世界前列，注重应用研究和产学研合作，其校训“开物成务 励学利民”体现了学以致用的精神。PolyU培养了大量专业人才，为香港和内地的社会经济发展做出了重要贡献。"
+    ],
+    "en": [
+      "The Hong Kong Polytechnic University (PolyU), founded in 1937, is a leading public research university in Hung Hom, Kowloon, Hong Kong. It excels in engineering, architecture, design, hotel management, nursing, and more, emphasizing applied research and industry collaboration. Its motto 'To learn and to apply, for the benefit of mankind' reflects a practical spirit. PolyU has produced numerous professionals, contributing to Hong Kong and mainland China's development."
+    ]
+  },
+  "contact": "https://www.polyu.edu.hk",
+  "address": {
+    "zh": "中国香港九龙红磡育才道11号",
+    "en": "11 Yuk Choi Rd, Hung Hom, Kowloon, Hong Kong"
+  }
+}

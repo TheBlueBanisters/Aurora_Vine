@@ -8,13 +8,6 @@ CREATE TABLE IF NOT EXISTS schools (
     country_en VARCHAR(100),
     city_zh VARCHAR(100),
     city_en VARCHAR(100),
-    ranking_qs INT
+    ranking_qs INT,
+    logo_filename TEXT
 );
-
--- 插入数据
-INSERT INTO schools VALUES
-('mit','麻省理工学院','Massachusetts Institute of Technology','MIT','美国','USA','剑桥','Cambridge',1),
-('icl','伦敦帝国学院','Imperial College London','ICL','英国','UK','伦敦','London',2),
-('stanford','斯坦福大学','Stanford University','Stanford','美国','USA','斯坦福','Stanford',3),
-('oxford','牛津大学','University of Oxford','Oxford','英国','UK','牛津','Oxford',4),
-('harvard','哈佛大学','Harvard University','Harvard','美国','USA','剑桥','Cambridge',5);

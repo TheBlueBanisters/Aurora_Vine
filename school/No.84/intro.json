@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "布宜诺斯艾利斯大学（Universidad de Buenos Aires，简称UBA）成立于1821年，位于阿根廷布宜诺斯艾利斯市，是阿根廷历史最悠久、规模最大的公立研究型大学，也是拉丁美洲顶尖的大学之一。学校在医学、法学、社会科学、自然科学、工程等领域享有盛誉，其学术研究水平位居拉丁美洲前列。UBA以其优秀的教学质量和丰富的学术资源，培养了大量阿根廷各领域的杰出人才。"
+    ],
+    "en": [
+      "Universidad de Buenos Aires (UBA), founded in 1821, is Argentina's oldest and largest public research university in Buenos Aires, and one of Latin America's leading universities. It excels in medicine, law, social sciences, natural sciences, engineering, and more, with leading academic research in Latin America. Known for its excellent teaching quality and rich academic resources, UBA has produced numerous talents across fields in Argentina."
+    ]
+  },
+  "contact": "https://www.uba.ar",
+  "address": {
+    "zh": "阿根廷布宜诺斯艾利斯市里瓦达维亚大道430号",
+    "en": "Av. Rivadavia 430, C1002 CABA, Argentina"
+  }
+}

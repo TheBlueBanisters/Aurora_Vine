@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "卡尔斯鲁厄理工学院（Karlsruhe Institute of Technology，简称KIT）成立于2009年，位于德国巴登-符腾堡州卡尔斯鲁厄市，是德国顶尖的公立理工大学，由原卡尔斯鲁厄大学和卡尔斯鲁厄研究中心合并而成。学校在工程技术、自然科学、计算机科学等领域享有盛誉，其学术研究水平位居世界前列。KIT以其优秀的教学质量和创新的研究成果，培养了大量工程技术领域的杰出人才。"
+    ],
+    "en": [
+      "Karlsruhe Institute of Technology (KIT), founded in 2009, is a leading public technical university in Karlsruhe, Baden-Württemberg, Germany, formed by the merger of the University of Karlsruhe and the Karlsruhe Research Center. It excels in engineering, natural sciences, computer science, and more, with world-leading academic research. Known for its excellent teaching quality and innovative research, KIT has produced numerous talents in engineering and technology."
+    ]
+  },
+  "contact": "https://www.kit.edu",
+  "address": {
+    "zh": "德国巴登-符腾堡州卡尔斯鲁厄市凯撒大街12号",
+    "en": "Kaiserstraße 12, 76131 Karlsruhe, Germany"
+  }
+}

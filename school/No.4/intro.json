@@ -1,17 +1,15 @@
 {
   "intro": {
     "zh": [
-      "麻省理工学院（Massachusetts Institute of Technology，简称 MIT）成立于1861年，位于美国马萨诸塞州剑桥市，是世界顶尖的研究型大学之一。学校创立之初旨在回应工业化时代对工程与科学人才的需求，经过一个多世纪的发展，MIT已成为全球科技创新与工程教育的重要中心。学校在工程、计算机科学、人工智能、物理学、数学、材料科学以及经济学等多个领域长期处于世界领先地位。",
-      "MIT以强调实践与创新的教育理念著称，其校训“Mens et Manus”（心与手）体现了理论知识与实践能力并重的教学传统。学校拥有众多世界知名研究机构，例如 MIT 林肯实验室（MIT Lincoln Laboratory）、MIT 媒体实验室（MIT Media Lab）以及计算机科学与人工智能实验室（CSAIL）。MIT 的校友、教授与研究人员中产生了大量诺贝尔奖得主、图灵奖得主以及全球知名科技企业创始人，对现代科技发展、工程创新与产业变革产生了深远影响。"
+      "牛津大学（University of Oxford）成立于1167年，位于英国牛津市，是英语世界中最古老的大学，也是世界现存第二古老的持续办学高等教育机构。学校采用书院联邦制，由38个独立书院及4个学术学院组成，各书院拥有独立的行政与教学体系。\r\n牛津大学在数学、物理、医学、法学、商学等多个领域拥有崇高的学术地位，有记录的教学活动可追溯至1096年，目前在校生超22000人，其中研究生约12000名。学校的学术传统可追溯至中世纪，培养了72位诺贝尔奖得主、28位英国首相、6位图灵奖得主，在人文社科、自然科学等领域均有深厚的学术积淀。2026QS世界大学排名中，牛津大学位列世界第4位。"
     ],
     "en": [
-      "The Massachusetts Institute of Technology (MIT), founded in 1861 and located in Cambridge, Massachusetts, is one of the world’s leading research universities. Established during the rise of industrialization in the United States, MIT was designed to advance education in science and engineering and to address the technological needs of modern society. Over the past century and a half, MIT has developed into a global center for technological innovation and scientific research, with particular strengths in engineering, computer science, artificial intelligence, physics, mathematics, materials science, and economics.",
-      "MIT is widely known for its motto 'Mens et Manus' (Mind and Hand), which reflects the institute’s emphasis on the integration of theoretical knowledge and practical application. The university hosts several internationally recognized research institutions, including the MIT Lincoln Laboratory, the MIT Media Lab, and the Computer Science and Artificial Intelligence Laboratory (CSAIL). MIT’s faculty and alumni include numerous Nobel Prize laureates, Turing Award winners, and founders of influential technology companies, and the institute continues to play a major role in shaping global technological innovation and scientific progress."
+      "The University of Oxford is a public research university in Oxford, England. It is the oldest university in the English-speaking world and the world's second-oldest surviving university institution. Founded in 1167, Oxford operates under a collegiate system comprising 38 independent colleges and 4 academic divisions. Oxford holds a dominant global position in mathematics, physics, medicine, law, and business, with teaching documented as early as 1096. Oxford currently has over 22,000 students, including approximately 12,000 graduate students, and has produced 72 Nobel Prize winners, 28 UK prime ministers, and 6 Turing Award winners. Ranked No.4 in the world in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "https://www.mit.edu",
+  "contact": "https://www.ox.ac.uk/",
   "address": {
-    "zh": "美国马萨诸塞州剑桥市马萨诸塞大道77号",
-    "en": "77 Massachusetts Avenue, Cambridge, MA 02139, United States"
+    "zh": "英国牛津市威灵顿广场",
+    "en": "University of Oxford, Wellington Square, Oxford OX1 2JD, United Kingdom"
   }
 }

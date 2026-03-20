@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "马来亚大学（Universiti Malaya，简称UM）成立于1949年，位于马来西亚吉隆坡市，是马来西亚历史最悠久、最顶尖的公立研究型大学。学校在医学、工程、社会科学、法学、自然科学等领域享有盛誉，是马来西亚高等教育的旗舰机构。马来亚大学以其多元文化的学术氛围和高质量的教学研究，培养了大量马来西亚和东南亚地区的杰出人才。"
+    ],
+    "en": [
+      "Universiti Malaya (UM), founded in 1949, is Malaysia's oldest and leading public research university in Kuala Lumpur. It excels in medicine, engineering, social sciences, law, natural sciences, and more, serving as Malaysia's flagship higher education institution. Known for its multicultural academic environment and high-quality teaching, UM has produced numerous talents in Malaysia and Southeast Asia."
+    ]
+  },
+  "contact": "https://www.um.edu.my",
+  "address": {
+    "zh": "马来西亚吉隆坡市联邦大道",
+    "en": "Jalan Universiti, 50603 Kuala Lumpur, Malaysia"
+  }
+}

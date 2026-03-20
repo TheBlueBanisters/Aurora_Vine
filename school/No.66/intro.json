@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "加州大学圣地亚哥分校（University of California, San Diego，简称UCSD）成立于1960年，位于美国加利福尼亚州圣地亚哥市，是世界顶尖的公立研究型大学，也是加州大学系统的重要成员。学校在生物学、海洋科学、工程、计算机科学、经济学等领域享有盛誉，其学术研究水平位居世界前列。UCSD以其创新的学术氛围和优秀的教学质量，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "The University of California, San Diego (UCSD), founded in 1960, is a world-leading public research university in San Diego, California, and a key member of the UC system. It excels in biology, ocean science, engineering, computer science, economics, and more, with world-leading academic research. Known for its innovative academic environment and excellent teaching quality, UCSD has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.ucsd.edu",
+  "address": {
+    "zh": "美国加利福尼亚州圣地亚哥市吉尔曼大道9500号",
+    "en": "9500 Gilman Dr, La Jolla, CA 92093, United States"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "慕尼黑大学（Ludwig-Maximilians-Universität München，简称LMU）成立于1472年，位于德国巴伐利亚州慕尼黑市，是德国历史最悠久的大学之一，也是欧洲顶尖的研究型大学。学校在物理学、医学、哲学、法学、经济学等领域享有盛誉，其学术研究水平位居世界前列。慕尼黑大学以其卓越的教学研究和丰富的文化遗产，培养了大量诺贝尔奖得主和各领域杰出人才。"
+    ],
+    "en": [
+      "Ludwig-Maximilians-Universität München (LMU), founded in 1472, is one of Germany's oldest universities and a leading European research institution in Munich, Bavaria. It excels in physics, medicine, philosophy, law, economics, and more, with world-leading research. Known for its outstanding teaching and rich cultural heritage, LMU has produced numerous Nobel laureates and talents across fields."
+    ]
+  },
+  "contact": "https://www.lmu.de",
+  "address": {
+    "zh": "德国慕尼黑市路德维希大街33号",
+    "en": "Geschwister-Scholl-Platz 1, 80539 München, Germany"
+  }
+}

@@ -1,17 +1,15 @@
 {
   "intro": {
     "zh": [
-      "麻省理工学院（Massachusetts Institute of Technology，简称 MIT）成立于1861年，位于美国马萨诸塞州剑桥市，是世界顶尖的研究型大学之一。学校创立之初旨在回应工业化时代对工程与科学人才的需求，经过一个多世纪的发展，MIT已成为全球科技创新与工程教育的重要中心。学校在工程、计算机科学、人工智能、物理学、数学、材料科学以及经济学等多个领域长期处于世界领先地位。",
-      "MIT以强调实践与创新的教育理念著称，其校训“Mens et Manus”（心与手）体现了理论知识与实践能力并重的教学传统。学校拥有众多世界知名研究机构，例如 MIT 林肯实验室（MIT Lincoln Laboratory）、MIT 媒体实验室（MIT Media Lab）以及计算机科学与人工智能实验室（CSAIL）。MIT 的校友、教授与研究人员中产生了大量诺贝尔奖得主、图灵奖得主以及全球知名科技企业创始人，对现代科技发展、工程创新与产业变革产生了深远影响。"
+      "斯坦福大学（Stanford University，正式名称利兰·斯坦福初级大学）成立于1885年，1891年正式开学，位于美国加利福尼亚州帕洛阿尔托市，地处硅谷核心地带，是世界顶尖私立研究型大学。学校由加州参议员利兰·斯坦福与妻子简·斯坦福为纪念早逝的儿子创立，校园占地约33平方公里（8180英亩），是美国占地面积最大的大学之一。\r\n斯坦福大学下设7个学院，开设67个本科学习领域，截至2022年有2304位教员、17326名在校生。学校在自然科学、工程技术、商学、法学等领域稳居世界前列，诞生了36位诺贝尔奖获得者、20位图灵奖获得者、7位菲尔兹奖获得者，更是硅谷发展的核心驱动力，校友与师生创办了谷歌、惠普、思科等全球知名科技企业。2026QS世界大学排名中，斯坦福大学位列世界第3位。"
     ],
     "en": [
-      "The Massachusetts Institute of Technology (MIT), founded in 1861 and located in Cambridge, Massachusetts, is one of the world’s leading research universities. Established during the rise of industrialization in the United States, MIT was designed to advance education in science and engineering and to address the technological needs of modern society. Over the past century and a half, MIT has developed into a global center for technological innovation and scientific research, with particular strengths in engineering, computer science, artificial intelligence, physics, mathematics, materials science, and economics.",
-      "MIT is widely known for its motto 'Mens et Manus' (Mind and Hand), which reflects the institute’s emphasis on the integration of theoretical knowledge and practical application. The university hosts several internationally recognized research institutions, including the MIT Lincoln Laboratory, the MIT Media Lab, and the Computer Science and Artificial Intelligence Laboratory (CSAIL). MIT’s faculty and alumni include numerous Nobel Prize laureates, Turing Award winners, and founders of influential technology companies, and the institute continues to play a major role in shaping global technological innovation and scientific progress."
+      "Stanford University (Leland Stanford Junior University) is a private research university located in Palo Alto, California, in the heart of Silicon Valley. Founded in 1885 by California senator Leland Stanford and his wife Jane, and opened in 1891, Stanford occupies approximately 33 square kilometers (8,180 acres), making it one of the largest universities in the United States by area. The University comprises seven schools and offers 67 undergraduate fields of study. As of 2022, Stanford has 2,304 faculty members including 36 Nobel Prize laureates, 20 Turing Award winners, and 7 Fields Medalists, with 17,326 enrolled students. Ranked No.3 in the world in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "https://www.mit.edu",
+  "contact": "https://www.stanford.edu/",
   "address": {
-    "zh": "美国马萨诸塞州剑桥市马萨诸塞大道77号",
-    "en": "77 Massachusetts Avenue, Cambridge, MA 02139, United States"
+    "zh": "美国加利福尼亚州斯坦福市简·斯坦福路450号",
+    "en": "Stanford University, 450 Jane Stanford Way, Stanford, CA 94305-2004, United States"
   }
 }

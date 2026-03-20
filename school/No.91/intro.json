@@ -1,0 +1,15 @@
+{
+  "intro": {
+    "zh": [
+      "大阪大学（Osaka University）成立于1931年，位于日本大阪府吹田市，是日本顶尖的公立研究型大学，也是日本旧帝国大学之一。学校在医学、工程、自然科学、社会科学、人文艺术等领域享有盛誉，其学术研究水平位居世界前列。大阪大学以其优秀的教学质量和丰富的学术资源，培养了大量各领域的杰出人才。"
+    ],
+    "en": [
+      "Osaka University, founded in 1931, is a leading public research university in Suita, Osaka, Japan, and one of Japan's former imperial universities. It excels in medicine, engineering, natural sciences, social sciences, humanities, and more, with world-leading academic research. Known for its excellent teaching quality and rich academic resources, Osaka University has produced numerous talents across fields."
+    ]
+  },
+  "contact": "https://www.osaka-u.ac.jp",
+  "address": {
+    "zh": "日本大阪府吹田市山田丘1-1",
+    "en": "1-1 Yamadaoka, Suita, Osaka 565-0871, Japan"
+  }
+}
