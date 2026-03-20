@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "哥本哈根大学（University of Copenhagen，简称 UCPH 或 KU）成立于1479年6月1日，是丹麦历史最悠久的大学，也是北欧地区最古老的大学之一。学校由丹麦国王克里斯蒂安一世向教皇西斯都四世申请建立，最初设立神学院、法学院、医学院和哲学院四个学院，完全遵循中世纪欧洲大学的模式。经过500多年的发展，哥本哈根大学已成为丹麦规模最大、最具影响力的综合性研究型大学。"
+      "哥本哈根大学（University of Copenhagen，简称UCPH 或 KU）是一所位于丹麦哥本哈根的公立研究型大学，在2026QS世界大学排名中位列第101位。"
     ],
     "en": [
-      "The University of Copenhagen (UCPH or KU) was founded on June 1"
+      "University of Copenhagen (UCPH or KU) is a public research university located in Copenhagen, Denmark. It is ranked No. 101 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "1479",
+  "contact": "https://www.ku.dk/",
   "address": {
-    "zh": "making it Denmark's oldest university and one of the oldest in Northern Europe. The university was established when King Christian I of Denmark received approval from Pope Sixtus IV",
-    "en": "initially comprising four faculties: theology"
+    "zh": "丹麦哥本哈根",
+    "en": "Copenhagen, Denmark"
   }
 }

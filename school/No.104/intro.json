@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "乌得勒支大学（Utrecht University，简称 UU）成立于1636年3月26日，是荷兰第四古老的大学（次于莱顿大学、格罗宁根大学和阿姆斯特丹大学）。学校坐落在荷兰人文荟萃的乌得勒支市，最初是一所神学院，后来发展成为一所综合性研究型大学。乌得勒支大学是荷兰综合实力最强的大学，同时也是欧洲最好的研究型大学之一。"
+      "乌得勒支大学（Utrecht University，简称UU）是一所位于荷兰乌得勒支的高等院校，在2026QS世界大学排名中位列第104位。"
     ],
     "en": [
-      "Utrecht University (UU) was founded on March 26"
+      "Utrecht University (UU) is a university located in Utrecht, Netherlands. It is ranked No. 104 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "1636",
+  "contact": "https://uu.nl",
   "address": {
-    "zh": "making it the fourth oldest university in the Netherlands (after Leiden University",
-    "en": "Groningen University"
+    "zh": "荷兰乌得勒支",
+    "en": "Utrecht, Netherlands"
   }
 }

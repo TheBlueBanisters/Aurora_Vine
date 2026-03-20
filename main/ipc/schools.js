@@ -4,24 +4,124 @@ import fs from 'fs';
 import { getReadOnlyDb } from '../utils/db';
 import { normalizeRankingQs, normalizeFilename, resolveSchoolPath } from '../utils/security';
 
+const REGION_ALIAS_MAP = {
+  hong_kong: ['中国香港', '香港', 'hong kong'],
+  singapore: ['新加坡', 'singapore'],
+  uk: ['英国', 'uk', 'united kingdom', 'england', 'scotland', 'wales', 'northern ireland'],
+  usa: ['美国', 'usa', 'united states', 'united states of america'],
+  australia: ['澳大利亚', 'australia'],
+  macao: ['中国澳门', '澳门', 'macao', 'macau'],
+  malaysia: ['马来西亚', 'malaysia']
+};
+
+const EUROPE_ALIASES = [
+  '法国', 'france',
+  '德国', 'germany',
+  '荷兰', 'netherlands',
+  '瑞士', 'switzerland',
+  '爱尔兰', 'ireland',
+  '意大利', 'italy',
+  '西班牙', 'spain',
+  '比利时', 'belgium',
+  '瑞典', 'sweden',
+  '丹麦', 'denmark',
+  '芬兰', 'finland',
+  '挪威', 'norway',
+  '奥地利', 'austria',
+  '葡萄牙', 'portugal',
+  '波兰', 'poland',
+  '捷克', 'czech',
+  '匈牙利', 'hungary',
+  '希腊', 'greece'
+];
+
+function buildCountryAliasClause(aliases = []) {
+  if (!aliases.length) return { clause: '', params: [] };
+  const clause = aliases.map(() => '(country_zh LIKE ? OR country_en LIKE ?)').join(' OR ');
+  const params = aliases.flatMap((alias) => {
+    const likePattern = `%${alias}%`;
+    return [likePattern, likePattern];
+  });
+  return { clause: `(${clause})`, params };
+}
+
+function buildRegionFilter(filters = {}) {
+  const region = String(filters?.region ?? 'all').trim().toLowerCase();
+  if (!region || region === 'all') return { clause: '', params: [] };
+  if (region === 'europe') return buildCountryAliasClause(EUROPE_ALIASES);
+  return buildCountryAliasClause(REGION_ALIAS_MAP[region] || []);
+}
+
 export function registerSchoolsIpc() {
-  ipcMain.handle('schools:list', async (event, page = 1, pageSize = 10) => {
+  ipcMain.handle('schools:list', async (event, page = 1, pageSize = 10, filters = {}) => {
     const db = getReadOnlyDb();
     if (!db) {
       return { items: [], total: 0, error: '数据库文件不存在，请运行 node data/init_db.js 初始化' };
     }
     try {
       const offset = Math.max(0, (page - 1) * pageSize);
+      const regionFilter = buildRegionFilter(filters);
+      const whereClause = regionFilter.clause ? `WHERE ${regionFilter.clause}` : '';
       const stmt = db.prepare(
-        'SELECT school_id, school_name_zh, school_name_en, short_name, country_zh, country_en, city_zh, city_en, ranking_qs, logo_filename FROM schools ORDER BY ranking_qs ASC LIMIT ? OFFSET ?'
+        `SELECT school_id, school_name_zh, school_name_en, short_name, country_zh, country_en, city_zh, city_en, ranking_qs, logo_filename FROM schools ${whereClause} ORDER BY ranking_qs ASC LIMIT ? OFFSET ?`
       );
-      const countStmt = db.prepare('SELECT COUNT(*) as total FROM schools');
-      const items = stmt.all(pageSize, offset);
-      const { total } = countStmt.get();
+      const countStmt = db.prepare(`SELECT COUNT(*) as total FROM schools ${whereClause}`);
+      const items = stmt.all(...regionFilter.params, pageSize, offset);
+      const { total } = countStmt.get(...regionFilter.params);
       return { items, total };
     } catch (err) {
       console.error('schools:list error:', err);
       return { items: [], total: 0, error: err.message || '数据库读取失败' };
+    } finally {
+      db.close();
+    }
+  });
+
+  ipcMain.handle('schools:search', async (event, keyword = '', page = 1, pageSize = 10, filters = {}) => {
+    const db = getReadOnlyDb();
+    if (!db) {
+      return { items: [], total: 0, error: '数据库文件不存在，请运行 node data/init_db.js 初始化' };
+    }
+    try {
+      const kw = String(keyword ?? '').trim();
+      const offset = Math.max(0, (page - 1) * pageSize);
+      const regionFilter = buildRegionFilter(filters);
+
+      if (!kw) {
+        const whereClause = regionFilter.clause ? `WHERE ${regionFilter.clause}` : '';
+        const stmt = db.prepare(
+          `SELECT school_id, school_name_zh, school_name_en, short_name, country_zh, country_en, city_zh, city_en, ranking_qs, logo_filename FROM schools ${whereClause} ORDER BY ranking_qs ASC LIMIT ? OFFSET ?`
+        );
+        const countStmt = db.prepare(`SELECT COUNT(*) as total FROM schools ${whereClause}`);
+        const items = stmt.all(...regionFilter.params, pageSize, offset);
+        const { total } = countStmt.get(...regionFilter.params);
+        return { items, total };
+      }
+
+      const likePattern = `%${kw}%`;
+      const searchClause = `
+        (school_name_zh LIKE ? OR school_name_en LIKE ? OR short_name LIKE ?
+          OR country_zh LIKE ? OR country_en LIKE ?
+          OR city_zh LIKE ? OR city_en LIKE ?)
+      `;
+      const whereParts = [searchClause.trim()];
+      const params = Array(7).fill(likePattern);
+      if (regionFilter.clause) {
+        whereParts.push(regionFilter.clause);
+        params.push(...regionFilter.params);
+      }
+      const whereClause = `WHERE ${whereParts.join(' AND ')}`;
+
+      const stmt = db.prepare(
+        `SELECT school_id, school_name_zh, school_name_en, short_name, country_zh, country_en, city_zh, city_en, ranking_qs, logo_filename FROM schools ${whereClause} ORDER BY ranking_qs ASC LIMIT ? OFFSET ?`
+      );
+      const countStmt = db.prepare(`SELECT COUNT(*) as total FROM schools ${whereClause}`);
+      const items = stmt.all(...params, pageSize, offset);
+      const { total } = countStmt.get(...params);
+      return { items, total };
+    } catch (err) {
+      console.error('schools:search error:', err);
+      return { items: [], total: 0, error: err.message || '搜索失败' };
     } finally {
       db.close();
     }

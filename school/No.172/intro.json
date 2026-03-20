@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "巴塞罗那自治大学（Universitat Autònoma de Barcelona，简称UAB）成立于1968年，是一所位于西班牙加泰罗尼亚自治区巴塞罗那市的公立研究型大学，在2026年QS世界大学排名中位列第172位，西班牙第2位{insert\\_element\\_4\\_}。UAB是欧洲顶尖大学之一，是欧洲大学协会、创新技术联盟、欧洲青年研究者协会等多个学术组织的成员，以其卓越的科研实力和国际化程度闻名于世。学校拥有三个校区，主校区Bellaterra也是科技园驻地，学科覆盖人文艺术、社科、健康、实验、技术科学等领域，设七十八个本科课程，八十八个博士项目，一百八十三个官方硕士及三百三十四个校际硕士课程。巴塞罗那自治大学在兽医、考古学、现代语言、经济学等学科领域跻身世界前一百，尤其在环境科学、生命科学等领域具有独特优势。学校高度重视国际化，与全球300多所大学建立了合作关系，国际学生占比超过15%。"
+      "巴塞罗那自治大学（Universitat Autònoma de Barcelona，简称UAB）是一所位于西班牙Bellaterra的高等院校，在2026QS世界大学排名中位列第172位。"
     ],
     "en": [
-      "Universitat Autònoma de Barcelona (UAB)"
+      "Universitat Autònoma de Barcelona (UAB) is a university located in Bellaterra, Spain. It is ranked No. 172 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1968",
+  "contact": "https://www.uab.cat",
   "address": {
-    "zh": "is a public research university located in Barcelona",
-    "en": "Catalonia"
+    "zh": "西班牙Bellaterra",
+    "en": "Bellaterra, Spain"
   }
 }

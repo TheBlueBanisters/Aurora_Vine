@@ -4,12 +4,12 @@
       "根特大学（Ghent University，简称UGent）成立于1817年，位于比利时根特市，是比利时最大的公立研究型大学，2026QS世界大学排名第162位。作为佛兰芒地区顶尖的高等学府，根特大学拥有11个学院，涵盖人文科学、社会科学、自然科学、医学、工程学等多个领域，在生命科学、医学、工程学、环境科学等学科领域具有世界领先地位。学校与根特市的众多科研机构和企业保持着密切合作关系，尤其在生物医药、农业技术、环境治理等领域形成了强大的产学研集群，为比利时及全球相关产业发展做出了重要贡献。根特大学注重国际化发展，与全球200多所高校建立了合作关系，拥有来自100多个国家的国际学生，校园文化多元包容。学校培养了包括多位诺贝尔奖得主在内的众多杰出人才，校友网络遍布全球，在国际学术和商业领域具有广泛影响力。"
     ],
     "en": [
-      "Ghent University (UGent)"
+      "Ghent University (UGent) is a university located in Ghent, Belgium. It is ranked No. 162 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1817",
+  "contact": "https://www.ugent.be/",
   "address": {
-    "zh": "is Belgium's largest public research university located in Ghent",
-    "en": "Belgium"
+    "zh": "比利时根特",
+    "en": "Ghent, Belgium"
   }
 }

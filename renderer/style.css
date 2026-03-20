@@ -2089,6 +2089,183 @@ textarea {
 }
 
 /* ============================================
+   院校搜索框
+   ============================================ */
+
+.school-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  height: 50px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  margin-bottom: 20px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.school-search-bar:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.18);
+}
+
+.school-search-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--content-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.school-search-bar:focus-within .school-search-icon {
+  color: var(--accent);
+}
+
+.school-search-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--content-text);
+  font-size: 14px;
+  outline: none;
+}
+
+.school-search-input::placeholder {
+  color: var(--content-text-secondary);
+  opacity: 0.7;
+}
+
+.school-search-clear {
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--content-text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: color var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.school-search-bar.has-value .school-search-clear {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.school-search-clear:hover {
+  color: var(--accent);
+  border-color: var(--content-border);
+  background: var(--accent-soft);
+}
+
+/* ============================================
+   院校筛选
+   ============================================ */
+
+.school-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 18px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+}
+
+.school-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.school-filter-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.school-filter-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--content-text);
+}
+
+.school-filter-title-en {
+  font-size: 12px;
+  color: var(--content-text-secondary);
+}
+
+.school-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.school-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid var(--content-border);
+  border-radius: 999px;
+  background: var(--card-bg);
+  color: var(--content-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.school-filter-chip:hover:not(.is-disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.school-filter-chip.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(137, 180, 250, 0.18);
+}
+
+.school-filter-chip.is-disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  color: var(--content-text-secondary);
+  background: color-mix(in srgb, var(--content-bg) 55%, var(--card-bg));
+}
+
+.school-filter-chip-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--content-border) 70%, transparent);
+  color: var(--content-text-secondary);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* ============================================
    院校列表（横条）
    ============================================ */
 
@@ -2121,7 +2298,7 @@ textarea {
 .school-card-main {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 20px;
   padding: 22px 24px;
   cursor: pointer;
   outline: none;
@@ -2143,8 +2320,9 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  flex: 1;
+  flex: 0 0 320px;
   min-width: 0;
+  max-width: 320px;
 }
 
 .school-card-name-zh {
@@ -2167,6 +2345,19 @@ textarea {
   justify-content: center;
   gap: 4px;
   min-width: 72px;
+  flex-shrink: 0;
+}
+
+.school-card-meta-block-location {
+  /* 不要用 margin-left:auto，否则地区列会被推到右侧紧贴 QS，中间出现大空白 */
+  flex: 1;
+  min-width: 120px;
+  align-items: center;
+  text-align: center;
+}
+
+.school-card-meta-block-qs {
+  margin-left: 12px;
 }
 
 .school-card-meta-label {
@@ -2190,9 +2381,13 @@ textarea {
   font-size: 17px;
 }
 
-.school-card-meta-bilingual {
-  font-size: 15px;
+.school-card-meta-location {
+  font-size: 14px;
   font-weight: 500;
+  width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .school-card-star {
@@ -2231,6 +2426,56 @@ textarea {
 .school-card-star svg {
   width: 24px;
   height: 24px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.school-card-skeleton .school-card-main {
+  pointer-events: none;
+}
+
+.skeleton-block {
+  background: linear-gradient(90deg, #e9ecf2 25%, #f4f6fa 37%, #e9ecf2 63%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.5s infinite ease-in-out;
+  border-radius: 6px;
+}
+
+.skeleton-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-name {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+}
+
+.skeleton-meta {
+  width: 120px;
+  height: 34px;
+}
+
+.skeleton-qs {
+  width: 36px;
+  height: 34px;
+}
+
+.skeleton-star {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+[data-theme="dark"] .skeleton-block {
+  background: linear-gradient(90deg, #2a2a3a 25%, #353548 37%, #2a2a3a 63%);
+  background-size: 800px 100%;
 }
 
 .school-list-pagination {
@@ -2398,12 +2643,14 @@ body.school-detail-open .main-content {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  z-index: 0;
 }
 
 .school-detail-hero-mask {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 2;
 }
 
 .school-detail-hero-content {
@@ -2413,6 +2660,7 @@ body.school-detail-open .main-content {
   gap: 24px;
   padding: 32px 48px;
   height: 100%;
+  z-index: 3;
 }
 
 .school-detail-logo {
@@ -2495,18 +2743,24 @@ body.school-detail-open .main-content {
 }
 
 .school-detail-carousel-wrap {
-  padding: 32px 48px 48px;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   overflow: hidden;
+  padding: 0;
 }
 
 .school-detail-carousel {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
 .school-detail-carousel-track {
   display: flex;
-  gap: 24px;
+  gap: 0;
   width: max-content;
+  height: 100%;
 }
 
 .school-detail-carousel-track.carousel-animate {
@@ -2524,10 +2778,10 @@ body.school-detail-open .main-content {
 
 .school-detail-carousel-track img {
   flex: 0 0 auto;
-  width: 280px;
-  height: 180px;
-  object-fit: fill;
-  border-radius: var(--radius-sm);
+  width: 420px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
   cursor: pointer;
   transition: opacity var(--transition-fast);
 }
@@ -3872,6 +4126,15 @@ body.school-detail-open .main-content {
 
   .page-title {
     font-size: 22px;
+  }
+
+  .school-filter-bar {
+    padding: 16px;
+  }
+
+  .school-filter-chip {
+    min-height: 34px;
+    padding: 7px 12px;
   }
 
   .planning-intro-box {

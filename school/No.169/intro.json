@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "约克大学（University of York）建于1963年，是一所位于英国英格兰约克郡约克市的世界一流研究型大学，也是罗素大学集团成员、白玫瑰大学联盟成员和N8大学联盟成员。学校以其卓越的学术研究、美丽的校园环境和跨学科的教学方法而闻名，秉持“Independent minds. Collective spirit. All for the public good.”（独立思考，集体精神，一切为了公共利益）的办学理念。约克大学在社会政策与管理、英语语言文学、考古学、心理学等学科领域处于世界领先地位，尤其在科研质量评估（REF）中表现突出，多个学科获得最高评级。学校拥有两个校区：主校区Heslington距离古城仅1英里，市中心校区King's Manor位于历史悠久的约克市中心{insert\\_element\\_0\\_}。约克大学的学生来自150多个国家，形成了多元化的学术社区，毕业生在全球范围内享有良好的就业声誉。"
+      "约克大学（University of York）是一所位于英国约克的公立研究型大学，在2026QS世界大学排名中位列第169位。"
     ],
     "en": [
-      "University of York"
+      "University of York is a public research university located in York, England, United Kingdom. It is ranked No. 169 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1963",
+  "contact": "https://york.ac.uk/",
   "address": {
-    "zh": "is a world-class research university located in York",
-    "en": "Yorkshire"
+    "zh": "英国约克",
+    "en": "York, England, United Kingdom"
   }
 }

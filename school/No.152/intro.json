@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "维也纳大学（University of Vienna）成立于1365年，是德语区最古老的大学，也是世界上最负盛名的大学之一，位于奥地利首都维也纳。作为奥地利规模最大、历史最悠久的综合性大学，维也纳大学在2026QS世界大学排名中位列第152位，是奥地利排名最高的大学。学校拥有8个学院，涵盖人文科学、社会科学、自然科学、医学等多个领域，在哲学、法学、经济学、心理学、物理学等学科具有深厚的学术传统和卓越的研究实力。维也纳大学培养了包括弗洛伊德、薛定谔等在内的众多杰出学者，校友中产生了27位诺贝尔奖得主，对世界学术发展和科学进步做出了重要贡献。"
+      "维也纳大学（University of Vienna）是一所位于奥地利维也纳的高等院校，在2026QS世界大学排名中位列第152位。"
     ],
     "en": [
-      "The University of Vienna"
+      "University of Vienna is a university located in Vienna, Austria. It is ranked No. 152 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1365",
+  "contact": "https://www.univie.ac.at/",
   "address": {
-    "zh": "is the oldest university in the German-speaking world and one of the most prestigious universities globally",
-    "en": "located in Vienna"
+    "zh": "奥地利维也纳",
+    "en": "Vienna, Austria"
   }
 }

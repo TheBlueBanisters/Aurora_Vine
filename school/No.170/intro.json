@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "北海道大学（Hokkaido University，简称北大/Hokudai）是一所本部位于日本北海道札幌市的世界一流、日本顶尖的著名研究型综合国立大学，也是日本七所旧帝国大学之一和超级国际化大学计划A类拔尖校。学校前身为札幌农学校，成立于1876年，是日本最早的高等教育机构之一，校训为“Be ambitious”（胸怀大志）{insert\\_element\\_2\\_}。北海道大学是日本占地面积最大的国立大学，校园总面积约660平方公里（包括研究林），是东京大学的两倍，设有札幌和函馆两个主校区，札幌校区以“榆树的森林”著称。学校在农学、林学、水产学、生命科学、医学、工程学等领域处于世界领先地位，尤其在寒冷地区研究方面具有独特优势。北海道大学培养了众多杰出人才，包括诺贝尔奖得主铃木章等，对日本乃至全球的科技发展和社会进步做出了重要贡献。"
+      "北海道大学（Hokkaido University，简称Hokudai）是一所位于日本北海道札幌市的国立研究型大学，在2026QS世界大学排名中位列第170位。"
     ],
     "en": [
-      "Hokkaido University (Hokudai)"
+      "Hokkaido University (Hokudai) is a national research university located in Sapporo, Hokkaido, Japan. It is ranked No. 170 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "is a world-class",
+  "contact": "https://www.hokudai.ac.jp/",
   "address": {
-    "zh": "top-ranked research comprehensive national university headquartered in Sapporo",
-    "en": "Hokkaido"
+    "zh": "日本北海道札幌市",
+    "en": "Sapporo, Hokkaido, Japan"
   }
 }

@@ -4,12 +4,12 @@
       "埃克塞特大学（University of Exeter）成立于1955年，位于英国英格兰西南部的埃克塞特市，是一所世界知名的公立研究型大学，2026QS世界大学排名第155位。学校拥有四个校区，主校区位于斯特里汉姆，其他校区分布在康沃尔郡的彭林、埃克塞特市中心的圣卢克和德文郡的特鲁罗。埃克塞特大学在商科、法学、教育学、工程学、医学、人文社科等多个领域具有较高的学术声誉，尤其在环境科学、气候研究、考古学、体育科学等学科领域表现突出。学校注重国际化发展，与全球100多所高校建立了合作关系，拥有来自130多个国家的国际学生，校园文化多元包容。埃克塞特大学以其优质的教学质量和研究水平，在英国及全球高等教育领域享有良好声誉，培养了众多杰出校友，包括英国王室成员扎拉·菲利普斯等。"
     ],
     "en": [
-      "The University of Exeter"
+      "University of Exeter is a university located in Exeter, United Kingdom. It is ranked No. 155 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1955",
+  "contact": "https://www.exeter.ac.uk/",
   "address": {
-    "zh": "is a world-renowned public research university located in Exeter",
-    "en": "southwest England"
+    "zh": "埃克塞特",
+    "en": "Exeter, United Kingdom"
   }
 }

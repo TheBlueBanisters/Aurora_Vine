@@ -512,6 +512,44 @@
           <p class="page-subtitle">University Explorer</p>
         </div>
         <div class="page-body">
+          <div class="school-search-bar" id="school-search-bar">
+            <svg class="school-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="school-search-input" class="school-search-input" placeholder="搜索院校名称、国家或城市 / Search by name, country or city">
+            <button type="button" id="school-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索">×</button>
+          </div>
+          <div class="school-filter-bar" id="school-filter-bar">
+            <div class="school-filter-group">
+              <div class="school-filter-heading">
+                <span class="school-filter-title">地区筛选</span>
+                <span class="school-filter-title-en">Region</span>
+              </div>
+              <div class="school-filter-chips" id="school-region-filters" role="tablist" aria-label="地区筛选">
+                <button type="button" class="school-filter-chip is-active" data-region="all" aria-pressed="true">不限</button>
+                <button type="button" class="school-filter-chip" data-region="hong_kong" aria-pressed="false">中国香港</button>
+                <button type="button" class="school-filter-chip" data-region="singapore" aria-pressed="false">新加坡</button>
+                <button type="button" class="school-filter-chip" data-region="uk" aria-pressed="false">英国</button>
+                <button type="button" class="school-filter-chip" data-region="usa" aria-pressed="false">美国</button>
+                <button type="button" class="school-filter-chip" data-region="australia" aria-pressed="false">澳大利亚</button>
+                <button type="button" class="school-filter-chip" data-region="malaysia" aria-pressed="false">马来西亚</button>
+                <button type="button" class="school-filter-chip" data-region="europe" aria-pressed="false">欧洲</button>
+                <button type="button" class="school-filter-chip" data-region="other" aria-pressed="false">其他</button>
+              </div>
+            </div>
+            <div class="school-filter-group">
+              <div class="school-filter-heading">
+                <span class="school-filter-title">热门榜单</span>
+                <span class="school-filter-title-en">Ranking Lists</span>
+              </div>
+              <div class="school-filter-chips" id="school-ranking-filters" role="tablist" aria-label="热门榜单筛选">
+                <button type="button" class="school-filter-chip is-active" data-ranking="qs" aria-pressed="true">QS世界大学排名</button>
+                <button type="button" class="school-filter-chip is-disabled" data-ranking="times" aria-pressed="false" aria-disabled="true" title="敬请期待">Times英国大学排名<span class="school-filter-chip-badge">敬请期待</span></button>
+                <button type="button" class="school-filter-chip is-disabled" data-ranking="us_news" aria-pressed="false" aria-disabled="true" title="敬请期待">U.S.News美国大学排名<span class="school-filter-chip-badge">敬请期待</span></button>
+              </div>
+            </div>
+          </div>
           <div class="school-list-container" id="school-list-explorer">
             <div class="school-list-grid" id="school-list-explorer-grid"></div>
             <div class="school-list-pagination" id="school-list-explorer-pagination"></div>
@@ -780,6 +818,11 @@
         <div class="school-detail-body">
           <div class="school-detail-hero" id="school-detail-hero">
             <div class="school-detail-hero-bg" id="school-detail-hero-bg"></div>
+            <div class="school-detail-carousel-wrap" id="school-detail-carousel-wrap">
+              <div class="school-detail-carousel" id="school-detail-carousel">
+                <div class="school-detail-carousel-track" id="school-detail-carousel-track"></div>
+              </div>
+            </div>
             <div class="school-detail-hero-mask"></div>
             <div class="school-detail-hero-content">
               <img class="school-detail-logo" id="school-detail-logo" alt="校徽">
@@ -790,11 +833,6 @@
             </div>
           </div>
           <div class="school-detail-intro" id="school-detail-intro"></div>
-          <div class="school-detail-carousel-wrap" id="school-detail-carousel-wrap">
-            <div class="school-detail-carousel" id="school-detail-carousel">
-              <div class="school-detail-carousel-track" id="school-detail-carousel-track"></div>
-            </div>
-          </div>
           <div class="school-detail-lightbox" id="school-detail-lightbox">
             <button class="school-detail-lightbox-close" id="school-detail-lightbox-close">×</button>
             <img class="school-detail-lightbox-img" id="school-detail-lightbox-img" alt="">

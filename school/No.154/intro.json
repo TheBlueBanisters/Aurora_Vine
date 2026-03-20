@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "瓦格宁根大学（Wageningen University & Research，简称WUR）成立于1918年，位于荷兰瓦格宁根市，是全球顶尖的专注于生命科学和环境科学的研究型大学，2026QS世界大学排名第153位。学校由瓦格宁根大学和研究中心组成，在农业科学、食品科学、环境科学、生命科学等领域处于世界领先地位，被誉为\"世界农业大学之最\"。瓦格宁根大学拥有强大的科研实力和创新能力，与全球众多科研机构和企业建立了广泛的合作关系，在可持续发展、气候变化、食品安全等全球性问题的研究中发挥着重要作用。学校注重实践教学和国际化培养，吸引了来自全球100多个国家的学生和学者，为解决全球粮食安全和环境问题培养了大量专业人才。"
+      "瓦格宁根大学（Wageningen University & Research，简称WUR）是一所位于荷兰瓦赫宁恩的高等院校，在2026QS世界大学排名中位列第154位。"
     ],
     "en": [
-      "Wageningen University & Research (WUR)"
+      "Wageningen University & Research (WUR) is a university located in Wageningen, Netherlands. It is ranked No. 154 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1918",
+  "contact": "https://www.wur.nl/",
   "address": {
-    "zh": "is a world-class research university specializing in life sciences and environmental sciences",
-    "en": "located in Wageningen"
+    "zh": "荷兰瓦赫宁恩",
+    "en": "Wageningen, Netherlands"
   }
 }

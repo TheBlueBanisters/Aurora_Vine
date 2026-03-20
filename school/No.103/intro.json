@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "南京大学（Nanjing University，简称 NJU）的历史可以追溯到1902年创建的三江师范学堂，此后历经两江师范学堂、南京高等师范学校、国立东南大学、国立第四中山大学、国立中央大学、国立南京大学等历史时期，于1950年正式定名为南京大学。1952年全国高校院系调整中，南京大学与创办于1888年的金陵大学文、理学院合并，形成了现在的格局。"
+      "南京大学（Nanjing University，简称NJU）是一所位于中国南京市的高等院校，在2026QS世界大学排名中位列第103位。"
     ],
     "en": [
-      "Nanjing University (NJU) traces its origins to the Sanjiang Normal School founded in 1902. It has undergone several name changes throughout its history"
+      "Nanjing University (NJU) is a university located in Nanjing, People's Republic of China. It is ranked No. 103 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "including Liangjiang Normal School",
+  "contact": "https://www.nju.edu.cn/main.htm",
   "address": {
-    "zh": "Nanjing Higher Normal School",
-    "en": "National Southeastern University"
+    "zh": "中国南京市",
+    "en": "Nanjing, People's Republic of China"
   }
 }

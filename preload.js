@@ -19,12 +19,14 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('auth:uploadAvatar', base64DataUrl),
   avatarGetDataUrl: (accountId) =>
     ipcRenderer.invoke('avatar:getDataUrl', accountId),
-  schoolsList: (page = 1, pageSize = 10) =>
-    ipcRenderer.invoke('schools:list', page, pageSize),
+  schoolsList: (page = 1, pageSize = 10, filters = {}) =>
+    ipcRenderer.invoke('schools:list', page, pageSize, filters),
   schoolsGetById: (schoolId) =>
     ipcRenderer.invoke('schools:getById', schoolId),
   schoolsGetByIds: (schoolIds) =>
     ipcRenderer.invoke('schools:getByIds', schoolIds),
+  schoolsSearch: (keyword, page = 1, pageSize = 10, filters = {}) =>
+    ipcRenderer.invoke('schools:search', keyword, page, pageSize, filters),
   schoolsGetIntro: (rankingQs) =>
     ipcRenderer.invoke('schools:getIntro', rankingQs),
   schoolsGetAssetPath: (rankingQs, filename) =>

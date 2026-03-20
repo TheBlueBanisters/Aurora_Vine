@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "名古屋大学（Nagoya University）成立于1939年，位于日本爱知县名古屋市，是日本顶尖的国立研究型大学，2026QS世界大学排名第164位。作为日本旧帝国大学之一，名古屋大学拥有两个校区，主校区位于名古屋市千种区，另一个校区位于名古屋市热田区。学校在物理学、化学、医学、工程学、材料科学等多个领域具有较高的学术声誉，尤其在诺贝尔奖获奖研究方面表现突出，培养了包括6位诺贝尔奖得主在内的众多杰出人才，其中包括2014年诺贝尔物理学奖得主赤崎勇、天野浩和中村修二，以及2018年诺贝尔生理学或医学奖得主本庶佑。名古屋大学注重国际化发展，与全球100多所高校建立了合作关系，拥有来自100多个国家的国际学生，校园文化多元包容。学校以其优质的教学质量和研究水平，在日本及全球高等教育领域享有良好声誉，为日本科技发展和创新做出了重要贡献。"
+      "名古屋大学（Nagoya University）是一所位于日本名古屋市的高等院校，在2026QS世界大学排名中位列第164位。"
     ],
     "en": [
-      "Nagoya University"
+      "Nagoya University is a university located in Nagoya, Japan. It is ranked No. 164 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1939",
+  "contact": "https://www.nagoya-u.ac.jp",
   "address": {
-    "zh": "is a top national research university located in Nagoya",
-    "en": "Aichi Prefecture"
+    "zh": "日本名古屋市",
+    "en": "Nagoya, Japan"
   }
 }

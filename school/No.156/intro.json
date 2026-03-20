@@ -4,12 +4,12 @@
       "日内瓦大学（University of Geneva，简称UNIGE）成立于1559年，位于瑞士日内瓦市，是一所历史悠久、声誉卓著的公立研究型大学，2026QS世界大学排名第155位。作为瑞士第二大大学，日内瓦大学拥有16个学院，涵盖人文科学、社会科学、自然科学、医学、法学、经济学等多个领域，在国际法学、国际经济学、生命科学、粒子物理学等学科领域具有世界领先地位。学校与欧洲核子研究组织（CERN）、世界卫生组织（WHO）、联合国欧洲经济委员会等国际组织保持着密切合作关系，为学生提供了丰富的国际交流和研究机会。日内瓦大学培养了包括10位诺贝尔奖得主在内的众多杰出人才，校友网络遍布全球，在国际事务、学术研究和商业领域具有广泛影响力。"
     ],
     "en": [
-      "The University of Geneva (UNIGE)"
+      "University of Geneva (UNIGE) is a university located in Geneva, Switzerland. It is ranked No. 156 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1559",
+  "contact": "https://www.unige.ch",
   "address": {
-    "zh": "is a long-established and prestigious public research university located in Geneva",
-    "en": "Switzerland"
+    "zh": "瑞士日内瓦",
+    "en": "Geneva, Switzerland"
   }
 }

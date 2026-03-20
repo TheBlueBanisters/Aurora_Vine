@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "印度理工学院孟买分校（Indian Institute of Technology Bombay，简称 IIT Bombay）成立于1958年，是印度理工学院系统中最著名的学院之一。学校位于马哈拉施特拉邦孟买市，以其在工程、技术、自然科学等领域的卓越教育和研究而著称。IIT Bombay在计算机科学、机械工程、电气工程等领域处于世界领先地位，被誉为\"印度的MIT\"，培养了大量科技创新人才。"
+      "印度理工学院孟买分校（Indian Institute of Technology Bombay，简称IIT Bombay）是一所位于印度Powai的高等院校，在2026QS世界大学排名中位列第129位。"
     ],
     "en": [
-      "Indian Institute of Technology Bombay (IIT Bombay) was founded in 1958 and is one of the most famous institutes in the Indian Institute of Technology system. Located in Mumbai"
+      "Indian Institute of Technology Bombay (IIT Bombay) is a university located in Powai, India. It is ranked No. 129 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "Maharashtra",
+  "contact": "https://www.iitb.ac.in",
   "address": {
-    "zh": "the university is renowned for its卓越 education and研究 in engineering",
-    "en": "technology"
+    "zh": "印度Powai",
+    "en": "Powai, India"
   }
 }

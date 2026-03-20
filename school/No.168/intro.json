@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "蒙特利尔大学（Université de Montréal，简称UdeM）创建于1878年，是一所主校区位于加拿大魁北克省蒙特利尔市的以法语为主要教学语言的公立研究型大学，也是全球最大的法语授课大学。作为加拿大U15研究型大学联盟成员和Universitas 21成员，蒙特利尔大学在全球高等教育领域享有盛誉，尤其在医学、生命科学、社会科学、人文科学等领域处于世界领先地位。学校拥有3600余名学术研究人员，其中1600多名来自56个国家，高度国际化，设有西班牙语、加泰罗尼亚语和英语三种语言授课模式。蒙特利尔大学的附属学校包括蒙特利尔理工学院和圣安妮学院，共同构成了加拿大最重要的高等教育中心之一。学校培养了无数领袖人物，包括加拿大前总理皮埃尔·特鲁多等，对加拿大和国际社会各个领域发展做出了重要贡献。"
+      "蒙特利尔大学（Université de Montréal，简称UdeM）是一所位于加拿大蒙特利尔的高等院校，在2026QS世界大学排名中位列第168位。"
     ],
     "en": [
-      "Université de Montréal (UdeM)"
+      "Université de Montréal (UdeM) is a university located in Montreal, Canada. It is ranked No. 168 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1878",
+  "contact": "https://www.umontreal.ca/",
   "address": {
-    "zh": "is a public research university primarily teaching in French with its main campus located in Montreal",
-    "en": "Quebec"
+    "zh": "加拿大蒙特利尔",
+    "en": "Montreal, Canada"
   }
 }

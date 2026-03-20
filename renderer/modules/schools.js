@@ -1,16 +1,66 @@
-import { escapeHtml, formatBilingual } from './utils.js'
+import { escapeHtml } from './utils.js'
 import { PAGE_SIZE } from './state.js'
 import { isFavorite, toggleFavorite, getTargetSchools } from './storage.js'
 import { getTheme } from './theme.js'
 
 let explorerPage = 1
 let explorerTotal = 0
+let explorerKeyword = ''
+let explorerRegion = 'all'
+let explorerRanking = 'qs'
+let explorerSearchTimer = null
 let detailBackPage = 'university-explorer'
 let currentDetailSchool = null
 const schoolAssetDataUrlCache = new Map()
 
+const REGION_BUCKET_ALIASES = {
+  hong_kong: ['中国香港', '香港', 'hong kong'],
+  singapore: ['新加坡', 'singapore'],
+  uk: ['英国', 'uk', 'united kingdom', 'england', 'scotland', 'wales', 'northern ireland'],
+  usa: ['美国', 'usa', 'united states', 'united states of america'],
+  australia: ['澳大利亚', 'australia'],
+  malaysia: ['马来西亚', 'malaysia']
+}
+
+const EUROPE_ALIASES = [
+  '法国', 'france',
+  '德国', 'germany',
+  '荷兰', 'netherlands',
+  '瑞士', 'switzerland',
+  '爱尔兰', 'ireland',
+  '意大利', 'italy',
+  '西班牙', 'spain',
+  '比利时', 'belgium',
+  '瑞典', 'sweden',
+  '丹麦', 'denmark',
+  '芬兰', 'finland',
+  '挪威', 'norway',
+  '奥地利', 'austria',
+  '葡萄牙', 'portugal',
+  '波兰', 'poland',
+  '捷克', 'czech',
+  '匈牙利', 'hungary',
+  '希腊', 'greece'
+]
+
 let overlay, backBtn, titleEl, starBtn, heroBg, logoEl, nameEl, metaEl, introEl, detailBody, carouselTrack
 let lightbox, lightboxImg, lightboxClose
+
+function renderSkeletonCards(container, count) {
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div')
+    el.className = 'school-card school-card-skeleton'
+    el.innerHTML = `
+      <div class="school-card-main">
+        <div class="skeleton-block skeleton-logo"></div>
+        <div class="skeleton-block skeleton-name"></div>
+        <div class="skeleton-block skeleton-meta"></div>
+        <div class="skeleton-block skeleton-qs"></div>
+        <div class="skeleton-block skeleton-star"></div>
+      </div>`
+    container.appendChild(el)
+  }
+}
 
 async function getSchoolAssetDataUrl(rankingQs, filename) {
   if (!rankingQs || !filename || !window.api?.schoolsGetAssetDataUrl) return null
@@ -20,6 +70,108 @@ async function getSchoolAssetDataUrl(rankingQs, filename) {
   const dataUrl = res?.dataUrl || null
   if (dataUrl) schoolAssetDataUrlCache.set(cacheKey, dataUrl)
   return dataUrl
+}
+
+/** 与 data/init_db.js 中逻辑一致：列表英文行不显示「，正式名称…」「，全称…」等括号内中文说明 */
+function stripChineseAliasSuffixFromEnglishName(nameEn) {
+  return String(nameEn || '')
+    .replace(/[,，]\s*正式名称[\s\S]*$/u, '')
+    .replace(/[,，]\s*全称[\s\S]*$/u, '')
+    .replace(/[,，]\s*(?:又名|旧称|曾用名)[\s\S]*$/u, '')
+    .trim()
+}
+
+function formatLocationZh(countryZh, cityZh) {
+  const normalizedCountry = String(countryZh || '').trim()
+  let normalizedCity = String(cityZh || '').trim()
+  if (normalizedCountry && normalizedCity.startsWith(normalizedCountry)) {
+    normalizedCity = normalizedCity.slice(normalizedCountry.length)
+  }
+  const zh = [normalizedCountry, normalizedCity].filter(Boolean).join('')
+  return escapeHtml(zh || '-')
+}
+
+function normalizeSearchText(value) {
+  return String(value || '').trim().toLowerCase()
+}
+
+function normalizeCountryText(value) {
+  return normalizeSearchText(value).replace(/\d+/g, '').replace(/[().]/g, '').trim()
+}
+
+function getSchoolCountryFields(school) {
+  return [school.country_zh, school.country_en].map(normalizeCountryText).filter(Boolean)
+}
+
+function schoolCountryMatchesAliases(school, aliases) {
+  const fields = getSchoolCountryFields(school)
+  return aliases.some((alias) => {
+    const needle = normalizeSearchText(alias)
+    return needle && fields.some((field) => field.includes(needle))
+  })
+}
+
+function getSchoolRegionBucket(school) {
+  const orderedBuckets = ['hong_kong', 'singapore', 'uk', 'usa', 'australia', 'malaysia']
+  for (const bucket of orderedBuckets) {
+    if (schoolCountryMatchesAliases(school, REGION_BUCKET_ALIASES[bucket] || [])) return bucket
+  }
+  if (schoolCountryMatchesAliases(school, EUROPE_ALIASES)) return 'europe'
+  return 'other'
+}
+
+function schoolMatchesRegion(school, region) {
+  if (!region || region === 'all') return true
+  return getSchoolRegionBucket(school) === region
+}
+
+function sliceExplorerItems(items, page, pageSize) {
+  const safeItems = Array.isArray(items) ? items : []
+  const offset = Math.max(0, (page - 1) * pageSize)
+  return {
+    items: safeItems.slice(offset, offset + pageSize),
+    total: safeItems.length
+  }
+}
+
+function getExplorerFilters() {
+  return {
+    region: explorerRegion,
+    ranking: explorerRanking
+  }
+}
+
+function syncFilterChipState(container, attrName, activeValue) {
+  if (!container) return
+  container.querySelectorAll(`.school-filter-chip[data-${attrName}]`).forEach((button) => {
+    const isActive = button.dataset[attrName] === activeValue
+    button.classList.toggle('is-active', isActive)
+    button.setAttribute('aria-pressed', String(isActive))
+  })
+}
+
+function schoolMatchesKeyword(school, keyword) {
+  const kw = normalizeSearchText(keyword)
+  if (!kw) return true
+  const fields = [
+    school.school_name_zh,
+    school.school_name_en,
+    school.short_name,
+    school.country_zh,
+    school.country_en,
+    school.city_zh,
+    school.city_en
+  ]
+  return fields.some((field) => normalizeSearchText(field).includes(kw))
+}
+
+async function searchSchoolsFallback(keyword) {
+  if (!window.api?.schoolsList) return { items: [], total: 0, error: '无法加载院校数据' }
+  const res = await window.api.schoolsList(1, 1000, getExplorerFilters())
+  const { items = [], error } = res || {}
+  if (error) return { items: [], total: 0, error }
+  const filtered = items.filter((school) => schoolMatchesKeyword(school, keyword) && schoolMatchesRegion(school, explorerRegion))
+  return { items: filtered, total: filtered.length }
 }
 
 function renderSchoolCard(school, container, onClick) {
@@ -32,17 +184,13 @@ function renderSchoolCard(school, container, onClick) {
       <img class="school-card-logo" alt="" src="" loading="lazy">
       <div class="school-card-names">
         <span class="school-card-name-zh">${escapeHtml(school.school_name_zh || '')}</span>
-        <span class="school-card-name-en">${escapeHtml(school.school_name_en || '')}</span>
+        <span class="school-card-name-en">${escapeHtml(stripChineseAliasSuffixFromEnglishName(school.school_name_en || ''))}</span>
       </div>
-      <div class="school-card-meta-block">
-        <span class="school-card-meta-label">国家 (Country)</span>
-        <span class="school-card-meta-value school-card-meta-bilingual">${formatBilingual(school.country_zh, school.country_en)}</span>
+      <div class="school-card-meta-block school-card-meta-block-location">
+        <span class="school-card-meta-label">地区 (Location)</span>
+        <span class="school-card-meta-value school-card-meta-location">${formatLocationZh(school.country_zh, school.city_zh)}</span>
       </div>
-      <div class="school-card-meta-block">
-        <span class="school-card-meta-label">城市 (City)</span>
-        <span class="school-card-meta-value school-card-meta-bilingual">${formatBilingual(school.city_zh, school.city_en)}</span>
-      </div>
-      <div class="school-card-meta-block">
+      <div class="school-card-meta-block school-card-meta-block-qs">
         <span class="school-card-meta-label">QS</span>
         <span class="school-card-meta-value school-card-meta-qs">${school.ranking_qs || '-'}</span>
       </div>
@@ -117,7 +265,7 @@ function openSchoolDetail(school, fromPage) {
   document.body.classList.add('school-detail-open')
   requestAnimationFrame(() => resetSchoolViewScroll())
 
-  titleEl.textContent = school.school_name_zh || school.school_name_en || ''
+  titleEl.textContent = school.school_name_zh || stripChineseAliasSuffixFromEnglishName(school.school_name_en || '') || ''
   const fav = isFavorite(school.school_id)
   starBtn.classList.toggle('favorited', fav)
 
@@ -141,7 +289,7 @@ function openSchoolDetail(school, fromPage) {
     logoEl.style.display = 'none'
   }
 
-  nameEl.textContent = school.school_name_zh || school.school_name_en || ''
+  nameEl.textContent = school.school_name_zh || stripChineseAliasSuffixFromEnglishName(school.school_name_en || '') || ''
   metaEl.textContent = [school.country_zh, school.city_zh, `QS #${school.ranking_qs || '-'}`].filter(Boolean).join(' · ')
 
   if (window.api.schoolsGetIntro) {
@@ -217,16 +365,55 @@ export async function loadSchoolListExplorer() {
   grid.innerHTML = ''
   paginationEl.innerHTML = ''
 
-  if (!window.api?.schoolsList) {
+  const canSearch = !!window.api?.schoolsSearch
+  const canList = !!window.api?.schoolsList
+  if (!canList && !canSearch) {
     grid.innerHTML = '<p class="placeholder-hint">无法加载院校数据</p>'
     return
   }
 
+  renderSkeletonCards(grid, PAGE_SIZE)
+
   try {
-    const res = await window.api.schoolsList(explorerPage, PAGE_SIZE)
+    const kw = explorerKeyword.trim()
+    const filters = getExplorerFilters()
+    const needsClientRegionFiltering = explorerRegion !== 'all'
+    let res
+    if (kw && canSearch) {
+      if (needsClientRegionFiltering) {
+        const fullRes = await window.api.schoolsSearch(kw, 1, 1000, filters)
+        const { items = [], error } = fullRes || {}
+        if (error) res = { items: [], total: 0, error }
+        else res = sliceExplorerItems(items.filter((school) => schoolMatchesRegion(school, explorerRegion)), explorerPage, PAGE_SIZE)
+      } else {
+        res = await window.api.schoolsSearch(kw, explorerPage, PAGE_SIZE, filters)
+      }
+    } else if (kw) {
+      const fallbackRes = await searchSchoolsFallback(kw)
+      const offset = Math.max(0, (explorerPage - 1) * PAGE_SIZE)
+      res = {
+        ...fallbackRes,
+        items: fallbackRes.items.slice(offset, offset + PAGE_SIZE)
+      }
+    } else {
+      if (needsClientRegionFiltering) {
+        const fullRes = await window.api.schoolsList(1, 1000, filters)
+        const { items = [], error } = fullRes || {}
+        if (error) res = { items: [], total: 0, error }
+        else res = sliceExplorerItems(items.filter((school) => schoolMatchesRegion(school, explorerRegion)), explorerPage, PAGE_SIZE)
+      } else {
+        res = await window.api.schoolsList(explorerPage, PAGE_SIZE, filters)
+      }
+    }
+    grid.innerHTML = ''
     const { items = [], total = 0, error } = res || {}
     if (error) { grid.innerHTML = `<p class="placeholder-hint">${escapeHtml(error)}</p>`; return }
     explorerTotal = total
+
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="school-list-empty"><p class="placeholder-text">未找到匹配院校</p><p class="placeholder-hint">请尝试搜索院校名称、国家或城市</p></div>`
+      return
+    }
 
     items.forEach((school) => renderSchoolCard(school, grid, (s) => openSchoolDetail(s, 'university-explorer')))
 
@@ -322,6 +509,67 @@ export function initSchools() {
   })
 
   overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeSchoolDetail() })
+
+  const searchInput = document.getElementById('school-search-input')
+  const searchClearBtn = document.getElementById('school-search-clear')
+  const searchBar = document.getElementById('school-search-bar')
+  const regionFilters = document.getElementById('school-region-filters')
+  const rankingFilters = document.getElementById('school-ranking-filters')
+  if (searchInput) {
+    const refreshSearchUiState = () => {
+      if (!searchBar) return
+      searchBar.classList.toggle('has-value', !!searchInput.value.trim())
+    }
+
+    searchInput.addEventListener('input', () => {
+      refreshSearchUiState()
+      if (explorerSearchTimer) clearTimeout(explorerSearchTimer)
+      explorerSearchTimer = setTimeout(() => {
+        explorerKeyword = searchInput.value
+        explorerPage = 1
+        loadSchoolListExplorer()
+      }, 300)
+    })
+
+    searchClearBtn?.addEventListener('click', () => {
+      if (!searchInput.value) return
+      searchInput.value = ''
+      refreshSearchUiState()
+      if (explorerSearchTimer) clearTimeout(explorerSearchTimer)
+      explorerKeyword = ''
+      explorerPage = 1
+      loadSchoolListExplorer()
+      searchInput.focus()
+    })
+
+    refreshSearchUiState()
+  }
+
+  regionFilters?.querySelectorAll('.school-filter-chip[data-region]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const nextRegion = button.dataset.region || 'all'
+      if (nextRegion === explorerRegion) return
+      explorerRegion = nextRegion
+      explorerPage = 1
+      syncFilterChipState(regionFilters, 'region', explorerRegion)
+      loadSchoolListExplorer()
+    })
+  })
+
+  rankingFilters?.querySelectorAll('.school-filter-chip[data-ranking]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (button.classList.contains('is-disabled')) return
+      const nextRanking = button.dataset.ranking || 'qs'
+      if (nextRanking === explorerRanking) return
+      explorerRanking = nextRanking
+      explorerPage = 1
+      syncFilterChipState(rankingFilters, 'ranking', explorerRanking)
+      loadSchoolListExplorer()
+    })
+  })
+
+  syncFilterChipState(regionFilters, 'region', explorerRegion)
+  syncFilterChipState(rankingFilters, 'ranking', explorerRanking)
 
   const logoWrap = document.querySelector('.sidebar-logo-wrap')
   const logoHi = document.querySelector('.sidebar-logo-hi')

@@ -1,15 +1,15 @@
 {
   "intro": {
     "zh": [
-      "同济大学（Tongji University，简称同济）创办于1907年，是一所位于中国上海市的教育部直属重点综合性大学，国家“双一流”A类、“985工程”和“211工程”重点建设高校，由德国医生埃里希·宝隆创办，最初名为德文医学堂。同济在2026年QS世界大学排名中位列第177位，在软科排名第18位，在泰晤士大陆排名第16位，在US排名第124位，综合实力和核心竞争力不断提升。学校拥有四个校区：四平路校区、沪西校区、沪北校区和嘉定校区以及临港、张江等研究基地，其中四平路校区位于上海市杨浦区四平路1239号，是学校的主校区。同济大学在土木工程、建筑学、城市规划、交通运输工程等领域具有深厚的学术底蕴和强大的科研实力，被誉为“中国土木建筑领域的摇篮”，尤其在桥梁工程、地下工程、城市轨道交通等领域处于世界领先地位。学校培养了众多杰出人才，包括建筑大师贝聿铭等，对中国乃至全球的城市建设和社会发展做出了重要贡献。"
+      "同济大学（Tongji University）是一所位于中国上海市的高等院校，在2026QS世界大学排名中位列第178位。"
     ],
     "en": [
-      "Tongji University"
+      "Tongji University is a public research university located in Shanghai, China. It is ranked No. 178 in the 2026 QS World University Rankings."
     ]
   },
-  "contact": "founded in 1907",
+  "contact": "https://www.tongji.edu.cn/",
   "address": {
-    "zh": "is a key comprehensive university directly under the Ministry of Education",
-    "en": "located in Shanghai"
+    "zh": "中国上海市",
+    "en": "Shanghai, China"
   }
 }

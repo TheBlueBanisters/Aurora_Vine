@@ -28,6 +28,7 @@ const COUNTRY_ZH_LIST = [
   '中国香港', '中国澳门', '中国台湾',
   '沙特阿拉伯', '阿联酋', '新西兰', '澳大利亚', '马来西亚',
   '新加坡', '阿根廷', '哥伦比亚', '以色列',
+  '哈萨克斯坦', '卡塔尔',
   '美国', '英国', '瑞士', '加拿大', '日本', '韩国', '中国',
   '法国', '德国', '荷兰', '瑞典', '丹麦', '芬兰', '挪威',
   '比利时', '爱尔兰', '西班牙', '意大利', '俄罗斯', '巴西',
@@ -55,9 +56,81 @@ const COUNTRY_EN_ALIASES = {
   'macau': 'Macau', 'taiwan': 'Taiwan',
   'saudi arabia': 'Saudi Arabia', 'uae': 'UAE', 'united arab emirates': 'UAE',
   'argentina': 'Argentina', 'chile': 'Chile', 'colombia': 'Colombia',
+  'kazakhstan': 'Kazakhstan', 'qatar': 'Qatar',
   'indonesia': 'Indonesia', 'philippines': 'Philippines', 'egypt': 'Egypt',
   'greece': 'Greece'
 };
+
+const COUNTRY_EN_TO_ZH = {
+  USA: '美国',
+  UK: '英国',
+  Switzerland: '瑞士',
+  Canada: '加拿大',
+  Australia: '澳大利亚',
+  Japan: '日本',
+  'South Korea': '韩国',
+  China: '中国',
+  Singapore: '新加坡',
+  France: '法国',
+  Germany: '德国',
+  Netherlands: '荷兰',
+  Sweden: '瑞典',
+  Denmark: '丹麦',
+  Finland: '芬兰',
+  Norway: '挪威',
+  Belgium: '比利时',
+  Ireland: '爱尔兰',
+  Spain: '西班牙',
+  Italy: '意大利',
+  Russia: '俄罗斯',
+  Malaysia: '马来西亚',
+  Brazil: '巴西',
+  Mexico: '墨西哥',
+  'New Zealand': '新西兰',
+  Israel: '以色列',
+  Austria: '奥地利',
+  'South Africa': '南非',
+  Thailand: '泰国',
+  India: '印度',
+  Portugal: '葡萄牙',
+  'Czech Republic': '捷克',
+  Poland: '波兰',
+  Hungary: '匈牙利',
+  Turkey: '土耳其',
+  'Hong Kong': '中国香港',
+  Macau: '中国澳门',
+  Taiwan: '中国台湾',
+  'Saudi Arabia': '沙特阿拉伯',
+  UAE: '阿联酋',
+  Argentina: '阿根廷',
+  Chile: '智利',
+  Colombia: '哥伦比亚',
+  Kazakhstan: '哈萨克斯坦',
+  Qatar: '卡塔尔',
+  Indonesia: '印度尼西亚',
+  Philippines: '菲律宾',
+  Egypt: '埃及',
+  Greece: '希腊'
+};
+
+const COUNTRY_ZH_NORMALIZE = {
+  中华人民共和国: '中国',
+  中华民国: '中国台湾'
+};
+
+const COUNTRY_EN_TOKENS = Array.from(new Set([
+  ...Object.keys(COUNTRY_EN_ALIASES),
+  ...Object.values(COUNTRY_EN_ALIASES)
+])).sort((a, b) => b.length - a.length);
+
+/** 去掉括号内英文校名后紧跟的中文说明，如「，正式名称…」「，全称…」 */
+function stripChineseAliasSuffixFromEnglishName(nameEn) {
+  return String(nameEn || '')
+    .replace(/[,，]\s*正式名称[\s\S]*$/u, '')
+    .replace(/[,，]\s*全称[\s\S]*$/u, '')
+    .replace(/[,，]\s*(?:又名|旧称|曾用名)[\s\S]*$/u, '')
+    .trim();
+}
 
 function extractEnglishNameAndShort(zhText) {
   const match = zhText.match(/[（(]([^）)]+?)[）)]/);
@@ -71,22 +144,67 @@ function extractEnglishNameAndShort(zhText) {
   } else {
     nameEn = inner.trim();
   }
-  nameEn = nameEn.replace(/[，,].+$/, '').trim();
+  nameEn = stripChineseAliasSuffixFromEnglishName(nameEn);
+  shortName = String(shortName || '')
+    .replace(/[或/]/g, ' ')
+    .replace(/[^\w.+\- ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   return { nameEn, shortName };
+}
+
+function extractEnglishNameFromEnglishIntro(enText) {
+  const text = String(enText || '').trim();
+  if (!text) return '';
+  const patterns = [
+    /^([A-Z][A-Za-z0-9&.'’\- ]+?)\s+\(/,
+    /^([A-Z][A-Za-z0-9&.'’\- ]+?)\s+(?:is|was|founded|established)\b/,
+    /^([A-Z][A-Za-z0-9&.'’\- ]+?)(?:,|\.|$)/
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match) return match[1].trim();
+  }
+  return '';
+}
+
+function extractChineseNameFromIntro(zhText) {
+  return String(zhText || '').split(/[（(]/)[0].trim();
+}
+
+function normalizeCountryZh(value) {
+  const text = String(value || '').trim();
+  return COUNTRY_ZH_NORMALIZE[text] || text;
+}
+
+function isLikelyBrokenZhLocation(value) {
+  const text = String(value || '').trim();
+  return !text || /\?{2,}/.test(text) || (!/[\u3400-\u9fff]/u.test(text) && /[A-Za-z]{4,}/.test(text));
+}
+
+function isLikelyBrokenEnLocation(value) {
+  const text = String(value || '').trim();
+  return !text
+    || /\?{2,}/.test(text)
+    || /\b(university|college|research|renowned|founded|faculty|students|engineering|science|medicine|teaching|business|law|humanities|social sciences|technology)\b/i.test(text);
 }
 
 function parseAddressZh(addrZh) {
   let countryZh = '';
   let cityZh = '';
+  const text = normalizeCountryZh(String(addrZh || '').trim());
+  if (isLikelyBrokenZhLocation(text)) return { countryZh, cityZh };
   for (const c of COUNTRY_ZH_LIST) {
-    if (addrZh.startsWith(c)) {
+    if (text.startsWith(c) || text.includes(c)) {
       countryZh = c;
-      const rest = addrZh.slice(c.length);
-      const cityMatch = rest.match(/^(.+?)(?:省|州|特别市|特别行政区|市|区|县|街|路|道|大道|号|大街|\d)/);
+      const startIndex = text.indexOf(c);
+      let rest = startIndex >= 0 ? text.slice(startIndex + c.length) : text;
+      rest = rest.replace(/^[^省州市区县特别行政自治区]+(?:省|州|自治区|特别行政区|特别市|道(?=.+(?:市|区|县)))/, '');
+      const cityMatch = rest.match(/^(.+?)(?:市|区|县)/) || rest.match(/^(.+?)(?:街|路|道|大道|号|大街|\d)/);
       if (cityMatch) {
         cityZh = cityMatch[1];
       } else {
-        cityZh = rest.replace(/[省州市区街路道号]+.*$/, '');
+        cityZh = rest.replace(/[省州市区县街路道号]+.*$/, '');
       }
       break;
     }
@@ -95,9 +213,16 @@ function parseAddressZh(addrZh) {
 }
 
 function parseAddressEn(addrEn) {
-  const parts = addrEn.split(',').map(s => s.trim()).filter(Boolean);
+  const raw = String(addrEn || '').trim();
+  if (isLikelyBrokenEnLocation(raw)) return { countryEn: '', cityEn: '' };
+  const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
   if (parts.length < 2) return { countryEn: '', cityEn: '' };
-  const lastPart = parts[parts.length - 1].toLowerCase().replace(/^\s*the\s+/, '');
+  const lastPart = parts[parts.length - 1]
+    .toLowerCase()
+    .replace(/^\s*the\s+/, '')
+    .replace(/\d+/g, '')
+    .replace(/[().]/g, '')
+    .trim();
   const countryEn = COUNTRY_EN_ALIASES[lastPart] || parts[parts.length - 1];
   let cityEn = '';
   for (let i = parts.length - 2; i >= 0; i--) {
@@ -108,6 +233,34 @@ function parseAddressEn(addrEn) {
     }
   }
   return { countryEn, cityEn };
+}
+
+function parseCountryZhFromText(text) {
+  const source = String(text || '');
+  for (const country of COUNTRY_ZH_LIST.sort((a, b) => b.length - a.length)) {
+    if (source.includes(country)) return country;
+  }
+  return '';
+}
+
+function parseCountryEnFromText(text) {
+  const source = String(text || '').toLowerCase();
+  for (const token of COUNTRY_EN_TOKENS) {
+    const normalized = token.toLowerCase();
+    const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(^|[^a-z])${escaped}([^a-z]|$)`, 'i');
+    if (regex.test(source)) return COUNTRY_EN_ALIASES[normalized] || token;
+  }
+  return '';
+}
+
+function toSafeTextArray(value) {
+  return Array.isArray(value) ? value.map((item) => String(item || '').trim()).filter(Boolean) : [];
+}
+
+function toSafeUrlText(value) {
+  const text = String(value || '').trim();
+  return /^https?:\/\//i.test(text) ? text : '';
 }
 
 function generateSchoolId(shortName, nameEn, rank) {
@@ -179,14 +332,46 @@ for (const dirName of entries) {
     continue;
   }
 
-  const schoolNameZh = logoPng.replace(/\.png$/i, '');
-  const zhIntro = (intro.intro?.zh || []).join(' ');
-  const { nameEn, shortName } = extractEnglishNameAndShort(zhIntro);
+  const zhIntroItems = toSafeTextArray(intro.intro?.zh);
+  const enIntroItems = toSafeTextArray(intro.intro?.en);
+  const zhIntro = zhIntroItems.join(' ');
+  const enIntro = enIntroItems.join(' ');
+  const schoolNameZh = extractChineseNameFromIntro(zhIntro) || logoPng.replace(/\.png$/i, '');
+  const nameInfo = extractEnglishNameAndShort(zhIntro);
+  const nameEn = stripChineseAliasSuffixFromEnglishName(
+    nameInfo.nameEn || extractEnglishNameFromEnglishIntro(enIntro)
+  );
+  const shortName = nameInfo.shortName;
 
   const addrZh = intro.address?.zh || '';
   const addrEn = intro.address?.en || '';
-  const { countryZh, cityZh } = parseAddressZh(addrZh);
-  const { countryEn, cityEn } = parseAddressEn(addrEn);
+  const zhAllText = [
+    ...zhIntroItems,
+    intro.address?.zh || ''
+  ].join(' ');
+  const enAllText = [
+    ...enIntroItems,
+    intro.address?.en || '',
+    toSafeUrlText(intro.contact || '')
+  ].join(' ');
+
+  const addrParsedZh = parseAddressZh(addrZh);
+  const addrParsedEn = parseAddressEn(addrEn);
+  let countryZh = normalizeCountryZh(addrParsedZh.countryZh || parseCountryZhFromText(zhAllText));
+  let countryEn = addrParsedEn.countryEn || parseCountryEnFromText(enAllText);
+  let cityZh = addrParsedZh.cityZh;
+  const cityEn = addrParsedEn.cityEn;
+
+  if (!countryZh && countryEn) countryZh = COUNTRY_EN_TO_ZH[countryEn] || '';
+  if (!countryEn && countryZh) {
+    const pair = Object.entries(COUNTRY_EN_TO_ZH).find(([, zh]) => zh === countryZh);
+    countryEn = pair ? pair[0] : '';
+  }
+  if (!cityZh && !countryZh && /[\u3400-\u9fff]/u.test(String(addrZh || '').trim())) {
+    cityZh = String(addrZh || '').trim().replace(/[街路道号]+.*$/, '');
+  } else if (!cityZh && /[\u3400-\u9fff]/u.test(String(addrZh || '').trim()) && String(addrZh || '').trim().length <= 12) {
+    cityZh = String(addrZh || '').trim().replace(/[街路道号]+.*$/, '');
+  }
 
   let schoolId = generateSchoolId(shortName, nameEn, rank);
   if (usedIds.has(schoolId)) {
