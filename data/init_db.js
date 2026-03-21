@@ -1,6 +1,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
+const XLSX = require('xlsx');
 
 const dbPath = path.join(__dirname, 'school_item.db');
 if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
@@ -20,9 +21,83 @@ CREATE TABLE schools (
     ranking_qs INT,
     logo_filename TEXT
 );
+
+CREATE TABLE school_programs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id VARCHAR(50) NOT NULL,
+    ranking_qs INT NOT NULL,
+    school_name_zh VARCHAR(200),
+    school_name_en VARCHAR(200),
+    program_name_cn TEXT NOT NULL,
+    program_name_en TEXT,
+    tuition_est REAL,
+    language_requirement TEXT,
+    duration TEXT,
+    curriculum_summary_cn TEXT,
+    curriculum_summary_en TEXT,
+    difficulty_score REAL,
+    display_order INT NOT NULL DEFAULT 0,
+    raw_json TEXT NOT NULL,
+    FOREIGN KEY(school_id) REFERENCES schools(school_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_school_programs_school_id ON school_programs(school_id);
+CREATE INDEX idx_school_programs_ranking_qs ON school_programs(ranking_qs);
+CREATE INDEX idx_school_programs_display_order ON school_programs(school_id, display_order);
+
+CREATE TABLE application_cases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_no INTEGER NOT NULL UNIQUE,
+    profile_tier_score REAL NOT NULL,
+    undergrad_tier TEXT NOT NULL,
+    gpa_scale TEXT NOT NULL,
+    gpa_value REAL NOT NULL,
+    gpa_rank_percent REAL,
+    ielts_score REAL,
+    toefl_score REAL,
+    gre_score REAL,
+    gre_writing_score REAL,
+    internship_count INTEGER NOT NULL DEFAULT 0,
+    research_count INTEGER NOT NULL DEFAULT 0,
+    paper_count INTEGER NOT NULL DEFAULT 0,
+    tags_json TEXT NOT NULL DEFAULT '[]',
+    primary_school_id VARCHAR(50),
+    primary_school_name_zh VARCHAR(200),
+    primary_program_name_cn TEXT,
+    primary_program_name_en TEXT,
+    raw_json TEXT NOT NULL,
+    FOREIGN KEY(primary_school_id) REFERENCES schools(school_id) ON DELETE SET NULL
+);
+
+CREATE TABLE application_case_offers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL,
+    school_id VARCHAR(50) NOT NULL,
+    ranking_qs INT NOT NULL,
+    school_name_zh VARCHAR(200) NOT NULL,
+    school_name_en VARCHAR(200),
+    program_id INTEGER,
+    program_name_cn TEXT NOT NULL,
+    program_name_en TEXT,
+    offer_type TEXT NOT NULL DEFAULT 'offer',
+    offer_tier TEXT NOT NULL,
+    is_primary_offer INTEGER NOT NULL DEFAULT 0,
+    display_order INT NOT NULL DEFAULT 0,
+    FOREIGN KEY(case_id) REFERENCES application_cases(id) ON DELETE CASCADE,
+    FOREIGN KEY(school_id) REFERENCES schools(school_id) ON DELETE CASCADE,
+    FOREIGN KEY(program_id) REFERENCES school_programs(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_application_cases_score ON application_cases(profile_tier_score DESC);
+CREATE INDEX idx_application_cases_undergrad_tier ON application_cases(undergrad_tier);
+CREATE INDEX idx_application_cases_primary_school_id ON application_cases(primary_school_id);
+CREATE INDEX idx_application_case_offers_case_id ON application_case_offers(case_id, display_order);
+CREATE INDEX idx_application_case_offers_school_id ON application_case_offers(school_id, ranking_qs);
 `);
 
 const schoolDir = path.join(__dirname, '..', 'school');
+const majorDir = path.join(__dirname, '..', 'major');
+const personalCaseDir = path.join(__dirname, '..', 'personalCase');
 
 const COUNTRY_ZH_LIST = [
   '中国香港', '中国澳门', '中国台湾',
@@ -263,6 +338,645 @@ function toSafeUrlText(value) {
   return /^https?:\/\//i.test(text) ? text : '';
 }
 
+function normalizeProgramHeader(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[()（）.:：/\\_-]+/g, '');
+}
+
+const PROGRAM_COLUMN_ALIASES = {
+  schoolNameZh: ['大学名称 (CN)', '大学名称(CN)', '大学名称', '院校名称 (CN)', '院校名称(CN)', '院校名称'],
+  schoolNameEn: ['University Name (EN)', 'University Name(EN)', 'University Name', '院校英文名'],
+  programNameCn: ['开设专业 (CN)', '开设专业(CN)', '开设专业', '专业名称 (CN)', '专业名称(CN)', '专业名称'],
+  programNameEn: ['Program Name (EN)', 'Program Name(EN)', 'Program Name', '专业英文名'],
+  tuitionEst: ['学费 (Est.) ', '学费 (Est.)', '学费(Est.)', '学费 Est.', '学费', 'Tuition'],
+  languageRequirement: ['语言要求', 'Language Requirement'],
+  duration: ['学制', 'Duration'],
+  curriculumSummaryCn: ['培养方案简述 (CN)', '培养方案简述(CN)', '培养方案简述'],
+  curriculumSummaryEn: ['Curriculum Summary (EN)', 'Curriculum Summary(EN)', 'Curriculum Summary'],
+  difficultyScore: ['专业难度系数', '难度系数', 'Difficulty Score']
+};
+
+const SCHOOL_NAME_ALIAS_MAP_ZH = {
+  '苏黎世联邦理工学院': '苏黎世联邦理工大学',
+  '圣三一大学': '都柏林圣三一学院',
+  '皇家理工学院': 'KTH皇家理工学院',
+  '莫斯科国立大学': '罗蒙诺索夫莫斯科国立大学',
+  '埃因霍温理工大学': '埃因霍芬理工大学',
+  '瓦赫宁根大学': '瓦格宁根大学',
+  '查尔姆斯理工大学': '查尔姆斯工业大学',
+  '阿里-法拉比哈萨克国立大学': '阿里-法拉比哈萨克斯坦国立大学',
+  '华盛顿大学圣路易斯分校': '圣路易斯华盛顿大学',
+  '国立阳明交通大学': '台湾阳明交通大学',
+  '清华大学(新竹)': '台湾清华大学'
+};
+
+const SCHOOL_NAME_ALIAS_MAP_EN_RAW = {
+  UCL: 'University College London',
+  Caltech: 'California Institute of Technology',
+  WashU: 'Washington University in St. Louis',
+  QMUL: 'Queen Mary University of London',
+  UBC: 'The University of British Columbia',
+  TokyoTech: 'Institute of Science Tokyo',
+  USTC: 'University of Science and Technology of China',
+  DTU: 'Technical University of Denmark',
+  ASU: 'Arizona State University',
+  UIUC: 'University of Illinois at Urbana-Champaign',
+  LSE: 'The London School of Economics and Political Science',
+  USC: 'University of Southern California',
+  UCLA: 'University of California, Los Angeles',
+  UCSD: 'University of California, San Diego',
+  UCSB: 'University of California, Santa Barbara',
+  UCDavis: 'University of California, Davis',
+  UCBerkeley: 'University of California, Berkeley',
+  UNCChapelHill: 'University of North Carolina at Chapel Hill',
+  GeorgiaTech: 'Georgia Institute of Technology',
+  KTH: 'KTH Royal Institute of Technology',
+  TUEindhoven: 'Eindhoven University of Technology',
+  WageningenUniversity: 'Wageningen University & Research',
+  Chalmers: 'Chalmers University of Technology',
+  AlFarabiKazakh: 'Al-Farabi Kazakh National University',
+  NYCU: 'National Yang Ming Chiao Tung University',
+  MSU: 'Lomonosov Moscow State University'
+};
+
+const SCHOOL_NAME_ALIAS_MAP_EN = Object.fromEntries(
+  Object.entries(SCHOOL_NAME_ALIAS_MAP_EN_RAW).map(([key, value]) => [normalizeSchoolLookupText(key), value])
+);
+
+function normalizeSchoolLookupText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^the\s+/i, '')
+    .replace(/[（(][^）)]*[）)]/g, ' ')
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9\u3400-\u9fff]+/gu, '');
+}
+
+function normalizeProgramText(value) {
+  const text = String(value ?? '').trim();
+  return text || '';
+}
+
+function toNullableNumber(value) {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const text = String(value).replace(/[,，\s]/g, '');
+  const match = text.match(/-?\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : null;
+}
+
+function buildProgramColumnMap(headerRow) {
+  const headerLookup = new Map();
+  headerRow.forEach((header) => {
+    const normalized = normalizeProgramHeader(header);
+    if (normalized) headerLookup.set(normalized, String(header));
+  });
+  const columnMap = {};
+  for (const [field, aliases] of Object.entries(PROGRAM_COLUMN_ALIASES)) {
+    const matchedHeader = aliases
+      .map((alias) => headerLookup.get(normalizeProgramHeader(alias)))
+      .find(Boolean);
+    if (matchedHeader) columnMap[field] = matchedHeader;
+  }
+  const requiredFields = ['schoolNameZh', 'schoolNameEn', 'programNameCn', 'programNameEn'];
+  const missing = requiredFields.filter((field) => !columnMap[field]);
+  if (missing.length) {
+    throw new Error(`专业表缺少必要列：${missing.join(', ')}`);
+  }
+  return columnMap;
+}
+
+function getProgramCell(row, columnMap, field) {
+  const key = columnMap[field];
+  return key ? row[key] : '';
+}
+
+function addSchoolLookupCandidate(lookup, key, record) {
+  if (!key) return;
+  const normalized = normalizeSchoolLookupText(key);
+  if (!normalized) return;
+  const existing = lookup.get(normalized) || [];
+  if (!existing.some((item) => item.schoolId === record.schoolId)) existing.push(record);
+  lookup.set(normalized, existing);
+}
+
+function buildSchoolLookup(records) {
+  const lookup = new Map();
+  records.forEach((record) => {
+    addSchoolLookupCandidate(lookup, record.schoolNameZh, record);
+    addSchoolLookupCandidate(lookup, record.schoolNameEn, record);
+    addSchoolLookupCandidate(lookup, record.shortName, record);
+  });
+  return lookup;
+}
+
+function resolveSchoolForProgram(row, columnMap, schoolLookup, rowIndex) {
+  const schoolNameZhRaw = normalizeProgramText(getProgramCell(row, columnMap, 'schoolNameZh'));
+  const schoolNameEnRaw = normalizeProgramText(getProgramCell(row, columnMap, 'schoolNameEn'));
+  const schoolNameZh = SCHOOL_NAME_ALIAS_MAP_ZH[schoolNameZhRaw] || schoolNameZhRaw;
+  const schoolNameEnAliasKey = normalizeSchoolLookupText(schoolNameEnRaw);
+  const schoolNameEn = SCHOOL_NAME_ALIAS_MAP_EN[schoolNameEnAliasKey] || schoolNameEnRaw;
+
+  const candidates = [];
+  const seen = new Set();
+  [schoolNameZh, schoolNameEn, schoolNameZhRaw, schoolNameEnRaw].forEach((key) => {
+    const matched = schoolLookup.get(normalizeSchoolLookupText(key)) || [];
+    matched.forEach((record) => {
+      if (seen.has(record.schoolId)) return;
+      seen.add(record.schoolId);
+      candidates.push(record);
+    });
+  });
+
+  if (candidates.length === 1) return candidates[0];
+  if (candidates.length > 1) {
+    const preciseZh = candidates.find((record) => normalizeSchoolLookupText(record.schoolNameZh) === normalizeSchoolLookupText(schoolNameZh));
+    if (preciseZh) return preciseZh;
+    const preciseEn = candidates.find((record) => normalizeSchoolLookupText(record.schoolNameEn) === normalizeSchoolLookupText(schoolNameEn));
+    if (preciseEn) return preciseEn;
+  }
+
+  throw new Error(`第 ${rowIndex} 行专业数据无法匹配院校：${schoolNameZhRaw || '-'} / ${schoolNameEnRaw || '-'}`);
+}
+
+function resolveProgramWorkbookPath() {
+  if (!fs.existsSync(majorDir)) return '';
+  const workbook = fs.readdirSync(majorDir).find((name) => /\.xlsx$/i.test(name) && !/^~\$/.test(name));
+  return workbook ? path.join(majorDir, workbook) : '';
+}
+
+function importSchoolPrograms(records) {
+  const workbookPath = resolveProgramWorkbookPath();
+  if (!workbookPath) {
+    console.warn('[SKIP] no major workbook found under major/');
+    return 0;
+  }
+
+  const workbook = XLSX.readFile(workbookPath);
+  const sheetName = workbook.SheetNames[0];
+  if (!sheetName) {
+    console.warn(`[SKIP] ${path.basename(workbookPath)}: no worksheet found`);
+    return 0;
+  }
+
+  const sheet = workbook.Sheets[sheetName];
+  const rowsAsArrays = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
+  if (!rowsAsArrays.length) {
+    console.warn(`[SKIP] ${path.basename(workbookPath)}: worksheet is empty`);
+    return 0;
+  }
+
+  const headerRow = rowsAsArrays[0];
+  const columnMap = buildProgramColumnMap(headerRow);
+  const rows = XLSX.utils.sheet_to_json(sheet, { raw: true, defval: '' });
+  const schoolLookup = buildSchoolLookup(records);
+  const insertProgramStmt = db.prepare(`
+    INSERT INTO school_programs
+    (school_id, ranking_qs, school_name_zh, school_name_en, program_name_cn, program_name_en, tuition_est,
+     language_requirement, duration, curriculum_summary_cn, curriculum_summary_en, difficulty_score, display_order, raw_json)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const displayOrderMap = new Map();
+  let insertedPrograms = 0;
+  const insertPrograms = db.transaction((items) => {
+    for (const item of items) {
+      insertProgramStmt.run(
+        item.schoolId,
+        item.rankingQs,
+        item.schoolNameZh,
+        item.schoolNameEn,
+        item.programNameCn,
+        item.programNameEn,
+        item.tuitionEst,
+        item.languageRequirement,
+        item.duration,
+        item.curriculumSummaryCn,
+        item.curriculumSummaryEn,
+        item.difficultyScore,
+        item.displayOrder,
+        item.rawJson
+      );
+      insertedPrograms++;
+    }
+  });
+
+  const programRecords = rows
+    .filter((row) => Object.values(row).some((value) => String(value ?? '').trim()))
+    .map((row, index) => {
+      const matchedSchool = resolveSchoolForProgram(row, columnMap, schoolLookup, index + 2);
+      const schoolCount = (displayOrderMap.get(matchedSchool.schoolId) || 0) + 1;
+      displayOrderMap.set(matchedSchool.schoolId, schoolCount);
+      return {
+        schoolId: matchedSchool.schoolId,
+        rankingQs: matchedSchool.rank,
+        schoolNameZh: matchedSchool.schoolNameZh,
+        schoolNameEn: matchedSchool.schoolNameEn,
+        programNameCn: normalizeProgramText(getProgramCell(row, columnMap, 'programNameCn')),
+        programNameEn: normalizeProgramText(getProgramCell(row, columnMap, 'programNameEn')),
+        tuitionEst: toNullableNumber(getProgramCell(row, columnMap, 'tuitionEst')),
+        languageRequirement: normalizeProgramText(getProgramCell(row, columnMap, 'languageRequirement')),
+        duration: normalizeProgramText(getProgramCell(row, columnMap, 'duration')),
+        curriculumSummaryCn: normalizeProgramText(getProgramCell(row, columnMap, 'curriculumSummaryCn')),
+        curriculumSummaryEn: normalizeProgramText(getProgramCell(row, columnMap, 'curriculumSummaryEn')),
+        difficultyScore: toNullableNumber(getProgramCell(row, columnMap, 'difficultyScore')),
+        displayOrder: schoolCount,
+        rawJson: JSON.stringify(row)
+      };
+    })
+    .filter((item) => item.programNameCn || item.programNameEn);
+
+  insertPrograms(programRecords);
+  console.log(`Programs imported from ${path.basename(workbookPath)} (${insertedPrograms} rows inserted)`);
+  return insertedPrograms;
+}
+
+function resolvePersonalCaseCsvPath() {
+  if (!fs.existsSync(personalCaseDir)) return '';
+  const csvFile = fs.readdirSync(personalCaseDir).find((name) => /\.csv$/i.test(name));
+  return csvFile ? path.join(personalCaseDir, csvFile) : '';
+}
+
+function parseSimpleCsvText(text) {
+  const lines = String(text || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (!lines.length) return [];
+  const rows = lines.map((line) => line.split(',').map((cell) => cell.trim()));
+  const header = rows[0];
+  return rows.slice(1).map((cells) => {
+    const row = {};
+    header.forEach((key, index) => {
+      row[key] = cells[index] ?? '';
+    });
+    return row;
+  });
+}
+
+function parsePercentNumber(value) {
+  const text = String(value ?? '').trim();
+  if (!text) return null;
+  const match = text.match(/-?\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : null;
+}
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function pickFirstPositive(...values) {
+  for (const value of values) {
+    const num = Number(value);
+    if (Number.isFinite(num) && num > 0) return num;
+  }
+  return 0;
+}
+
+function getGpaScaleNumber(scaleText) {
+  const text = String(scaleText || '').trim();
+  if (/4/.test(text)) return 4;
+  if (/100/.test(text)) return 100;
+  return 5;
+}
+
+function normalizeTierWeight(value) {
+  const text = String(value || '').trim();
+  if (text === '985') return 1;
+  if (text === '海本') return 0.92;
+  if (text === '211') return 0.82;
+  if (text === '中外合作') return 0.72;
+  if (text === '双非') return 0.58;
+  return 0.62;
+}
+
+function buildCaseTags(row) {
+  const tags = new Set();
+  const tier = String(row['本科层次'] || '').trim();
+  if (tier) tags.add(tier);
+
+  const gpaValue = Number(row['绩点'] || 0);
+  if (gpaValue >= 4.5) tags.add('高GPA');
+  else if (gpaValue >= 3.6) tags.add('稳健GPA');
+  else if (gpaValue > 0) tags.add('低GPA冲刺');
+
+  const rankPercent = parsePercentNumber(row['绩点排名百分比']);
+  if (Number.isFinite(rankPercent)) {
+    if (rankPercent <= 5) tags.add('排名前列');
+    else if (rankPercent >= 50) tags.add('排名靠后');
+  }
+
+  const ielts = Number(row['雅思成绩'] || 0);
+  const toefl = Number(row['托福成绩'] || 0);
+  if (ielts >= 7.5 || toefl >= 110) tags.add('语言强');
+  else if (ielts > 0 || toefl > 0) tags.add('语言达标');
+  else tags.add('语言待补强');
+
+  const gre = Number(row.GRE || 0);
+  if (gre >= 325) tags.add('GRE高分');
+  else if (gre >= 310) tags.add('GRE达标');
+
+  const internshipCount = Number(row['实习数量'] || 0);
+  const researchCount = Number(row['科研数量'] || 0);
+  const paperCount = Number(row['论文数量'] || 0);
+  if (researchCount >= 3) tags.add('科研强');
+  if (internshipCount >= 3) tags.add('实习丰富');
+  if (paperCount >= 1) tags.add('论文加成');
+
+  return Array.from(tags);
+}
+
+function computeProfileTierScore(row) {
+  const gpaScale = getGpaScaleNumber(row['绩点分制']);
+  const gpaValue = Number(row['绩点'] || 0);
+  const gpaNorm = clamp01(gpaScale > 0 ? gpaValue / gpaScale : 0);
+  const rankPercent = parsePercentNumber(row['绩点排名百分比']);
+  const rankNorm = Number.isFinite(rankPercent) ? clamp01(1 - rankPercent / 100) : 0.45;
+
+  const ielts = Number(row['雅思成绩'] || 0);
+  const toefl = Number(row['托福成绩'] || 0);
+  const gre = Number(row.GRE || 0);
+  const greWriting = Number(row['GRE写作'] || 0);
+  const internshipCount = Number(row['实习数量'] || 0);
+  const researchCount = Number(row['科研数量'] || 0);
+  const paperCount = Number(row['论文数量'] || 0);
+
+  const languageNorm = clamp01(
+    Math.max(
+      ielts > 0 ? ielts / 9 : 0,
+      toefl > 0 ? toefl / 120 : 0
+    )
+  );
+  const greNorm = clamp01(
+    Math.max(
+      gre > 0 ? (gre - 290) / 50 : 0,
+      greWriting > 0 ? greWriting / 6 : 0
+    )
+  );
+  const softNorm = clamp01(
+    internshipCount / 4 * 0.28
+    + researchCount / 5 * 0.5
+    + paperCount / 2 * 0.22
+  );
+  const tierNorm = normalizeTierWeight(row['本科层次']);
+
+  const score = (
+    gpaNorm * 34
+    + rankNorm * 16
+    + languageNorm * 15
+    + greNorm * 11
+    + softNorm * 14
+    + tierNorm * 10
+  );
+  return Number(score.toFixed(2));
+}
+
+function buildOfferTier(targetRank, rankingQs) {
+  if (rankingQs < targetRank - 8) return '冲刺';
+  if (rankingQs > targetRank + 12) return '保底';
+  return '匹配';
+}
+
+function chooseProgramForOffer(programs, caseNo, displayOrder) {
+  if (!Array.isArray(programs) || programs.length === 0) return null;
+  const index = Math.abs((caseNo * 7 + displayOrder * 3) % programs.length);
+  return programs[index];
+}
+
+function buildSchoolProgramsMap() {
+  const rows = db.prepare(`
+    SELECT id, school_id, ranking_qs, program_name_cn, program_name_en
+    FROM school_programs
+    ORDER BY school_id ASC, display_order ASC, id ASC
+  `).all();
+  const programMap = new Map();
+  rows.forEach((row) => {
+    const list = programMap.get(row.school_id) || [];
+    list.push(row);
+    programMap.set(row.school_id, list);
+  });
+  return programMap;
+}
+
+function assignSchoolSlotsToCases(caseProfiles, schoolRecords) {
+  const slots = schoolRecords.flatMap((school, duplicateIndex) => ([
+    { school, duplicateIndex: 0, targetCaseIndex: 0 },
+    { school, duplicateIndex: 1, targetCaseIndex: 0 }
+  ]));
+
+  slots.forEach((slot, index) => {
+    const schoolIndex = schoolRecords.findIndex((school) => school.schoolId === slot.school.schoolId);
+    const normalizedCaseIndex = schoolIndex / Math.max(1, schoolRecords.length - 1) * Math.max(1, caseProfiles.length - 1);
+    slot.targetCaseIndex = slot.duplicateIndex === 0
+      ? normalizedCaseIndex * 0.72
+      : normalizedCaseIndex * 0.72 + (caseProfiles.length - 1) * 0.28;
+    slot.sortValue = slot.targetCaseIndex + slot.duplicateIndex * 0.0001 + index * 0.000001;
+  });
+
+  slots.sort((a, b) => a.sortValue - b.sortValue);
+
+  caseProfiles.forEach((profile) => {
+    profile.offerSchools = [];
+    profile.offerSchoolIds = new Set();
+    profile.capacity = 5;
+  });
+
+  slots.forEach((slot) => {
+    let bestIndex = -1;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < caseProfiles.length; i++) {
+      const profile = caseProfiles[i];
+      if (profile.capacity <= 0) continue;
+      if (profile.offerSchoolIds.has(slot.school.schoolId)) continue;
+      const distance = Math.abs(i - slot.targetCaseIndex);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = i;
+      }
+    }
+    if (bestIndex < 0) {
+      for (let i = 0; i < caseProfiles.length; i++) {
+        const profile = caseProfiles[i];
+        if (profile.capacity <= 0) continue;
+        const distance = Math.abs(i - slot.targetCaseIndex);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = i;
+        }
+      }
+    }
+    if (bestIndex < 0) return;
+    const profile = caseProfiles[bestIndex];
+    profile.offerSchools.push(slot.school);
+    profile.offerSchoolIds.add(slot.school.schoolId);
+    profile.capacity -= 1;
+  });
+
+  caseProfiles.forEach((profile) => {
+    profile.offerSchools.sort((a, b) => a.rank - b.rank);
+  });
+}
+
+function importApplicationCases(records) {
+  const csvPath = resolvePersonalCaseCsvPath();
+  if (!csvPath) {
+    console.warn('[SKIP] no personal case csv found under personalCase/');
+    return { cases: 0, offers: 0 };
+  }
+
+  const csvBuffer = fs.readFileSync(csvPath);
+  const csvText = new TextDecoder('gb18030').decode(csvBuffer);
+  const rows = parseSimpleCsvText(csvText)
+    .filter((row) => Object.values(row).some((value) => String(value ?? '').trim()));
+  if (!rows.length) {
+    console.warn(`[SKIP] ${path.basename(csvPath)}: csv is empty`);
+    return { cases: 0, offers: 0 };
+  }
+
+  const schoolRecords = records.map((record) => ({
+    schoolId: record.schoolId,
+    schoolNameZh: record.schoolNameZh,
+    schoolNameEn: record.schoolNameEn,
+    countryZh: record.countryZh,
+    rank: record.rank
+  })).sort((a, b) => a.rank - b.rank);
+  const schoolProgramsMap = buildSchoolProgramsMap();
+
+  const caseProfiles = rows.map((row) => {
+    const caseNo = Number(row['案例序号'] || 0);
+    const profileTierScore = computeProfileTierScore(row);
+    const gpaScale = String(row['绩点分制'] || '').trim() || '5分制';
+    const gpaValue = Number(row['绩点'] || 0);
+    const gpaRankPercent = parsePercentNumber(row['绩点排名百分比']);
+    const ieltsScore = pickFirstPositive(row['雅思成绩']);
+    const toeflScore = pickFirstPositive(row['托福成绩']);
+    const greScore = pickFirstPositive(row.GRE);
+    const greWritingScore = pickFirstPositive(row['GRE写作']);
+    const internshipCount = Number(row['实习数量'] || 0);
+    const researchCount = Number(row['科研数量'] || 0);
+    const paperCount = Number(row['论文数量'] || 0);
+    const tags = buildCaseTags(row);
+    return {
+      caseNo,
+      profileTierScore,
+      undergradTier: String(row['本科层次'] || '').trim() || '其他',
+      gpaScale,
+      gpaValue,
+      gpaRankPercent,
+      ieltsScore: ieltsScore || null,
+      toeflScore: toeflScore || null,
+      greScore: greScore || null,
+      greWritingScore: greWritingScore || null,
+      internshipCount,
+      researchCount,
+      paperCount,
+      tags,
+      rawJson: JSON.stringify(row)
+    };
+  }).sort((a, b) => {
+    if (b.profileTierScore !== a.profileTierScore) return b.profileTierScore - a.profileTierScore;
+    return a.caseNo - b.caseNo;
+  });
+
+  assignSchoolSlotsToCases(caseProfiles, schoolRecords);
+
+  const insertCaseStmt = db.prepare(`
+    INSERT INTO application_cases
+    (case_no, profile_tier_score, undergrad_tier, gpa_scale, gpa_value, gpa_rank_percent, ielts_score,
+     toefl_score, gre_score, gre_writing_score, internship_count, research_count, paper_count,
+     tags_json, primary_school_id, primary_school_name_zh, primary_program_name_cn, primary_program_name_en, raw_json)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  const insertOfferStmt = db.prepare(`
+    INSERT INTO application_case_offers
+    (case_id, school_id, ranking_qs, school_name_zh, school_name_en, program_id, program_name_cn, program_name_en,
+     offer_type, offer_tier, is_primary_offer, display_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'offer', ?, ?, ?)
+  `);
+
+  let insertedCases = 0;
+  let insertedOffers = 0;
+  const insertAll = db.transaction((profiles) => {
+    profiles.forEach((profile, caseIndex) => {
+      const targetRank = schoolRecords[Math.max(0, Math.min(schoolRecords.length - 1, Math.round(caseIndex / Math.max(1, profiles.length - 1) * (schoolRecords.length - 1))))].rank;
+      const offers = profile.offerSchools.map((school, displayIndex) => {
+        const programs = schoolProgramsMap.get(school.schoolId) || [];
+        const program = chooseProgramForOffer(programs, profile.caseNo, displayIndex + 1);
+        return {
+          schoolId: school.schoolId,
+          rankingQs: school.rank,
+          schoolNameZh: school.schoolNameZh,
+          schoolNameEn: school.schoolNameEn,
+          programId: program?.id || null,
+          programNameCn: program?.program_name_cn || `${school.schoolNameZh}相关专业`,
+          programNameEn: program?.program_name_en || '',
+          offerTier: buildOfferTier(targetRank, school.rank),
+          displayOrder: displayIndex + 1
+        };
+      }).sort((a, b) => a.rankingQs - b.rankingQs);
+
+      let primaryOffer = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      offers.forEach((offer) => {
+        const distance = Math.abs(offer.rankingQs - targetRank);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          primaryOffer = offer;
+        }
+      });
+      if (primaryOffer) primaryOffer.offerTier = '匹配';
+
+      const caseResult = insertCaseStmt.run(
+        profile.caseNo,
+        profile.profileTierScore,
+        profile.undergradTier,
+        profile.gpaScale,
+        profile.gpaValue,
+        profile.gpaRankPercent,
+        profile.ieltsScore,
+        profile.toeflScore,
+        profile.greScore,
+        profile.greWritingScore,
+        profile.internshipCount,
+        profile.researchCount,
+        profile.paperCount,
+        JSON.stringify(profile.tags),
+        primaryOffer?.schoolId || null,
+        primaryOffer?.schoolNameZh || null,
+        primaryOffer?.programNameCn || null,
+        primaryOffer?.programNameEn || null,
+        profile.rawJson
+      );
+      insertedCases++;
+
+      offers.forEach((offer, index) => {
+        insertOfferStmt.run(
+          caseResult.lastInsertRowid,
+          offer.schoolId,
+          offer.rankingQs,
+          offer.schoolNameZh,
+          offer.schoolNameEn,
+          offer.programId,
+          offer.programNameCn,
+          offer.programNameEn,
+          offer.offerTier,
+          offer === primaryOffer ? 1 : 0,
+          index + 1
+        );
+        insertedOffers++;
+      });
+    });
+  });
+
+  insertAll(caseProfiles);
+  console.log(`Application cases imported from ${path.basename(csvPath)} (${insertedCases} cases, ${insertedOffers} offers inserted)`);
+  return { cases: insertedCases, offers: insertedOffers };
+}
+
 function generateSchoolId(shortName, nameEn, rank) {
   if (shortName) {
     const id = shortName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -394,6 +1108,10 @@ for (const dirName of entries) {
 }
 
 insertAll(records);
+const importedPrograms = importSchoolPrograms(records);
+const importedApplicationCases = importApplicationCases(records);
 db.close();
 
-console.log(`Database generated: data/school_item.db (${insertedCount} schools inserted)`);
+console.log(
+  `Database generated: data/school_item.db (${insertedCount} schools inserted, ${importedPrograms} programs inserted, ${importedApplicationCases.cases} cases inserted, ${importedApplicationCases.offers} case offers inserted)`
+);

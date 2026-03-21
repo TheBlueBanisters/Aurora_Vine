@@ -7,6 +7,7 @@ import { registerSchoolsIpc, registerSchoolProtocol } from './main/ipc/schools';
 import { registerDailyCheckinIpc, ensureDailyCheckinTable } from './main/ipc/daily-checkin';
 import { registerStudyPlanIpc, ensureStudyPlanTable } from './main/ipc/study-planning';
 import { registerCommunityIpc, ensureCommunityTables } from './main/ipc/community';
+import { registerApplicationCasesIpc } from './main/ipc/application-cases';
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'avatar', privileges: { standard: true, secure: true } },
@@ -71,6 +72,7 @@ registerSchoolsIpc();
 registerDailyCheckinIpc();
 registerStudyPlanIpc();
 registerCommunityIpc();
+registerApplicationCasesIpc();
 
 app.whenReady()
   .then(() => {

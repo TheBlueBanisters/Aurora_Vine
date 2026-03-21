@@ -2733,6 +2733,660 @@ body.school-detail-open .main-content {
   margin-bottom: 0;
 }
 
+.school-detail-programs {
+  padding: 0 48px 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.school-detail-related-cases {
+  padding: 0 48px 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.school-programs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.school-programs-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.school-programs-subtitle {
+  margin: 4px 0 0;
+  color: var(--content-text-secondary);
+  line-height: 1.7;
+}
+
+.school-programs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.school-related-cases-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.school-related-cases-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.school-related-cases-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.school-related-case-card {
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.school-related-case-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: rgba(137, 180, 250, 0.5);
+}
+
+.school-related-case-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.school-related-case-kicker {
+  color: var(--content-text-secondary);
+  font-size: 12px;
+}
+
+.school-related-case-title {
+  margin-top: 6px;
+  font-size: 16px;
+  color: var(--content-text);
+  line-height: 1.4;
+}
+
+.school-related-case-subtitle {
+  margin-top: 6px;
+  color: var(--content-text-secondary);
+  line-height: 1.6;
+}
+
+.school-related-case-score {
+  min-width: 82px;
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  text-align: center;
+}
+
+.school-related-case-score span {
+  display: block;
+  font-size: 12px;
+  color: var(--content-text-secondary);
+}
+
+.school-related-case-score strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 20px;
+  color: var(--content-text);
+}
+
+.school-related-case-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.school-related-case-meta span,
+.school-related-case-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--content-text);
+  font-size: 12px;
+}
+
+.school-related-case-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.school-program-card {
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.school-program-card[open] {
+  border-color: rgba(137, 180, 250, 0.55);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.school-program-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  cursor: pointer;
+}
+
+.school-program-summary::-webkit-details-marker {
+  display: none;
+}
+
+.school-program-title-wrap {
+  min-width: 0;
+}
+
+.school-program-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-text);
+}
+
+.school-program-title-en {
+  margin-top: 6px;
+  color: var(--content-text-secondary);
+  line-height: 1.6;
+}
+
+.school-program-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.school-program-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--content-text);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.school-program-body {
+  border-top: 1px solid var(--content-border);
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.school-program-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.school-program-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+}
+
+.school-program-field-label {
+  font-size: 12px;
+  color: var(--content-text-secondary);
+}
+
+.school-program-field-value {
+  color: var(--content-text);
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.school-program-copy h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--content-text);
+  margin-bottom: 8px;
+}
+
+.school-program-copy p {
+  margin-bottom: 0;
+  color: var(--content-text);
+  line-height: 1.8;
+}
+
+@media (max-width: 960px) {
+  .school-detail-intro,
+  .school-detail-programs,
+  .school-detail-related-cases {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .school-program-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .school-program-pills {
+    justify-content: flex-start;
+  }
+
+  .school-program-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .school-related-cases-list {
+    grid-template-columns: 1fr;
+  }
+
+  .school-related-case-top {
+    flex-direction: column;
+  }
+}
+
+.application-cases-search-bar {
+  margin-bottom: 18px;
+}
+
+.application-cases-filter-bar {
+  margin-bottom: 18px;
+}
+
+.application-cases-select-group {
+  flex: 1;
+  min-width: 320px;
+}
+
+.application-cases-select-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.application-cases-select-label {
+  color: var(--content-text-secondary);
+  font-size: 13px;
+}
+
+.application-cases-select {
+  min-width: 120px;
+  padding: 10px 12px;
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--content-text);
+}
+
+.application-cases-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.application-cases-summary {
+  margin-bottom: 18px;
+}
+
+.application-cases-summary-card {
+  background: var(--accent-soft);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+.application-cases-summary-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-text);
+}
+
+.application-cases-summary-text {
+  margin-top: 6px;
+  color: var(--content-text-secondary);
+  line-height: 1.7;
+}
+
+.application-cases-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.application-case-card {
+  background: var(--card-bg);
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.application-case-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: rgba(137, 180, 250, 0.5);
+}
+
+.application-case-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.application-case-card-kicker {
+  color: var(--content-text-secondary);
+  font-size: 12px;
+}
+
+.application-case-card-title {
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--content-text);
+}
+
+.application-case-card-subtitle {
+  margin-top: 8px;
+  color: var(--content-text-secondary);
+  line-height: 1.6;
+}
+
+.application-case-card-score {
+  flex-shrink: 0;
+  min-width: 88px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  text-align: center;
+}
+
+.application-case-card-score-label {
+  display: block;
+  font-size: 12px;
+  color: var(--content-text-secondary);
+}
+
+.application-case-card-score strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 22px;
+  color: var(--content-text);
+}
+
+.application-case-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.application-case-card-metric {
+  background: var(--accent-soft);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.application-case-card-metric-label {
+  display: block;
+  font-size: 12px;
+  color: var(--content-text-secondary);
+}
+
+.application-case-card-metric-value {
+  display: block;
+  margin-top: 6px;
+  color: var(--content-text);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.application-case-card-soft {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.application-case-card-soft span,
+.application-case-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--content-text);
+  font-size: 12px;
+}
+
+.application-case-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.application-case-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.application-case-card-btn {
+  min-width: 136px;
+}
+
+.application-case-empty-card {
+  grid-column: 1 / -1;
+  background: var(--card-bg);
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  text-align: center;
+}
+
+.application-case-modal {
+  display: none;
+  position: fixed;
+  left: var(--sidebar-width);
+  top: var(--overlay-top-offset);
+  right: 0;
+  bottom: 0;
+  z-index: 210;
+  background: rgba(15, 23, 42, 0.55);
+  padding: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.application-case-modal.active {
+  display: flex;
+}
+
+.application-case-modal-card {
+  width: min(980px, calc(100vw - var(--sidebar-width) - 48px));
+  max-height: calc(100vh - var(--overlay-top-offset) - 48px);
+  overflow-y: auto;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--content-border);
+  padding: 24px;
+  position: relative;
+}
+
+.application-case-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--content-text);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.application-case-modal-header {
+  padding-right: 56px;
+}
+
+.application-case-modal-kicker {
+  color: var(--content-text-secondary);
+  font-size: 12px;
+}
+
+.application-case-modal-title {
+  margin-top: 8px;
+  font-size: 28px;
+  line-height: 1.3;
+  color: var(--content-text);
+}
+
+.application-case-modal-subtitle {
+  margin-top: 10px;
+  color: var(--content-text-secondary);
+  line-height: 1.7;
+}
+
+.application-case-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.application-case-detail-section {
+  background: var(--accent-soft);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+.application-case-detail-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--content-text);
+  margin-bottom: 14px;
+}
+
+.application-case-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.application-case-detail-item {
+  background: var(--card-bg);
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.application-case-detail-item-label {
+  display: block;
+  font-size: 12px;
+  color: var(--content-text-secondary);
+}
+
+.application-case-detail-item-value {
+  display: block;
+  margin-top: 6px;
+  color: var(--content-text);
+  line-height: 1.6;
+}
+
+.application-case-detail-offers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.application-case-offer-card {
+  background: var(--card-bg);
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.application-case-offer-card.is-primary {
+  border-color: rgba(137, 180, 250, 0.55);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.application-case-offer-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.application-case-offer-school {
+  font-size: 16px;
+  color: var(--content-text);
+}
+
+.application-case-offer-program {
+  margin-top: 6px;
+  color: var(--content-text-secondary);
+  line-height: 1.6;
+}
+
+.application-case-offer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.application-case-offer-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--content-text);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.application-case-offer-badge.is-primary {
+  background: rgba(137, 180, 250, 0.28);
+}
+
+.application-case-offer-meta {
+  margin-top: 10px;
+  color: var(--content-text-secondary);
+}
+
 .school-detail-contact a,
 .school-detail-address {
   color: var(--accent);
@@ -4068,6 +4722,7 @@ body.school-detail-open .main-content {
 [data-theme="dark"] .form-select,
 [data-theme="dark"] .form-input,
 [data-theme="dark"] .auth-input,
+[data-theme="dark"] .application-cases-select,
 [data-theme="dark"] .daily-checkin-modal-input,
 [data-theme="dark"] .daily-checkin-modal-color,
 [data-theme="dark"] .community-modal-input,
@@ -4132,6 +4787,31 @@ body.school-detail-open .main-content {
     padding: 16px;
   }
 
+  .application-cases-list {
+    grid-template-columns: 1fr;
+  }
+
+  .application-case-card-top,
+  .application-case-offer-top {
+    flex-direction: column;
+  }
+
+  .application-case-offer-badges {
+    justify-content: flex-start;
+  }
+
+  .application-case-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .application-case-modal {
+    padding: 16px;
+  }
+
+  .application-case-modal-card {
+    width: min(100%, calc(100vw - var(--sidebar-width) - 32px));
+  }
+
   .school-filter-chip {
     min-height: 34px;
     padding: 7px 12px;
@@ -4186,6 +4866,21 @@ body.school-detail-open .main-content {
   }
 
   .daily-checkin-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .application-cases-select-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .application-cases-select {
+    width: 100%;
+  }
+
+  .application-case-card-grid {
     grid-template-columns: 1fr;
   }
 }

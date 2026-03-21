@@ -2,6 +2,7 @@ import { escapeHtml } from './utils.js'
 import { PAGE_SIZE } from './state.js'
 import { isFavorite, toggleFavorite, getTargetSchools } from './storage.js'
 import { getTheme } from './theme.js'
+import { openApplicationCaseDetail } from './application-cases.js'
 
 let explorerPage = 1
 let explorerTotal = 0
@@ -43,7 +44,7 @@ const EUROPE_ALIASES = [
   '希腊', 'greece'
 ]
 
-let overlay, backBtn, titleEl, starBtn, heroBg, logoEl, nameEl, metaEl, introEl, detailBody, carouselTrack
+let overlay, backBtn, titleEl, starBtn, heroBg, logoEl, nameEl, metaEl, introEl, programsEl, relatedCasesEl, detailBody, carouselTrack
 let lightbox, lightboxImg, lightboxClose
 
 function renderSkeletonCards(container, count) {
@@ -70,6 +71,227 @@ async function getSchoolAssetDataUrl(rankingQs, filename) {
   const dataUrl = res?.dataUrl || null
   if (dataUrl) schoolAssetDataUrlCache.set(cacheKey, dataUrl)
   return dataUrl
+}
+
+function formatProgramTuition(value) {
+  const amount = Number(value)
+  if (!Number.isFinite(amount)) return ''
+  return `约 ${amount.toLocaleString('zh-CN')}`
+}
+
+function formatProgramDifficulty(value) {
+  const score = Number(value)
+  if (!Number.isFinite(score)) return ''
+  const formatted = Number.isInteger(score) ? String(score) : score.toFixed(1)
+  return `难度 ${formatted}/10`
+}
+
+function buildProgramPills(program) {
+  return [
+    program.duration ? `<span class="school-program-pill">${escapeHtml(program.duration)}</span>` : '',
+    program.language_requirement ? `<span class="school-program-pill">${escapeHtml(program.language_requirement)}</span>` : '',
+    formatProgramDifficulty(program.difficulty_score) ? `<span class="school-program-pill">${escapeHtml(formatProgramDifficulty(program.difficulty_score))}</span>` : ''
+  ].filter(Boolean).join('')
+}
+
+function buildProgramField(label, value) {
+  const text = String(value || '').trim()
+  if (!text) return ''
+  return `
+    <div class="school-program-field">
+      <span class="school-program-field-label">${escapeHtml(label)}</span>
+      <span class="school-program-field-value">${escapeHtml(text)}</span>
+    </div>`
+}
+
+function renderProgramsLoading() {
+  if (!programsEl) return
+  programsEl.innerHTML = `
+    <div class="school-detail-section-block school-programs-section">
+      <div class="school-programs-heading">
+        <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
+        <p class="school-programs-subtitle">正在加载该院校的专业数据...</p>
+      </div>
+    </div>`
+}
+
+function renderProgramsSection(items = [], error = '') {
+  if (!programsEl) return
+  if (error) {
+    programsEl.innerHTML = `
+      <div class="school-detail-section-block school-programs-section">
+        <div class="school-programs-heading">
+          <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
+          <p class="placeholder-hint">${escapeHtml(error)}</p>
+        </div>
+      </div>`
+    return
+  }
+
+  if (!items.length) {
+    programsEl.innerHTML = `
+      <div class="school-detail-section-block school-programs-section">
+        <div class="school-programs-heading">
+          <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
+          <p class="placeholder-hint">暂无专业数据</p>
+        </div>
+      </div>`
+    return
+  }
+
+  const cards = items.map((program) => {
+    const tuition = formatProgramTuition(program.tuition_est)
+    const summaryCn = String(program.curriculum_summary_cn || '').trim()
+    const summaryEn = String(program.curriculum_summary_en || '').trim()
+    return `
+      <details class="school-program-card">
+        <summary class="school-program-summary">
+          <div class="school-program-title-wrap">
+            <h4 class="school-program-title">${escapeHtml(program.program_name_cn || program.program_name_en || '未命名专业')}</h4>
+            ${program.program_name_en ? `<p class="school-program-title-en">${escapeHtml(program.program_name_en)}</p>` : ''}
+          </div>
+          <div class="school-program-pills">${buildProgramPills(program)}</div>
+        </summary>
+        <div class="school-program-body">
+          <div class="school-program-grid">
+            ${buildProgramField('学制', program.duration)}
+            ${buildProgramField('语言要求', program.language_requirement)}
+            ${buildProgramField('预估学费', tuition)}
+            ${buildProgramField('难度系数', formatProgramDifficulty(program.difficulty_score).replace(/^难度\s*/, ''))}
+          </div>
+          ${summaryCn ? `<div class="school-program-copy"><h5>培养方案简述</h5><p>${escapeHtml(summaryCn)}</p></div>` : ''}
+          ${summaryEn ? `<div class="school-program-copy"><h5>Curriculum Summary</h5><p>${escapeHtml(summaryEn)}</p></div>` : ''}
+        </div>
+      </details>`
+  }).join('')
+
+  programsEl.innerHTML = `
+    <div class="school-detail-section-block school-programs-section">
+      <div class="school-programs-heading">
+        <div>
+          <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
+          <p class="school-programs-subtitle">共 ${items.length} 个专业，点击卡片可展开查看培养方向与要求。</p>
+        </div>
+      </div>
+      <div class="school-programs-list">${cards}</div>
+    </div>`
+}
+
+function loadSchoolPrograms(school) {
+  if (!programsEl) return
+  if (!window.api?.schoolsGetProgramsBySchoolId || !school?.school_id) {
+    programsEl.innerHTML = ''
+    return
+  }
+  renderProgramsLoading()
+  window.api.schoolsGetProgramsBySchoolId(school.school_id).then((res) => {
+    if (currentDetailSchool?.school_id !== school.school_id) return
+    renderProgramsSection(res?.items || [], res?.error || '')
+  }).catch((err) => {
+    if (currentDetailSchool?.school_id !== school.school_id) return
+    renderProgramsSection([], err?.message || '专业数据加载失败')
+  })
+}
+
+function renderRelatedCasesLoading() {
+  if (!relatedCasesEl) return
+  relatedCasesEl.innerHTML = `
+    <div class="school-detail-section-block school-related-cases-section">
+      <div class="school-related-cases-heading">
+        <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
+        <p class="school-programs-subtitle">正在加载该院校的申请案例...</p>
+      </div>
+    </div>`
+}
+
+function renderRelatedCases(items = [], error = '') {
+  if (!relatedCasesEl) return
+  if (error) {
+    relatedCasesEl.innerHTML = `
+      <div class="school-detail-section-block school-related-cases-section">
+        <div class="school-related-cases-heading">
+          <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
+          <p class="placeholder-hint">${escapeHtml(error)}</p>
+        </div>
+      </div>`
+    return
+  }
+
+  if (!items.length) {
+    relatedCasesEl.innerHTML = `
+      <div class="school-detail-section-block school-related-cases-section">
+        <div class="school-related-cases-heading">
+          <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
+          <p class="placeholder-hint">暂无相关案例</p>
+        </div>
+      </div>`
+    return
+  }
+
+  const cards = items.map((item) => {
+    const language = Number(item.ielts_score) > 0
+      ? `IELTS ${item.ielts_score}`
+      : Number(item.toefl_score) > 0
+        ? `TOEFL ${item.toefl_score}`
+        : '语言待补强'
+    const gre = Number(item.gre_score) > 0 ? `GRE ${item.gre_score}` : 'GRE 未提供'
+    const tags = Array.isArray(item.tags) ? item.tags.slice(0, 4) : []
+    return `
+      <article class="school-related-case-card" data-case-id="${item.id}">
+        <div class="school-related-case-top">
+          <div>
+            <p class="school-related-case-kicker">案例 #${escapeHtml(String(item.case_no || '-'))} · ${escapeHtml(item.undergrad_tier || '-')}</p>
+            <h4 class="school-related-case-title">${escapeHtml(item.program_name_cn || '相关项目')}</h4>
+            <p class="school-related-case-subtitle">${item.program_name_en ? escapeHtml(item.program_name_en) : '查看该背景样本对应的完整 offer 结果'}</p>
+          </div>
+          <div class="school-related-case-score">
+            <span>背景评分</span>
+            <strong>${escapeHtml(String(item.profile_tier_score || '-'))}</strong>
+          </div>
+        </div>
+        <div class="school-related-case-meta">
+          <span>GPA ${escapeHtml(String(item.gpa_value || '-'))}</span>
+          <span>${escapeHtml(language)}</span>
+          <span>${escapeHtml(gre)}</span>
+          <span>${escapeHtml(item.offer_tier || '匹配')}</span>
+        </div>
+        ${tags.length ? `<div class="school-related-case-tags">${tags.map((tag) => `<span class="school-related-case-tag">${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
+      </article>`
+  }).join('')
+
+  relatedCasesEl.innerHTML = `
+    <div class="school-detail-section-block school-related-cases-section">
+      <div class="school-related-cases-heading">
+        <div>
+          <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
+          <p class="school-programs-subtitle">已为该院校匹配 ${items.length} 条背景相近案例，点击可查看完整 offer。</p>
+        </div>
+      </div>
+      <div class="school-related-cases-list">${cards}</div>
+    </div>`
+
+  relatedCasesEl.querySelectorAll('.school-related-case-card[data-case-id]').forEach((card) => {
+    card.addEventListener('click', () => {
+      const caseId = Number(card.getAttribute('data-case-id'))
+      if (caseId) openApplicationCaseDetail(caseId)
+    })
+  })
+}
+
+function loadRelatedCases(school) {
+  if (!relatedCasesEl) return
+  if (!window.api?.applicationCasesListBySchoolId || !school?.school_id) {
+    relatedCasesEl.innerHTML = ''
+    return
+  }
+  renderRelatedCasesLoading()
+  window.api.applicationCasesListBySchoolId(school.school_id, 6).then((res) => {
+    if (currentDetailSchool?.school_id !== school.school_id) return
+    renderRelatedCases(res?.items || [], res?.error || '')
+  }).catch((err) => {
+    if (currentDetailSchool?.school_id !== school.school_id) return
+    renderRelatedCases([], err?.message || '相关案例加载失败')
+  })
 }
 
 /** 与 data/init_db.js 中逻辑一致：列表英文行不显示「，正式名称…」「，全称…」等括号内中文说明 */
@@ -291,6 +513,8 @@ function openSchoolDetail(school, fromPage) {
 
   nameEl.textContent = school.school_name_zh || stripChineseAliasSuffixFromEnglishName(school.school_name_en || '') || ''
   metaEl.textContent = [school.country_zh, school.city_zh, `QS #${school.ranking_qs || '-'}`].filter(Boolean).join(' · ')
+  loadSchoolPrograms(school)
+  loadRelatedCases(school)
 
   if (window.api.schoolsGetIntro) {
     window.api.schoolsGetIntro(rq).then((intro) => {
@@ -486,6 +710,8 @@ export function initSchools() {
   nameEl = document.getElementById('school-detail-name')
   metaEl = document.getElementById('school-detail-meta')
   introEl = document.getElementById('school-detail-intro')
+  programsEl = document.getElementById('school-detail-programs')
+  relatedCasesEl = document.getElementById('school-detail-related-cases')
   detailBody = overlay?.querySelector('.school-detail-body')
   carouselTrack = document.getElementById('school-detail-carousel-track')
   lightbox = document.getElementById('school-detail-lightbox')

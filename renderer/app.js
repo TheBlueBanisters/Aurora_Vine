@@ -10,6 +10,7 @@ import { initCommunityMessagesPage, updateCommunityComposerState, communityDetai
 import { initDailyCheckinPage } from './modules/daily-checkin.js'
 import { initStudyPlanningPage } from './modules/study-planning.js'
 import { initSchoolPlanningForm } from './modules/planning.js'
+import { initApplicationCasesPage, closeApplicationCaseModal } from './modules/application-cases.js'
 import { showToast } from './modules/utils.js'
 import { applyAuthState } from './modules/state.js'
 import { openAuthModal, showLanding } from './modules/auth.js'
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!pageId) return
       if (pageId === 'usage-guide') { startUsageGuide(true); return }
       if (pageId !== 'community-messages') { closeCommunityReplySheet(); closeCommunityDetailModal(); /* closeCommunityPostModal handled internally */ }
+      closeApplicationCaseModal()
       const overlay = getOverlay()
       if (overlay?.classList.contains('active')) closeSchoolDetail()
       navigateTo(pageId)
@@ -68,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pageId === 'study-planning') initStudyPlanningPage()
       if (pageId === 'daily-checkin') initDailyCheckinPage()
       if (pageId === 'community-messages') initCommunityMessagesPage()
+      if (pageId === 'application-cases') initApplicationCasesPage()
     })
   })
 
@@ -75,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key !== 'Escape') return
     const authModal = document.getElementById('auth-modal')
     if (authModal?.classList.contains('active')) { closeAuthModal(); return }
+    const caseModal = document.getElementById('application-case-modal')
+    if (caseModal?.classList.contains('active')) { closeApplicationCaseModal(); return }
     handleGlobalEscape()
   })
 
@@ -86,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activePage?.id === 'page-study-planning') initStudyPlanningPage()
     if (activePage?.id === 'page-daily-checkin') initDailyCheckinPage()
     if (activePage?.id === 'page-community-messages') initCommunityMessagesPage()
+    if (activePage?.id === 'page-application-cases') initApplicationCasesPage()
   }).catch((err) => {
     console.error('initAuthState:', err)
     showLanding()

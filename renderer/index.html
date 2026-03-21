@@ -713,12 +713,108 @@
           <p class="page-subtitle">Application Cases</p>
         </div>
         <div class="page-body">
-          <div class="placeholder-card">
-            <div class="placeholder-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          <div class="school-search-bar application-cases-search-bar" id="application-cases-search-bar">
+            <svg class="school-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="application-cases-search-input" class="school-search-input" placeholder="搜索录取院校、项目或案例标签">
+            <button type="button" id="application-cases-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索">×</button>
+          </div>
+
+          <div class="school-filter-bar application-cases-filter-bar">
+            <div class="school-filter-group">
+              <div class="school-filter-heading">
+                <span class="school-filter-title">本科背景</span>
+                <span class="school-filter-title-en">Undergrad Tier</span>
+              </div>
+              <div class="school-filter-chips" id="application-cases-tier-filters" role="tablist" aria-label="本科背景筛选">
+                <button type="button" class="school-filter-chip is-active" data-tier="all" aria-pressed="true">不限</button>
+                <button type="button" class="school-filter-chip" data-tier="985" aria-pressed="false">985</button>
+                <button type="button" class="school-filter-chip" data-tier="211" aria-pressed="false">211</button>
+                <button type="button" class="school-filter-chip" data-tier="海本" aria-pressed="false">海本</button>
+                <button type="button" class="school-filter-chip" data-tier="中外合作" aria-pressed="false">中外合作</button>
+                <button type="button" class="school-filter-chip" data-tier="双非" aria-pressed="false">双非</button>
+              </div>
             </div>
-            <p class="placeholder-text">申请案例功能即将上线</p>
-            <p class="placeholder-hint">浏览真实的留学申请案例和经验分享</p>
+
+            <div class="school-filter-group application-cases-select-group">
+              <div class="school-filter-heading">
+                <span class="school-filter-title">更多筛选</span>
+                <span class="school-filter-title-en">More Filters</span>
+              </div>
+              <div class="application-cases-select-row">
+                <label class="application-cases-select-label" for="application-cases-gpa-band">GPA</label>
+                <select id="application-cases-gpa-band" class="application-cases-select">
+                  <option value="all">全部</option>
+                  <option value="high">高 GPA</option>
+                  <option value="mid">中等 GPA</option>
+                  <option value="low">低 GPA</option>
+                </select>
+
+                <label class="application-cases-select-label" for="application-cases-language-band">语言</label>
+                <select id="application-cases-language-band" class="application-cases-select">
+                  <option value="all">全部</option>
+                  <option value="strong">语言强</option>
+                  <option value="qualified">语言达标</option>
+                  <option value="pending">语言待补强</option>
+                </select>
+
+                <label class="application-cases-select-label" for="application-cases-bg-focus">软背景</label>
+                <select id="application-cases-bg-focus" class="application-cases-select">
+                  <option value="all">全部</option>
+                  <option value="research">科研强</option>
+                  <option value="internship">实习丰富</option>
+                  <option value="paper">论文加成</option>
+                  <option value="balanced">综合型</option>
+                </select>
+
+                <label class="application-cases-select-label" for="application-cases-sort">排序</label>
+                <select id="application-cases-sort" class="application-cases-select">
+                  <option value="score_desc">背景强度</option>
+                  <option value="qs_asc">主录取 QS</option>
+                  <option value="gpa_desc">GPA</option>
+                  <option value="language_desc">语言成绩</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="application-cases-summary" id="application-cases-summary"></div>
+          <div class="application-cases-list" id="application-cases-list"></div>
+          <div class="school-list-pagination application-cases-pagination" id="application-cases-pagination"></div>
+
+          <div class="application-case-modal" id="application-case-modal" aria-hidden="true">
+            <div class="application-case-modal-card" role="dialog" aria-modal="true" aria-labelledby="application-case-detail-title">
+              <button type="button" class="application-case-modal-close" id="application-case-modal-close" aria-label="关闭">×</button>
+              <div class="application-case-modal-header">
+                <p class="application-case-modal-kicker" id="application-case-detail-kicker"></p>
+                <h3 class="application-case-modal-title" id="application-case-detail-title"></h3>
+                <p class="application-case-modal-subtitle" id="application-case-detail-subtitle"></p>
+              </div>
+
+              <div class="application-case-modal-body">
+                <section class="application-case-detail-section">
+                  <h4 class="application-case-detail-section-title">背景总览</h4>
+                  <div class="application-case-detail-grid" id="application-case-detail-overview"></div>
+                </section>
+
+                <section class="application-case-detail-section">
+                  <h4 class="application-case-detail-section-title">标化成绩</h4>
+                  <div class="application-case-detail-grid" id="application-case-detail-tests"></div>
+                </section>
+
+                <section class="application-case-detail-section">
+                  <h4 class="application-case-detail-section-title">软背景画像</h4>
+                  <div class="application-case-detail-grid" id="application-case-detail-soft"></div>
+                </section>
+
+                <section class="application-case-detail-section">
+                  <h4 class="application-case-detail-section-title">Offer 列表</h4>
+                  <div class="application-case-detail-offers" id="application-case-detail-offers"></div>
+                </section>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -833,6 +929,8 @@
             </div>
           </div>
           <div class="school-detail-intro" id="school-detail-intro"></div>
+          <div class="school-detail-programs" id="school-detail-programs"></div>
+          <div class="school-detail-related-cases" id="school-detail-related-cases"></div>
           <div class="school-detail-lightbox" id="school-detail-lightbox">
             <button class="school-detail-lightbox-close" id="school-detail-lightbox-close">×</button>
             <img class="school-detail-lightbox-img" id="school-detail-lightbox-img" alt="">

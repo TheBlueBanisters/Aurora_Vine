@@ -25,6 +25,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('schools:getById', schoolId),
   schoolsGetByIds: (schoolIds) =>
     ipcRenderer.invoke('schools:getByIds', schoolIds),
+  schoolsGetProgramsBySchoolId: (schoolId) =>
+    ipcRenderer.invoke('schools:getProgramsBySchoolId', schoolId),
   schoolsSearch: (keyword, page = 1, pageSize = 10, filters = {}) =>
     ipcRenderer.invoke('schools:search', keyword, page, pageSize, filters),
   schoolsGetIntro: (rankingQs) =>
@@ -33,6 +35,12 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('schools:getAssetPath', rankingQs, filename),
   schoolsGetAssetDataUrl: (rankingQs, filename) =>
     ipcRenderer.invoke('schools:getAssetDataUrl', rankingQs, filename),
+  applicationCasesList: (page = 1, pageSize = 12, filters = {}) =>
+    ipcRenderer.invoke('applicationCases:list', page, pageSize, filters),
+  applicationCasesGetDetail: (caseId) =>
+    ipcRenderer.invoke('applicationCases:getDetail', caseId),
+  applicationCasesListBySchoolId: (schoolId, limit = 6) =>
+    ipcRenderer.invoke('applicationCases:listBySchoolId', schoolId, limit),
   dailyCheckinGetByDate: (dateKey) =>
     ipcRenderer.invoke('dailyCheckin:getByDate', dateKey),
   dailyCheckinListByMonth: (monthKey) =>

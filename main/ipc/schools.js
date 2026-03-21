@@ -157,6 +157,43 @@ export function registerSchoolsIpc() {
     }
   });
 
+  ipcMain.handle('schools:getProgramsBySchoolId', async (_event, schoolId) => {
+    const normalizedSchoolId = String(schoolId ?? '').trim();
+    if (!normalizedSchoolId) return { items: [], error: '院校 ID 不正确' };
+    const db = getReadOnlyDb();
+    if (!db) {
+      return { items: [], error: '数据库文件不存在，请运行 node data/init_db.js 初始化' };
+    }
+    try {
+      const items = db.prepare(`
+        SELECT
+          id,
+          school_id,
+          ranking_qs,
+          school_name_zh,
+          school_name_en,
+          program_name_cn,
+          program_name_en,
+          tuition_est,
+          language_requirement,
+          duration,
+          curriculum_summary_cn,
+          curriculum_summary_en,
+          difficulty_score,
+          display_order
+        FROM school_programs
+        WHERE school_id = ?
+        ORDER BY display_order ASC, id ASC
+      `).all(normalizedSchoolId);
+      return { items };
+    } catch (err) {
+      console.error('schools:getProgramsBySchoolId error:', err);
+      return { items: [], error: err.message || '专业数据读取失败' };
+    } finally {
+      db.close();
+    }
+  });
+
   ipcMain.handle('schools:getIntro', async (event, rankingQs) => {
     const introPath = resolveSchoolPath(rankingQs, 'intro.json');
     if (!introPath) return null;
