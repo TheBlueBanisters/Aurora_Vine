@@ -2816,17 +2816,57 @@ body.school-detail-open .main-content {
   font-size: 12px;
 }
 
-.school-related-case-title {
-  margin-top: 6px;
-  font-size: 16px;
-  color: var(--content-text);
-  line-height: 1.4;
+.school-related-case-program {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.school-related-case-subtitle {
-  margin-top: 6px;
+.school-related-case-program-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--content-text-secondary);
-  line-height: 1.6;
+}
+
+.school-related-case-program-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.school-related-case-program-cn {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-text);
+  line-height: 1.45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.school-related-case-offer-mark {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--content-border);
+  background: var(--accent-soft);
+  color: var(--content-text-secondary);
+}
+
+.school-related-case-program-en {
+  margin: 0;
+  font-size: 13px;
+  color: var(--content-text-secondary);
+  line-height: 1.5;
 }
 
 .school-related-case-score {

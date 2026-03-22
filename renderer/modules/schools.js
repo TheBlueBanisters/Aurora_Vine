@@ -236,13 +236,23 @@ function renderRelatedCases(items = [], error = '') {
         : '语言待补强'
     const gre = Number(item.gre_score) > 0 ? `GRE ${item.gre_score}` : 'GRE 未提供'
     const tags = Array.isArray(item.tags) ? item.tags.slice(0, 4) : []
+    const programCn = String(item.program_name_cn || '').trim() || '—'
+    const programEn = String(item.program_name_en || '').trim()
     return `
       <article class="school-related-case-card" data-case-id="${item.id}">
         <div class="school-related-case-top">
           <div>
             <p class="school-related-case-kicker">案例 #${escapeHtml(String(item.case_no || '-'))} · ${escapeHtml(item.undergrad_tier || '-')}</p>
-            <h4 class="school-related-case-title">${escapeHtml(item.program_name_cn || '相关项目')}</h4>
-            <p class="school-related-case-subtitle">${item.program_name_en ? escapeHtml(item.program_name_en) : '查看该背景样本对应的完整 offer 结果'}</p>
+            <div class="school-related-case-program">
+              <span class="school-related-case-program-label">录取专业</span>
+              <div class="school-related-case-program-body">
+                <p class="school-related-case-program-cn">
+                  <span>${escapeHtml(programCn)}</span>
+                  <span class="school-related-case-offer-mark" title="该院校录取项目">Offer</span>
+                </p>
+                ${programEn ? `<p class="school-related-case-program-en">${escapeHtml(programEn)}</p>` : ''}
+              </div>
+            </div>
           </div>
           <div class="school-related-case-score">
             <span>背景评分</span>
@@ -264,7 +274,7 @@ function renderRelatedCases(items = [], error = '') {
       <div class="school-related-cases-heading">
         <div>
           <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
-          <p class="school-programs-subtitle">已为该院校匹配 ${items.length} 条背景相近案例，点击可查看完整 offer。</p>
+          <p class="school-programs-subtitle">已为该院校匹配 ${items.length} 条背景相近案例。</p>
         </div>
       </div>
       <div class="school-related-cases-list">${cards}</div>
