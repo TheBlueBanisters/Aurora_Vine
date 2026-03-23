@@ -1,4 +1,5 @@
 import { showToast } from './utils.js'
+import { t } from './i18n.js'
 import { getSchoolPlanningProfile, setSchoolPlanningProfile } from './storage.js'
 import { setSchoolPlanningView, syncSchoolPlanningIdentityState, renderScoreResult } from './profile.js'
 import { computeStudentScore, profileToScoreInput } from './scoring.js'
@@ -23,14 +24,14 @@ export function initSchoolPlanningForm() {
 
   function populateSelect(select, options, placeholder) {
     if (!select) return
-    select.innerHTML = `<option value="">${placeholder || '请选择 Select'}</option>`
+    select.innerHTML = `<option value="">${placeholder || t('planning.select')}</option>`
     options.forEach((v) => { const opt = document.createElement('option'); opt.value = String(v); opt.textContent = String(v); select.appendChild(opt) })
   }
 
-  populateSelect(ieltsSelect, (() => { const a = []; for (let i = 4; i <= 9; i += 0.5) a.push(i.toFixed(1)); return a })(), '请选择 Select')
-  populateSelect(toeflSelect, Array.from({ length: 51 }, (_, i) => 70 + i), '请选择 Select')
-  populateSelect(greSelect, Array.from({ length: 41 }, (_, i) => 300 + i), '请选择 Select')
-  populateSelect(greWritingSelect, (() => { const a = []; for (let i = 0; i <= 6; i += 0.5) a.push(i.toFixed(1)); return a })(), '请选择 Select')
+  populateSelect(ieltsSelect, (() => { const a = []; for (let i = 4; i <= 9; i += 0.5) a.push(i.toFixed(1)); return a })(), t('planning.select'))
+  populateSelect(toeflSelect, Array.from({ length: 51 }, (_, i) => 70 + i), t('planning.select'))
+  populateSelect(greSelect, Array.from({ length: 41 }, (_, i) => 300 + i), t('planning.select'))
+  populateSelect(greWritingSelect, (() => { const a = []; for (let i = 0; i <= 6; i += 0.5) a.push(i.toFixed(1)); return a })(), t('planning.select'))
 
   function populateCountSelect(select) {
     if (!select) return
@@ -88,22 +89,22 @@ export function initSchoolPlanningForm() {
     const gpaScale = document.querySelector('input[name="sp-gpa-scale"]:checked')?.value
     const gpaPercentile = document.getElementById('sp-gpa-percentile')?.value?.trim()
 
-    if (!graduationYear) { setFieldError('graduationYear', '请选择本科毕业年份 / Please select graduation year'); errors.push('graduationYear') }
-    if (!institutionTier) { setFieldError('institutionTier', '请选择本科院校层次 / Please select institution tier'); errors.push('institutionTier') }
-    if (!schoolName) { setFieldError('schoolName', '请输入本科学校名称 / Please enter school name'); errors.push('schoolName') }
-    if (!major) { setFieldError('major', '请输入本科专业 / Please enter major'); errors.push('major') }
-    if (!gpa || isNaN(gpaValue)) { setFieldError('gpa', '请输入有效绩点 / Please enter valid GPA'); errors.push('gpa') }
-    else if (gpaScale === '4' && (gpaValue < 0 || gpaValue > 4)) { setFieldError('gpa', '四分制绩点需在0-4之间 / GPA must be between 0-4 for 4.0 scale'); errors.push('gpa') }
-    else if (gpaScale === '5' && (gpaValue < 0 || gpaValue > 5)) { setFieldError('gpa', '五分制绩点需在0-5之间 / GPA must be between 0-5 for 5.0 scale'); errors.push('gpa') }
-    if (!gpaScale) { setFieldError('gpa', '请选择绩点分制 / Please select GPA scale'); if (!errors.includes('gpa')) errors.push('gpa') }
+    if (!graduationYear) { setFieldError('graduationYear', t('planning.err.gradYear')); errors.push('graduationYear') }
+    if (!institutionTier) { setFieldError('institutionTier', t('planning.err.tier')); errors.push('institutionTier') }
+    if (!schoolName) { setFieldError('schoolName', t('planning.err.schoolName')); errors.push('schoolName') }
+    if (!major) { setFieldError('major', t('planning.err.major')); errors.push('major') }
+    if (!gpa || isNaN(gpaValue)) { setFieldError('gpa', t('planning.err.gpa')); errors.push('gpa') }
+    else if (gpaScale === '4' && (gpaValue < 0 || gpaValue > 4)) { setFieldError('gpa', t('planning.err.gpa4Range')); errors.push('gpa') }
+    else if (gpaScale === '5' && (gpaValue < 0 || gpaValue > 5)) { setFieldError('gpa', t('planning.err.gpa5Range')); errors.push('gpa') }
+    if (!gpaScale) { setFieldError('gpa', t('planning.err.gpaScale')); if (!errors.includes('gpa')) errors.push('gpa') }
     const pct = parseFloat(gpaPercentile)
-    if (!gpaPercentile || isNaN(pct) || pct < 0 || pct > 100) { setFieldError('gpaPercentile', '请输入0-100之间的数值 / Please enter a value between 0-100'); errors.push('gpaPercentile') }
+    if (!gpaPercentile || isNaN(pct) || pct < 0 || pct > 100) { setFieldError('gpaPercentile', t('planning.err.gpaPercentile')); errors.push('gpaPercentile') }
 
-    if (!ieltsNone?.checked && (!ieltsSelect?.value || ieltsSelect.disabled)) { setFieldError('ielts', '请选择雅思分数或勾选无 / Please select IELTS score or check None'); errors.push('ielts') }
-    if (!toeflNone?.checked && (!toeflSelect?.value || toeflSelect.disabled)) { setFieldError('toefl', '请选择托福分数或勾选无 / Please select TOEFL score or check None'); errors.push('toefl') }
+    if (!ieltsNone?.checked && (!ieltsSelect?.value || ieltsSelect.disabled)) { setFieldError('ielts', t('planning.err.ielts')); errors.push('ielts') }
+    if (!toeflNone?.checked && (!toeflSelect?.value || toeflSelect.disabled)) { setFieldError('toefl', t('planning.err.toefl')); errors.push('toefl') }
     if (!greNone?.checked) {
-      if (!greSelect?.value || greSelect.disabled) { setFieldError('gre', '请选择GRE分数或勾选无 / Please select GRE score or check None'); errors.push('gre') }
-      else if (!greWritingSelect?.value || greWritingSelect.disabled) { setFieldError('gre', '请选择GRE写作分数 / Please select GRE Writing score'); if (!errors.includes('gre')) errors.push('gre') }
+      if (!greSelect?.value || greSelect.disabled) { setFieldError('gre', t('planning.err.gre')); errors.push('gre') }
+      else if (!greWritingSelect?.value || greWritingSelect.disabled) { setFieldError('gre', t('planning.err.greWriting')); if (!errors.includes('gre')) errors.push('gre') }
     }
 
     return { valid: errors.length === 0, errors }

@@ -1204,6 +1204,16 @@ textarea {
   max-height: 86px;
 }
 
+.settings-lang-hint {
+  margin-left: auto;
+  margin-right: 12px;
+  font-size: 12px;
+  color: var(--content-text-secondary);
+  opacity: .65;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .settings-certify-card {
   display: flex;
   flex-direction: column;
@@ -2552,7 +2562,8 @@ textarea {
   display: flex;
 }
 
-body.school-detail-open .main-content {
+body.school-detail-open .main-content,
+body.application-case-modal-open .main-content {
   overflow: hidden;
 }
 
@@ -3131,13 +3142,14 @@ body.school-detail-open .main-content {
   flex-direction: column;
   gap: 16px;
   cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .application-case-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--card-hover-shadow);
-  border-color: rgba(137, 180, 250, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(137, 180, 250, 0.18), 0 0 0 1px rgba(137, 180, 250, 0.25);
+  border-color: rgba(137, 180, 250, 0.6);
+  background: var(--accent-soft);
 }
 
 .application-case-card-top {
@@ -3233,11 +3245,13 @@ body.school-detail-open .main-content {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  min-height: 36px;
 }
 
 .application-case-card-actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: auto;
 }
 
 .application-case-card-btn {
@@ -3254,39 +3268,67 @@ body.school-detail-open .main-content {
 }
 
 .application-case-modal {
-  display: none;
   position: fixed;
   left: var(--sidebar-width);
   top: var(--overlay-top-offset);
   right: 0;
   bottom: 0;
   z-index: 210;
-  background: rgba(15, 23, 42, 0.55);
-  padding: 24px;
-  align-items: center;
-  justify-content: center;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+  visibility: hidden;
+  -webkit-app-region: no-drag;
 }
 
 .application-case-modal.active {
-  display: flex;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 .application-case-modal-card {
-  width: min(980px, calc(100vw - var(--sidebar-width) - 48px));
-  max-height: calc(100vh - var(--overlay-top-offset) - 48px);
-  overflow-y: auto;
+  width: min(620px, calc(100vw - var(--sidebar-width) - 24px));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-  border: 1px solid var(--content-border);
-  padding: 24px;
+  border-radius: 0;
+  border-left: 1px solid var(--content-border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.10);
   position: relative;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: auto;
+}
+
+.application-case-modal.active .application-case-modal-card {
+  transform: translateX(0);
+}
+
+.application-case-modal-topbar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 14px 18px 10px;
+  background: var(--card-bg);
+  position: relative;
+  z-index: 2;
+}
+
+.application-case-modal-topbar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -12px;
+  height: 12px;
+  background: linear-gradient(to bottom, var(--card-bg), transparent);
+  pointer-events: none;
 }
 
 .application-case-modal-close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
   width: 40px;
   height: 40px;
   border: none;
@@ -3295,10 +3337,28 @@ body.school-detail-open .main-content {
   color: var(--content-text);
   font-size: 24px;
   cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.application-case-modal-close:hover {
+  background: var(--content-border);
+}
+
+.application-case-modal-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 24px 28px;
+  scrollbar-width: none;
+}
+
+.application-case-modal-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .application-case-modal-header {
-  padding-right: 56px;
+  padding-right: 0;
 }
 
 .application-case-modal-kicker {
@@ -3350,6 +3410,13 @@ body.school-detail-open .main-content {
   border: 1px solid var(--content-border);
   border-radius: var(--radius-md);
   padding: 12px 14px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.application-case-detail-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(137, 180, 250, 0.12);
+  border-color: rgba(137, 180, 250, 0.4);
 }
 
 .application-case-detail-item-label {
@@ -3376,6 +3443,13 @@ body.school-detail-open .main-content {
   border: 1px solid var(--content-border);
   border-radius: var(--radius-md);
   padding: 14px 16px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.application-case-offer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(137, 180, 250, 0.15);
+  border-color: rgba(137, 180, 250, 0.45);
 }
 
 .application-case-offer-card.is-primary {
@@ -4844,12 +4918,8 @@ body.school-detail-open .main-content {
     grid-template-columns: 1fr;
   }
 
-  .application-case-modal {
-    padding: 16px;
-  }
-
   .application-case-modal-card {
-    width: min(100%, calc(100vw - var(--sidebar-width) - 32px));
+    width: min(100%, calc(100vw - var(--sidebar-width)));
   }
 
   .school-filter-chip {
@@ -5227,4 +5297,32 @@ body.school-detail-open .main-content {
 
 .usage-guide-skip:hover {
   opacity: 0.9;
+}
+
+/* ── Language switching ── */
+[data-lang="en"] .lang-zh,
+[data-lang="en"] .form-label-zh,
+[data-lang="en"] .planning-intro-text:not(.planning-intro-text-en):not(.lang-en),
+[data-lang="en"] .feature-intro-text:not(.feature-intro-text-en):not(.lang-en),
+[data-lang="en"] .study-planning-custom-hint:not(.study-planning-custom-hint-en):not(.lang-en),
+[data-lang="en"] .daily-checkin-task-empty-zh,
+[data-lang="en"] .page-subtitle,
+[data-lang="en"] .school-filter-title-en,
+[data-lang="en"] .study-planning-panel-title-en {
+  display: none !important;
+}
+
+[data-lang="zh"] .lang-en,
+[data-lang="zh"] .form-label-en,
+[data-lang="zh"] .planning-intro-text-en,
+[data-lang="zh"] .feature-intro-text-en,
+[data-lang="zh"] .study-planning-custom-hint-en,
+[data-lang="zh"] .daily-checkin-task-empty-en,
+[data-lang="zh"] .school-filter-title-en,
+[data-lang="zh"] .study-planning-panel-title-en {
+  display: none !important;
+}
+
+[data-lang="zh"] .page-subtitle {
+  display: none !important;
 }

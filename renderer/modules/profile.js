@@ -1,4 +1,5 @@
 import * as echarts from 'echarts'
+import { t } from './i18n.js'
 import { escapeHtml } from './utils.js'
 import { isAccountMode, getCurrentUserDisplayName } from './state.js'
 import { getSchoolPlanningProfile } from './storage.js'
@@ -26,15 +27,15 @@ export function loadMyProfile() {
   contentEl.style.display = ''
 
   const infoItems = [
-    { label: '本科毕业年份 / Graduation Year', value: profile.graduationYear },
-    { label: '本科院校层次 / Institution Tier', value: profile.institutionTier },
-    { label: '本科学校 / School', value: profile.schoolName },
-    { label: '本科专业 / Major', value: profile.major },
-    { label: '绩点 / GPA', value: profile.gpa ? `${profile.gpa} (${profile.gpaScale === '4' ? '四分制' : '五分制'})` : '-' },
-    { label: '绩点前百分比 / GPA Percentile', value: profile.gpaPercentile ? `${profile.gpaPercentile}%` : '-' },
-    { label: '雅思 / IELTS', value: profile.ielts != null ? profile.ielts : '无' },
-    { label: '托福 / TOEFL', value: profile.toefl != null ? profile.toefl : '无' },
-    { label: 'GRE / GRE Writing', value: profile.gre != null ? `${profile.gre} (写作 ${profile.greWriting || '-'})` : '无' },
+    { label: t('profile.gradYear'), value: profile.graduationYear },
+    { label: t('profile.tier'), value: profile.institutionTier },
+    { label: t('profile.school'), value: profile.schoolName },
+    { label: t('profile.major'), value: profile.major },
+    { label: t('profile.gpa'), value: profile.gpa ? `${profile.gpa} (${profile.gpaScale === '4' ? t('planning.scale4') : t('planning.scale5')})` : '-' },
+    { label: t('profile.gpaPercentile'), value: profile.gpaPercentile ? `${profile.gpaPercentile}%` : '-' },
+    { label: t('profile.ielts'), value: profile.ielts != null ? profile.ielts : t('profile.noData') },
+    { label: t('profile.toefl'), value: profile.toefl != null ? profile.toefl : t('profile.noData') },
+    { label: 'GRE', value: profile.gre != null ? `${profile.gre} (${t('profile.greWriting')} ${profile.greWriting || '-'})` : t('profile.noData') },
   ]
   if (infoGrid) {
     infoGrid.innerHTML = infoItems
@@ -58,7 +59,7 @@ export function loadMyProfile() {
     if (!isNaN(score)) {
       const pct = Math.round(((score - 4) / (9 - 4)) * 100 * 100) / 100
       chartData.push([labels.length, 0, Math.min(100, Math.max(0, pct))])
-      labels.push('雅思 / IELTS')
+      labels.push(t('profile.ielts'))
     }
   }
   if (profile.toefl != null && profile.toefl !== '') {
@@ -66,7 +67,7 @@ export function loadMyProfile() {
     if (!isNaN(score)) {
       const pct = Math.round(((score - 70) / (120 - 70)) * 100 * 100) / 100
       chartData.push([labels.length, 0, Math.min(100, Math.max(0, pct))])
-      labels.push('托福 / TOEFL')
+      labels.push(t('profile.toefl'))
     }
   }
   if (profile.gre != null && profile.gre !== '') {
@@ -82,7 +83,7 @@ export function loadMyProfile() {
     if (!isNaN(score)) {
       const pct = Math.round((score / 6) * 100 * 100) / 100
       chartData.push([labels.length, 0, Math.min(100, Math.max(0, pct))])
-      labels.push('GRE写作 / GRE Writing')
+      labels.push(t('profile.greWriting'))
     }
   }
 
@@ -102,7 +103,7 @@ export function loadMyProfile() {
   if (chartEl && typeof echarts !== 'undefined') {
     if (chartData.length === 0) {
       if (myProfileChartInstance) { myProfileChartInstance.dispose(); myProfileChartInstance = null }
-      chartEl.innerHTML = '<p class="placeholder-hint" style="padding: 40px; text-align: center;">暂无标化成绩数据可展示 / No test score data to display</p>'
+      chartEl.innerHTML = `<p class="placeholder-hint" style="padding: 40px; text-align: center;">${escapeHtml(t('profile.noTestData'))}</p>`
     } else {
       chartEl.innerHTML = ''
       if (myProfileChartInstance) myProfileChartInstance.dispose()

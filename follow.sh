@@ -38,6 +38,9 @@ git fetch "$REMOTE_NAME" "$BRANCH_NAME"
 echo "[follow] rebasing local branch onto latest remote..."
 git pull --rebase "$REMOTE_NAME" "$BRANCH_NAME"
 
+echo "[follow] ensuring latest backup.sh & follow.sh are checked out..."
+git checkout "$BRANCH_NAME" -- backup.sh follow.sh 2>/dev/null || true
+
 if [ "$AUTO_NPM_INSTALL" = "true" ] && [ -f "package.json" ]; then
     echo "[follow] installing npm dependencies..."
     npm install

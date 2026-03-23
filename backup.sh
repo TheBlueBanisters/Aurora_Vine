@@ -2,7 +2,7 @@
 set -e
 
 # ===== 用户手动控制区（只改这里） =====
-TAG_NAME=""
+TAG_NAME="整合了中英文模式；进行了案例展开界面的滚动优化"
 REMOTE_NAME="origin"
 BRANCH_NAME="main"
 REMOTE_URL="https://github.com/TheBlueBanisters/Aurora_Vine.git"
@@ -25,13 +25,20 @@ if ! git remote get-url "$REMOTE_NAME" >/dev/null 2>&1; then
     git remote add "$REMOTE_NAME" "$REMOTE_URL"
 fi
 
-echo "[backup] staging changes (exclude node_modules)..."
-git add -A -- . ":(exclude)node_modules/**"
+# 勿使用 :(exclude)node_modules —— 在 Windows 上会触发「ignored node_modules」且 git add 返回 1，set -e 会直接退出。
+# node_modules 已由 .gitignore 排除，普通 git add 不会纳入暂存区。
+echo "[backup] staging changes (respect .gitignore, skip node_modules)..."
+git add -A -- .
+git add -f -- backup.sh follow.sh 2>/dev/null || true
 
 if git diff --cached --quiet; then
     echo "[backup] no new changes to commit, will only push pending commits"
 else
-    COMMIT_MSG="backup $(date '+%Y-%m-%d %H:%M:%S')"
+    if [ -n "$TAG_NAME" ]; then
+        COMMIT_MSG="backup [$TAG_NAME] $(date '+%Y-%m-%d %H:%M:%S')"
+    else
+        COMMIT_MSG="backup $(date '+%Y-%m-%d %H:%M:%S')"
+    fi
 
     echo "[backup] committing..."
     git commit -m "$COMMIT_MSG"

@@ -10,6 +10,8 @@
       if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.dataset.theme = 'dark';
       }
+      const lang = localStorage.getItem('language') || 'zh';
+      document.documentElement.dataset.lang = lang;
     } catch(e){}
   })();
   </script>
@@ -18,16 +20,16 @@
 <body class="landing-mode">
   <!-- 启动页：功能简介 -->
   <div class="landing-page" id="landing-page">
-    <button type="button" class="landing-auth-btn" id="landing-auth-btn">登录 / 注册 / 游客</button>
+    <button type="button" class="landing-auth-btn" id="landing-auth-btn" data-i18n="landing.authBtn">登录 / 注册 / 游客</button>
     <div class="landing-content">
       <div class="feature-intro-box">
         <img src="../image/welcome.png" alt="Welcome" class="feature-intro-image">
-        <h2 class="feature-intro-title">极光藤 · Aurora Vine</h2>
-        <p class="feature-intro-subtitle">— 让留学规划更清晰 · A Clearer Path to Studying Abroad</p>
-        <p class="feature-intro-text">
+        <h2 class="feature-intro-title" data-i18n="landing.title">极光藤 · Aurora Vine</h2>
+        <p class="feature-intro-subtitle" data-i18n="landing.subtitle">— 让留学规划更清晰 · A Clearer Path to Studying Abroad</p>
+        <p class="feature-intro-text lang-zh" data-i18n="landing.introZh">
           Aurora Vine 是一款为留学申请者设计的规划工具，致力于帮助每一位正在准备申请的学生更从容地整理信息、探索院校，并逐步构建属于自己的申请路径。在这里，你可以记录和管理自己的学术背景与标化成绩，获得定校建议与申请方向参考；浏览世界各地的大学信息，了解院校环境并建立自己的目标院校列表；同时通过留学时间规划与每日打卡功能，将长期目标拆解为清晰可执行的步骤。Aurora Vine 还整合了院校数据库、真实申请案例、留学资源与交流社区，帮助你在信息纷繁的申请过程中保持方向与节奏。我们希望 Aurora Vine 能成为你留学旅程中的一个安静而可靠的伙伴，陪伴你从最初的探索，到最终抵达理想的校园。
         </p>
-        <p class="feature-intro-text feature-intro-text-en">
+        <p class="feature-intro-text feature-intro-text-en lang-en">
           Aurora Vine is a planning tool designed for students preparing for international study. It helps applicants organize their information, explore universities, and gradually build a clear application path. Within Aurora Vine, you can record and manage your academic background and test scores, receive guidance for school selection, and explore universities around the world while building your own list of target institutions. With integrated study planning timelines and daily progress tracking, long-term goals become clear and manageable steps. Aurora Vine also brings together a university database, real application cases, study resources, and a community for discussion, helping you stay informed and focused throughout the complex application journey. Our hope is that Aurora Vine becomes a quiet and reliable companion on your path-supporting you from the first stage of exploration all the way to your arrival at the campus you aspire to join.
         </p>
         <div class="feature-intro-carousel-wrap" id="feature-intro-carousel-wrap">
@@ -58,32 +60,32 @@
           <img src="../image/logo.png" alt="Aurora Vine" class="auth-gate-logo">
         </div>
         <div class="auth-gate-tabs" role="tablist" aria-label="登录注册切换">
-          <button type="button" class="auth-tab active" id="auth-tab-login" data-auth-tab="login">登录</button>
-          <button type="button" class="auth-tab" id="auth-tab-register" data-auth-tab="register">注册</button>
+          <button type="button" class="auth-tab active" id="auth-tab-login" data-auth-tab="login" data-i18n="auth.login">登录</button>
+          <button type="button" class="auth-tab" id="auth-tab-register" data-auth-tab="register" data-i18n="auth.register">注册</button>
         </div>
 
         <form class="auth-form active" id="auth-login-form">
-          <label class="auth-label" for="auth-login-email">邮箱</label>
-          <input id="auth-login-email" class="auth-input" type="email" autocomplete="username" placeholder="请输入邮箱地址">
-          <label class="auth-label" for="auth-login-password">密码</label>
-          <input id="auth-login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="请输入密码">
-          <button type="submit" class="form-submit-btn auth-submit-btn">登录</button>
+          <label class="auth-label" for="auth-login-email" data-i18n="auth.email">邮箱</label>
+          <input id="auth-login-email" class="auth-input" type="email" autocomplete="username" placeholder="请输入邮箱地址" data-i18n-placeholder="auth.emailPlaceholder">
+          <label class="auth-label" for="auth-login-password" data-i18n="auth.password">密码</label>
+          <input id="auth-login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="请输入密码" data-i18n-placeholder="auth.passwordPlaceholder">
+          <button type="submit" class="form-submit-btn auth-submit-btn" data-i18n="auth.loginBtn">登录</button>
         </form>
 
         <form class="auth-form" id="auth-register-form">
-          <label class="auth-label" for="auth-register-email">邮箱</label>
-          <input id="auth-register-email" class="auth-input" type="email" autocomplete="username" placeholder="请输入邮箱地址">
-          <label class="auth-label" for="auth-register-nickname">昵称</label>
-          <input id="auth-register-nickname" class="auth-input" type="text" maxlength="40" placeholder="选填，默认取邮箱前缀">
-          <label class="auth-label" for="auth-register-password">密码</label>
-          <input id="auth-register-password" class="auth-input" type="password" autocomplete="new-password" placeholder="至少 6 位密码">
-          <label class="auth-label" for="auth-register-password-confirm">确认密码</label>
-          <input id="auth-register-password-confirm" class="auth-input" type="password" autocomplete="new-password" placeholder="请再次输入密码">
-          <button type="submit" class="form-submit-btn auth-submit-btn">注册并进入</button>
+          <label class="auth-label" for="auth-register-email" data-i18n="auth.email">邮箱</label>
+          <input id="auth-register-email" class="auth-input" type="email" autocomplete="username" placeholder="请输入邮箱地址" data-i18n-placeholder="auth.emailPlaceholder">
+          <label class="auth-label" for="auth-register-nickname" data-i18n="auth.nickname">昵称</label>
+          <input id="auth-register-nickname" class="auth-input" type="text" maxlength="40" placeholder="选填，默认取邮箱前缀" data-i18n-placeholder="auth.nicknamePlaceholder">
+          <label class="auth-label" for="auth-register-password" data-i18n="auth.password">密码</label>
+          <input id="auth-register-password" class="auth-input" type="password" autocomplete="new-password" placeholder="至少 6 位密码" data-i18n-placeholder="auth.passwordMinPlaceholder">
+          <label class="auth-label" for="auth-register-password-confirm" data-i18n="auth.confirmPassword">确认密码</label>
+          <input id="auth-register-password-confirm" class="auth-input" type="password" autocomplete="new-password" placeholder="请再次输入密码" data-i18n-placeholder="auth.passwordConfirmPlaceholder">
+          <button type="submit" class="form-submit-btn auth-submit-btn" data-i18n="auth.registerBtn">注册并进入</button>
         </form>
 
-        <div class="auth-divider"><span>或</span></div>
-        <button type="button" class="auth-guest-btn" id="auth-enter-guest-btn">游客模式</button>
+        <div class="auth-divider"><span data-i18n="auth.or">或</span></div>
+        <button type="button" class="auth-guest-btn" id="auth-enter-guest-btn" data-i18n="auth.guestMode">游客模式</button>
       </div>
     </div>
   </div>
@@ -102,38 +104,31 @@
       <nav class="sidebar-nav" style="-webkit-app-region: no-drag;">
         <!-- 第一组：核心入口 -->
         <div class="nav-group">
-          <div class="nav-group-label">核心入口</div>
+          <div class="nav-group-label" data-i18n="nav.core">核心入口</div>
           <a class="nav-item active" data-page="school-planning">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
-            <span>定校规划</span>
+            <span data-i18n="nav.schoolPlanning">定校规划</span>
           </a>
           <a class="nav-item" data-page="my-profile">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>我的背景</span>
-          </a>
-          <a class="nav-item" data-page="university-explorer">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <span>院校大全</span>
+            <span data-i18n="nav.myProfile">我的背景</span>
           </a>
         </div>
 
         <!-- 第二组：目标推进区 -->
         <div class="nav-group">
-          <div class="nav-group-label">目标推进</div>
+          <div class="nav-group-label" data-i18n="nav.goals">目标推进</div>
           <a class="nav-item" data-page="target-universities">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
-            <span>目标院校</span>
+            <span data-i18n="nav.targetUniversities">目标院校</span>
           </a>
           <a class="nav-item" data-page="study-planning">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -142,27 +137,27 @@
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>留学规划</span>
+            <span data-i18n="nav.studyPlanning">留学规划</span>
           </a>
           <a class="nav-item" data-page="daily-checkin">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 11 12 14 22 4"></polyline>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
-            <span>每日打卡</span>
+            <span data-i18n="nav.dailyCheckin">每日打卡</span>
           </a>
         </div>
 
         <!-- 第三组：信息参考 -->
         <div class="nav-group">
-          <div class="nav-group-label">信息参考</div>
+          <div class="nav-group-label" data-i18n="nav.reference">信息参考</div>
           <a class="nav-item" data-page="university-database">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
               <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
               <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
             </svg>
-            <span>院校数据库</span>
+            <span data-i18n="nav.universityDatabase">院校数据库</span>
           </a>
           <a class="nav-item" data-page="application-cases">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -172,44 +167,44 @@
               <line x1="16" y1="17" x2="8" y2="17"></line>
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
-            <span>申请案例</span>
+            <span data-i18n="nav.applicationCases">申请案例</span>
           </a>
         </div>
 
         <!-- 第四组：资源与社区 -->
         <div class="nav-group">
-          <div class="nav-group-label">资源与社区</div>
+          <div class="nav-group-label" data-i18n="nav.resourceCommunity">资源与社区</div>
           <a class="nav-item" data-page="resource-center">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
-            <span>资源中心</span>
+            <span data-i18n="nav.resourceCenter">资源中心</span>
           </a>
           <a class="nav-item" data-page="community-messages">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            <span>社区留言</span>
+            <span data-i18n="nav.community">社区留言</span>
           </a>
         </div>
 
         <!-- 第五组：工具 -->
         <div class="nav-group">
-          <div class="nav-group-label">工具</div>
+          <div class="nav-group-label" data-i18n="nav.tools">工具</div>
           <a class="nav-item" data-page="settings">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
-            <span>设置</span>
+            <span data-i18n="nav.settings">设置</span>
           </a>
           <a class="nav-item" data-page="usage-guide" id="nav-item-usage-guide">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
-            <span>使用指南</span>
+            <span data-i18n="nav.usageGuide">使用指南</span>
           </a>
         </div>
       </nav>
@@ -222,32 +217,32 @@
       <!-- 定校规划 -->
       <section class="page active" id="page-school-planning">
         <div class="page-header">
-          <h1 class="page-title">定校规划</h1>
+          <h1 class="page-title" data-i18n="page.schoolPlanning.title">定校规划</h1>
           <p class="page-subtitle">School Planning</p>
         </div>
         <div class="page-body">
           <div class="planning-intro-box">
             <img src="../image/plan.png" alt="Plan" class="planning-intro-image">
-            <h2 class="planning-intro-title">定校规划 · School Planning</h2>
-            <p class="planning-intro-text">
+            <h2 class="planning-intro-title" data-i18n="planning.introTitle">定校规划 · School Planning</h2>
+            <p class="planning-intro-text lang-zh" data-i18n="planning.introZh">
               欢迎来到 Aurora Vine 的定校规划模块。在这里，我们会根据你的本科背景、成绩情况和语言成绩，为你生成一份个性化的留学定校建议。填写这些信息只需要几分钟，但它将帮助系统更准确地评估你的申请竞争力，并为你推荐合适的目标院校梯度，同时生成一份未来申请规划路径。请尽量如实填写，你随时可以返回修改；准备好了的话，就从下面开始吧。
             </p>
-            <p class="planning-intro-text planning-intro-text-en">
+            <p class="planning-intro-text planning-intro-text-en lang-en">
               Welcome to the School Planning module of Aurora Vine. Here, we will generate personalized study-abroad school recommendations based on your undergraduate background, academic performance, and language test scores. Completing this information only takes a few minutes, but it will help the system evaluate your application competitiveness more accurately, recommend appropriate tiers of target universities, and outline a future application roadmap. Please fill in the information as accurately as possible-you can always return to edit it later. When you're ready, simply begin below.
             </p>
           </div>
           <div id="school-planning-form" class="school-planning-form">
             <div class="form-section">
-              <h3 class="form-section-title">基本信息 Basic Info</h3>
+              <h3 class="form-section-title" data-i18n="planning.sectionBasicInfo">基本信息</h3>
 
               <div class="form-basic-info-grid">
                 <div class="form-field" data-field="graduationYear">
                   <label class="form-label">
-                    <span class="form-label-zh">本科毕业年份</span>
-                    <span class="form-label-en">Undergraduate Graduation Year</span>
+                    <span class="form-label-zh lang-zh">本科毕业年份</span>
+                    <span class="form-label-en lang-en">Undergraduate Graduation Year</span>
                   </label>
                   <select id="sp-graduation-year" class="form-select">
-                    <option value="">请选择 Select</option>
+                    <option value="" data-i18n="planning.select">请选择</option>
                     <option value="2027">2027</option>
                     <option value="2028">2028</option>
                     <option value="2029">2029</option>
@@ -260,11 +255,11 @@
 
                 <div class="form-field" data-field="institutionTier">
                   <label class="form-label">
-                    <span class="form-label-zh">本科院校层次</span>
-                    <span class="form-label-en">Institution Tier</span>
+                    <span class="form-label-zh lang-zh">本科院校层次</span>
+                    <span class="form-label-en lang-en">Institution Tier</span>
                   </label>
                   <select id="sp-institution-tier" class="form-select">
-                    <option value="">请选择 Select</option>
+                    <option value="" data-i18n="planning.select">请选择</option>
                     <option value="985">985</option>
                     <option value="211">211</option>
                     <option value="双非">双非</option>
@@ -275,19 +270,19 @@
 
                 <div class="form-field" data-field="schoolName">
                   <label class="form-label">
-                    <span class="form-label-zh">本科学校名称</span>
-                    <span class="form-label-en">Undergraduate School</span>
+                    <span class="form-label-zh lang-zh">本科学校名称</span>
+                    <span class="form-label-en lang-en">Undergraduate School</span>
                   </label>
-                  <input type="text" id="sp-school-name" class="form-input" placeholder="请输入学校名称 Enter school name">
+                  <input type="text" id="sp-school-name" class="form-input" placeholder="请输入学校名称" data-i18n-placeholder="planning.schoolNamePlaceholder">
                   <span class="form-error"></span>
                 </div>
 
                 <div class="form-field" data-field="major">
                   <label class="form-label">
-                    <span class="form-label-zh">本科专业</span>
-                    <span class="form-label-en">Undergraduate Major</span>
+                    <span class="form-label-zh lang-zh">本科专业</span>
+                    <span class="form-label-en lang-en">Undergraduate Major</span>
                   </label>
-                  <input type="text" id="sp-major" class="form-input" placeholder="请输入专业名称 Enter major">
+                  <input type="text" id="sp-major" class="form-input" placeholder="请输入专业名称" data-i18n-placeholder="planning.majorPlaceholder">
                   <span class="form-error"></span>
                 </div>
               </div>
@@ -295,19 +290,19 @@
               <div class="form-gpa-row">
                 <div class="form-field form-field-inline" data-field="gpa">
                 <label class="form-label">
-                  <span class="form-label-zh">绩点</span>
-                  <span class="form-label-en">GPA</span>
+                  <span class="form-label-zh lang-zh">绩点</span>
+                  <span class="form-label-en lang-en">GPA</span>
                 </label>
                 <div class="form-inline-group">
                   <input type="number" id="sp-gpa" class="form-input form-input-sm" placeholder="0.00" step="0.01" min="0" max="5">
                   <div class="form-radio-group">
                     <label class="form-radio-label">
                       <input type="radio" name="sp-gpa-scale" value="4" id="sp-gpa-4">
-                      <span>四分制</span>
+                      <span data-i18n="planning.scale4">四分制</span>
                     </label>
                     <label class="form-radio-label">
                       <input type="radio" name="sp-gpa-scale" value="5" id="sp-gpa-5">
-                      <span>五分制</span>
+                      <span data-i18n="planning.scale5">五分制</span>
                     </label>
                   </div>
                 </div>
@@ -316,8 +311,8 @@
 
                 <div class="form-field" data-field="gpaPercentile">
                   <label class="form-label">
-                    <span class="form-label-zh">绩点前百分比</span>
-                    <span class="form-label-en">GPA Percentile</span>
+                    <span class="form-label-zh lang-zh">绩点前百分比</span>
+                    <span class="form-label-en lang-en">GPA Percentile</span>
                   </label>
                   <input type="number" id="sp-gpa-percentile" class="form-input form-input-narrow" placeholder="0-100" min="0" max="100" step="0.1">
                   <span class="form-error"></span>
@@ -326,21 +321,21 @@
             </div>
 
             <div class="form-section">
-              <h3 class="form-section-title">语言与标化成绩 Language & Test Scores</h3>
+              <h3 class="form-section-title" data-i18n="planning.sectionLanguageScores">语言与标化成绩</h3>
 
               <div class="form-test-scores-grid">
                 <div class="form-field form-field-with-check" data-field="ielts">
                   <label class="form-label">
-                    <span class="form-label-zh">雅思</span>
-                    <span class="form-label-en">IELTS</span>
+                    <span class="form-label-zh lang-zh">雅思</span>
+                    <span class="form-label-en lang-en">IELTS</span>
                   </label>
                   <div class="form-inline-group">
                     <select id="sp-ielts" class="form-select">
-                      <option value="">请选择 Select</option>
+                      <option value="" data-i18n="planning.select">请选择</option>
                     </select>
                     <label class="form-check-label">
                       <input type="checkbox" id="sp-ielts-none" class="form-check">
-                      <span>无 None</span>
+                      <span data-i18n="planning.none">无</span>
                     </label>
                   </div>
                   <span class="form-error"></span>
@@ -348,16 +343,16 @@
 
                 <div class="form-field form-field-with-check" data-field="toefl">
                   <label class="form-label">
-                    <span class="form-label-zh">托福</span>
-                    <span class="form-label-en">TOEFL</span>
+                    <span class="form-label-zh lang-zh">托福</span>
+                    <span class="form-label-en lang-en">TOEFL</span>
                   </label>
                   <div class="form-inline-group">
                     <select id="sp-toefl" class="form-select">
-                      <option value="">请选择 Select</option>
+                      <option value="" data-i18n="planning.select">请选择</option>
                     </select>
                     <label class="form-check-label">
                       <input type="checkbox" id="sp-toefl-none" class="form-check">
-                      <span>无 None</span>
+                      <span data-i18n="planning.none">无</span>
                     </label>
                   </div>
                   <span class="form-error"></span>
@@ -365,19 +360,19 @@
 
                 <div class="form-field form-field-with-check form-field-gre" data-field="gre">
                   <label class="form-label">
-                    <span class="form-label-zh">GRE / GRE 写作</span>
-                    <span class="form-label-en">GRE / GRE Writing</span>
+                    <span class="form-label-zh lang-zh">GRE / GRE 写作</span>
+                    <span class="form-label-en lang-en">GRE / GRE Writing</span>
                   </label>
                   <div class="form-inline-group form-gre-group">
                     <select id="sp-gre" class="form-select">
-                      <option value="">请选择 Select</option>
+                      <option value="" data-i18n="planning.select">请选择</option>
                     </select>
                     <select id="sp-gre-writing" class="form-select">
-                      <option value="">请选择 Select</option>
+                      <option value="" data-i18n="planning.select">请选择</option>
                     </select>
                     <label class="form-check-label">
                       <input type="checkbox" id="sp-gre-none" class="form-check">
-                      <span>无 None</span>
+                      <span data-i18n="planning.none">无</span>
                     </label>
                   </div>
                   <span class="form-error"></span>
@@ -386,28 +381,28 @@
             </div>
 
             <div class="form-section">
-              <h3 class="form-section-title">简历 Resume</h3>
+              <h3 class="form-section-title" data-i18n="planning.sectionResume">简历</h3>
               <div class="form-resume-counts-row">
                 <div class="form-field" data-field="researchCount">
                   <label class="form-label">
-                    <span class="form-label-zh">科研数量</span>
-                    <span class="form-label-en">Research Count</span>
+                    <span class="form-label-zh lang-zh">科研数量</span>
+                    <span class="form-label-en lang-en">Research Count</span>
                   </label>
                   <select id="sp-research-count" class="form-select"></select>
                   <span class="form-error"></span>
                 </div>
                 <div class="form-field" data-field="internshipCount">
                   <label class="form-label">
-                    <span class="form-label-zh">实习数量</span>
-                    <span class="form-label-en">Internship Count</span>
+                    <span class="form-label-zh lang-zh">实习数量</span>
+                    <span class="form-label-en lang-en">Internship Count</span>
                   </label>
                   <select id="sp-internship-count" class="form-select"></select>
                   <span class="form-error"></span>
                 </div>
                 <div class="form-field" data-field="paperCount">
                   <label class="form-label">
-                    <span class="form-label-zh">论文数量</span>
-                    <span class="form-label-en">Paper Count</span>
+                    <span class="form-label-zh lang-zh">论文数量</span>
+                    <span class="form-label-en lang-en">Paper Count</span>
                   </label>
                   <select id="sp-paper-count" class="form-select"></select>
                   <span class="form-error"></span>
@@ -415,8 +410,8 @@
               </div>
               <div class="form-field" data-field="resume">
                 <label class="form-label">
-                  <span class="form-label-zh">简历（选填）</span>
-                  <span class="form-label-en">Resume（Optional）</span>
+                  <span class="form-label-zh lang-zh">简历（选填）</span>
+                  <span class="form-label-en lang-en">Resume（Optional）</span>
                 </label>
                 <input type="file" id="sp-resume" class="form-file" accept=".pdf,.doc,.docx">
                 <span class="form-error"></span>
@@ -424,7 +419,7 @@
             </div>
 
             <div class="form-actions">
-              <button type="button" id="school-planning-submit" class="form-submit-btn">提交 Submit</button>
+              <button type="button" id="school-planning-submit" class="form-submit-btn" data-i18n="planning.submitBtn">提交</button>
             </div>
           </div>
 
@@ -437,7 +432,7 @@
                 </svg>
                 <div class="score-ring-value">
                   <span id="score-total-number">0</span>
-                  <span class="score-ring-label">综合评分</span>
+                  <span class="score-ring-label" data-i18n="score.overall">综合评分</span>
                 </div>
               </div>
 
@@ -448,23 +443,23 @@
                   <span class="score-bar-value" id="score-val-gpa">0</span>
                 </div>
                 <div class="score-bar-item" data-dim="lang">
-                  <span class="score-bar-label">语言 Lang</span>
+                  <span class="score-bar-label" data-i18n="score.lang">语言</span>
                   <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-lang"></div></div>
                   <span class="score-bar-value" id="score-val-lang">0</span>
                 </div>
                 <div class="score-bar-item" data-dim="bg">
-                  <span class="score-bar-label">背景 BG</span>
+                  <span class="score-bar-label" data-i18n="score.bg">背景</span>
                   <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-bg"></div></div>
                   <span class="score-bar-value" id="score-val-bg">0</span>
                 </div>
                 <div class="score-bar-item" data-dim="school">
-                  <span class="score-bar-label">院校 School</span>
+                  <span class="score-bar-label" data-i18n="score.school">院校</span>
                   <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-school"></div></div>
                   <span class="score-bar-value" id="score-val-school">0</span>
                 </div>
               </div>
 
-              <button type="button" id="school-planning-refill" class="form-submit-btn school-planning-refill-btn">重新填写 Re-fill</button>
+              <button type="button" id="school-planning-refill" class="form-submit-btn school-planning-refill-btn" data-i18n="planning.refillBtn">重新填写</button>
             </div>
           </div>
         </div>
@@ -473,7 +468,7 @@
       <!-- 我的背景 -->
       <section class="page" id="page-my-profile">
         <div class="page-header">
-          <h1 class="page-title">我的背景</h1>
+          <h1 class="page-title" data-i18n="page.myProfile.title">我的背景</h1>
           <p class="page-subtitle">My Profile</p>
         </div>
         <div class="page-body">
@@ -481,78 +476,26 @@
             <div class="placeholder-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
-            <p class="placeholder-text">暂无背景信息</p>
-            <p class="placeholder-hint">请先在定校规划中填写您的学术背景，提交后将在此展示</p>
-            <button type="button" id="my-profile-go-planning" class="form-submit-btn">去定校规划填写</button>
+            <p class="placeholder-text" data-i18n="profile.empty">暂无背景信息</p>
+            <p class="placeholder-hint" data-i18n="profile.emptyHint">请先在定校规划中填写您的学术背景，提交后将在此展示</p>
+            <button type="button" id="my-profile-go-planning" class="form-submit-btn" data-i18n="profile.goPlanning">去定校规划填写</button>
           </div>
           <div id="my-profile-content" class="my-profile-content" style="display: none;">
             <div class="my-profile-info-card">
-              <h3 class="form-section-title">基本信息 Basic Info</h3>
+              <h3 class="form-section-title" data-i18n="profile.sectionBasicInfo">基本信息</h3>
               <div class="my-profile-info-grid" id="my-profile-info-grid"></div>
             </div>
             <div class="my-profile-chart-card">
-              <h3 class="form-section-title">标化成绩 Standardized Test Scores</h3>
+              <h3 class="form-section-title" data-i18n="profile.sectionTestScores">标化成绩</h3>
               <div id="my-profile-chart" class="my-profile-chart"></div>
             </div>
             <div class="my-profile-statement-card">
-              <h3 class="form-section-title">个人陈述 Personal Statement</h3>
-              <div class="my-profile-statement-box">无</div>
+              <h3 class="form-section-title" data-i18n="profile.sectionStatement">个人陈述</h3>
+              <div class="my-profile-statement-box" data-i18n="profile.statementNone">无</div>
             </div>
             <div class="my-profile-actions">
-              <button type="button" id="my-profile-refill" class="form-submit-btn">重新填写定校规划 Re-fill School Planning</button>
+              <button type="button" id="my-profile-refill" class="form-submit-btn" data-i18n="profile.refill">重新填写定校规划</button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 院校大全 -->
-      <section class="page" id="page-university-explorer">
-        <div class="page-header">
-          <h1 class="page-title">院校大全</h1>
-          <p class="page-subtitle">University Explorer</p>
-        </div>
-        <div class="page-body">
-          <div class="school-search-bar" id="school-search-bar">
-            <svg class="school-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="school-search-input" class="school-search-input" placeholder="搜索院校名称、国家或城市 / Search by name, country or city">
-            <button type="button" id="school-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索">×</button>
-          </div>
-          <div class="school-filter-bar" id="school-filter-bar">
-            <div class="school-filter-group">
-              <div class="school-filter-heading">
-                <span class="school-filter-title">地区筛选</span>
-                <span class="school-filter-title-en">Region</span>
-              </div>
-              <div class="school-filter-chips" id="school-region-filters" role="tablist" aria-label="地区筛选">
-                <button type="button" class="school-filter-chip is-active" data-region="all" aria-pressed="true">不限</button>
-                <button type="button" class="school-filter-chip" data-region="hong_kong" aria-pressed="false">中国香港</button>
-                <button type="button" class="school-filter-chip" data-region="singapore" aria-pressed="false">新加坡</button>
-                <button type="button" class="school-filter-chip" data-region="uk" aria-pressed="false">英国</button>
-                <button type="button" class="school-filter-chip" data-region="usa" aria-pressed="false">美国</button>
-                <button type="button" class="school-filter-chip" data-region="australia" aria-pressed="false">澳大利亚</button>
-                <button type="button" class="school-filter-chip" data-region="malaysia" aria-pressed="false">马来西亚</button>
-                <button type="button" class="school-filter-chip" data-region="europe" aria-pressed="false">欧洲</button>
-                <button type="button" class="school-filter-chip" data-region="other" aria-pressed="false">其他</button>
-              </div>
-            </div>
-            <div class="school-filter-group">
-              <div class="school-filter-heading">
-                <span class="school-filter-title">热门榜单</span>
-                <span class="school-filter-title-en">Ranking Lists</span>
-              </div>
-              <div class="school-filter-chips" id="school-ranking-filters" role="tablist" aria-label="热门榜单筛选">
-                <button type="button" class="school-filter-chip is-active" data-ranking="qs" aria-pressed="true">QS世界大学排名</button>
-                <button type="button" class="school-filter-chip is-disabled" data-ranking="times" aria-pressed="false" aria-disabled="true" title="敬请期待">Times英国大学排名<span class="school-filter-chip-badge">敬请期待</span></button>
-                <button type="button" class="school-filter-chip is-disabled" data-ranking="us_news" aria-pressed="false" aria-disabled="true" title="敬请期待">U.S.News美国大学排名<span class="school-filter-chip-badge">敬请期待</span></button>
-              </div>
-            </div>
-          </div>
-          <div class="school-list-container" id="school-list-explorer">
-            <div class="school-list-grid" id="school-list-explorer-grid"></div>
-            <div class="school-list-pagination" id="school-list-explorer-pagination"></div>
           </div>
         </div>
       </section>
@@ -560,15 +503,15 @@
       <!-- 目标院校 -->
       <section class="page" id="page-target-universities">
         <div class="page-header">
-          <h1 class="page-title">目标院校</h1>
+          <h1 class="page-title" data-i18n="page.targetUniversities.title">目标院校</h1>
           <p class="page-subtitle">Target Universities</p>
         </div>
         <div class="page-body">
           <div class="school-list-container" id="school-list-target">
             <div class="school-list-grid" id="school-list-target-grid"></div>
             <div class="school-list-empty" id="school-list-target-empty">
-              <p class="placeholder-text">暂无目标院校</p>
-              <p class="placeholder-hint">去院校大全添加你心仪的院校吧</p>
+              <p class="placeholder-text" data-i18n="target.empty">暂无目标院校</p>
+              <p class="placeholder-hint" data-i18n="target.emptyHint">去院校数据库添加你心仪的院校吧</p>
             </div>
           </div>
         </div>
@@ -577,42 +520,42 @@
       <!-- 留学规划 -->
       <section class="page" id="page-study-planning">
         <div class="page-header">
-          <h1 class="page-title">留学规划</h1>
+          <h1 class="page-title" data-i18n="page.studyPlanning.title">留学规划</h1>
           <p class="page-subtitle">Study Planning</p>
         </div>
         <div class="page-body">
           <div class="study-planning-layout">
             <!-- 左侧：留学规划大纲 -->
             <section class="study-planning-outline-panel">
-              <h3 class="study-planning-panel-title">留学规划大纲 <span class="study-planning-panel-title-en">Planning Outline</span></h3>
+              <h3 class="study-planning-panel-title" data-i18n="studyPlanning.outlineTitle">留学规划大纲</h3>
               <div class="study-planning-outline-list" id="study-planning-outline-list">
                 <div class="study-planning-outline-empty" id="study-planning-outline-empty">
-                  <p>暂无规划条目</p>
-                  <p class="study-planning-outline-empty-hint">在右侧「自定义规划」中添加规划内容</p>
+                  <p data-i18n="studyPlanning.outlineEmpty">暂无规划条目</p>
+                  <p class="study-planning-outline-empty-hint" data-i18n="studyPlanning.outlineEmptyHint">在右侧「自定义规划」中添加规划内容</p>
                 </div>
               </div>
             </section>
 
             <!-- 右侧上：智能留学规划 -->
             <section class="study-planning-smart-panel">
-              <h3 class="study-planning-panel-title">智能留学规划 <span class="study-planning-panel-title-en">Smart Planning</span></h3>
+              <h3 class="study-planning-panel-title" data-i18n="studyPlanning.smartTitle">智能留学规划</h3>
               <div class="placeholder-card study-planning-smart-placeholder">
                 <div class="placeholder-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 </div>
-                <p class="placeholder-text">智能留学规划即将上线</p>
-                <p class="placeholder-hint">AI 将根据你的背景自动生成个性化留学规划</p>
+                <p class="placeholder-text" data-i18n="studyPlanning.smartComingSoon">智能留学规划即将上线</p>
+                <p class="placeholder-hint" data-i18n="studyPlanning.smartHint">AI 将根据你的背景自动生成个性化留学规划</p>
               </div>
             </section>
 
             <!-- 右侧下：自定义规划 -->
             <section class="study-planning-custom-panel">
-              <h3 class="study-planning-panel-title">自定义规划 <span class="study-planning-panel-title-en">Custom Planning</span></h3>
+              <h3 class="study-planning-panel-title" data-i18n="studyPlanning.customTitle">自定义规划</h3>
               <textarea id="study-planning-custom-input" class="study-planning-custom-input" placeholder="#英语水平提升&#10;*外语对申请欧洲学校来说很重要&#10;[2025.3.1-2025.3.10]背诵5个单词&#10;[2025.3.8-2025.3.15]练一篇作文&#10;&#10;#学术成绩提升&#10;[2025.4.1-2025.4.30]复习高数"></textarea>
-              <p class="study-planning-custom-hint">格式：<code>#标题</code>（必填）、<code>*简介</code>（可选）、<code>[年.月.日-年.月.日]任务内容</code></p>
-              <p class="study-planning-custom-hint study-planning-custom-hint-en">Format: <code>#Title</code> (required), <code>*Description</code> (optional), <code>[YYYY.M.D-YYYY.M.D]Task</code></p>
+              <p class="study-planning-custom-hint lang-zh">格式：<code>#标题</code>（必填）、<code>*简介</code>（可选）、<code>[年.月.日-年.月.日]任务内容</code></p>
+              <p class="study-planning-custom-hint study-planning-custom-hint-en lang-en">Format: <code>#Title</code> (required), <code>*Description</code> (optional), <code>[YYYY.M.D-YYYY.M.D]Task</code></p>
               <div class="study-planning-custom-actions">
-                <button type="button" class="form-submit-btn" id="study-planning-custom-submit">解析并添加</button>
+                <button type="button" class="form-submit-btn" id="study-planning-custom-submit" data-i18n="studyPlanning.parseAndAdd">解析并添加</button>
               </div>
             </section>
           </div>
@@ -622,17 +565,17 @@
       <!-- 每日打卡 -->
       <section class="page" id="page-daily-checkin">
         <div class="page-header">
-          <h1 class="page-title">每日打卡</h1>
+          <h1 class="page-title" data-i18n="page.dailyCheckin.title">每日打卡</h1>
           <p class="page-subtitle">Daily Check-in</p>
         </div>
 
         <div class="daily-checkin-confirm-modal" id="daily-checkin-confirm-modal" aria-hidden="true">
           <div class="daily-checkin-confirm-card" role="dialog" aria-modal="true">
-            <h3 class="daily-checkin-confirm-title">确认清空全部日程？ / Clear all schedules?</h3>
-            <p class="daily-checkin-confirm-desc">此操作将删除所有日期的全部任务条目，且无法恢复。<br>This will permanently delete all tasks across every date.</p>
+            <h3 class="daily-checkin-confirm-title" data-i18n="daily.clearAllTitle">确认清空全部日程？</h3>
+            <p class="daily-checkin-confirm-desc" data-i18n="daily.clearAllDesc">此操作将删除所有日期的全部任务条目，且无法恢复。</p>
             <div class="daily-checkin-confirm-actions">
-              <button type="button" class="form-submit-btn" id="daily-checkin-confirm-cancel">取消 / Cancel</button>
-              <button type="button" class="form-submit-btn daily-checkin-confirm-danger" id="daily-checkin-confirm-ok">确认清空 / Confirm</button>
+              <button type="button" class="form-submit-btn" id="daily-checkin-confirm-cancel" data-i18n="daily.cancel">取消</button>
+              <button type="button" class="form-submit-btn daily-checkin-confirm-danger" id="daily-checkin-confirm-ok" data-i18n="daily.confirmClear">确认清空</button>
             </div>
           </div>
         </div>
@@ -641,14 +584,14 @@
             <section class="daily-checkin-calendar-panel">
               <div class="daily-checkin-peel-triangle" id="daily-checkin-peel-triangle">
                 <div class="daily-checkin-peel-tri-fold"></div>
-                <button type="button" class="daily-checkin-peel-tri-btn" id="daily-checkin-clear-global" title="清空全部日程" aria-label="清空全部日程">🗑</button>
+                <button type="button" class="daily-checkin-peel-tri-btn" id="daily-checkin-clear-global" title="清空全部日程" aria-label="清空全部日程" data-i18n-title="daily.clearGlobalLabel" data-i18n-aria-label="daily.clearGlobalLabel">🗑</button>
               </div>
               <div class="daily-checkin-calendar-toolbar">
-                <button type="button" class="daily-checkin-month-btn" id="daily-checkin-prev-month" aria-label="上一月">‹</button>
+                <button type="button" class="daily-checkin-month-btn" id="daily-checkin-prev-month" aria-label="上一月" data-i18n-aria-label="daily.prevMonth">‹</button>
                 <h3 class="daily-checkin-month-title" id="daily-checkin-month-title"></h3>
-                <button type="button" class="daily-checkin-month-btn" id="daily-checkin-next-month" aria-label="下一月">›</button>
+                <button type="button" class="daily-checkin-month-btn" id="daily-checkin-next-month" aria-label="下一月" data-i18n-aria-label="daily.nextMonth">›</button>
               </div>
-              <div class="daily-checkin-weekdays">
+              <div class="daily-checkin-weekdays" id="daily-checkin-weekday-labels">
                 <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
               </div>
               <div class="daily-checkin-calendar-grid" id="daily-checkin-calendar-grid"></div>
@@ -659,30 +602,30 @@
                 <h3 class="daily-checkin-task-date" id="daily-checkin-task-date"></h3>
                 <div class="daily-checkin-task-header-right">
                   <span class="daily-checkin-task-count" id="daily-checkin-task-count">0/9</span>
-                  <button type="button" class="daily-checkin-clear-btn" id="daily-checkin-clear-all" title="清空所有任务" aria-label="清空所有任务">🗑</button>
+                  <button type="button" class="daily-checkin-clear-btn" id="daily-checkin-clear-all" title="清空所有任务" aria-label="清空所有任务" data-i18n-title="daily.clearDayLabel" data-i18n-aria-label="daily.clearDayLabel">🗑</button>
                 </div>
               </div>
               <div class="daily-checkin-task-list" id="daily-checkin-task-list"></div>
               <div class="daily-checkin-task-empty" id="daily-checkin-task-empty">
-                <p class="daily-checkin-task-empty-en">No tasks today~</p>
-                <p class="daily-checkin-task-empty-zh">今天没有任务~</p>
+                <p class="daily-checkin-task-empty-en lang-en">No tasks today~</p>
+                <p class="daily-checkin-task-empty-zh lang-zh">今天没有任务~</p>
               </div>
               <div class="daily-checkin-task-actions">
-                <button type="button" class="form-submit-btn" id="daily-checkin-add-task">新建条目</button>
+                <button type="button" class="form-submit-btn" id="daily-checkin-add-task" data-i18n="daily.addTask">新建条目</button>
               </div>
             </section>
           </div>
 
           <div class="daily-checkin-modal" id="daily-checkin-modal" aria-hidden="true">
             <div class="daily-checkin-modal-card" role="dialog" aria-modal="true" aria-labelledby="daily-checkin-modal-title">
-              <h3 class="daily-checkin-modal-title" id="daily-checkin-modal-title">新增任务</h3>
-              <label class="daily-checkin-modal-label" for="daily-checkin-modal-input">任务内容</label>
-              <textarea id="daily-checkin-modal-input" class="daily-checkin-modal-input" maxlength="200" placeholder="请输入任务内容（可详细一点）"></textarea>
-              <label class="daily-checkin-modal-label" for="daily-checkin-modal-color">任务颜色</label>
+              <h3 class="daily-checkin-modal-title" id="daily-checkin-modal-title" data-i18n="daily.modalTitle">新增任务</h3>
+              <label class="daily-checkin-modal-label" for="daily-checkin-modal-input" data-i18n="daily.modalContentLabel">任务内容</label>
+              <textarea id="daily-checkin-modal-input" class="daily-checkin-modal-input" maxlength="200" placeholder="请输入任务内容（可详细一点）" data-i18n-placeholder="daily.modalContentPlaceholder"></textarea>
+              <label class="daily-checkin-modal-label" for="daily-checkin-modal-color" data-i18n="daily.modalColorLabel">任务颜色</label>
               <select id="daily-checkin-modal-color" class="daily-checkin-modal-color"></select>
               <div class="daily-checkin-modal-actions">
-                <button type="button" class="form-submit-btn" id="daily-checkin-modal-cancel">取消</button>
-                <button type="button" class="form-submit-btn" id="daily-checkin-modal-confirm">确认添加</button>
+                <button type="button" class="form-submit-btn" id="daily-checkin-modal-cancel" data-i18n="daily.modalCancel">取消</button>
+                <button type="button" class="form-submit-btn" id="daily-checkin-modal-confirm" data-i18n="daily.modalConfirm">确认添加</button>
               </div>
             </div>
           </div>
@@ -692,16 +635,51 @@
       <!-- 院校数据库 -->
       <section class="page" id="page-university-database">
         <div class="page-header">
-          <h1 class="page-title">院校数据库</h1>
+          <h1 class="page-title" data-i18n="page.universityDatabase.title">院校数据库</h1>
           <p class="page-subtitle">University Database</p>
         </div>
         <div class="page-body">
-          <div class="placeholder-card">
-            <div class="placeholder-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          <div class="school-search-bar" id="school-search-bar">
+            <svg class="school-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="school-search-input" class="school-search-input" placeholder="搜索院校名称、国家或城市" data-i18n-placeholder="uniDb.searchPlaceholder">
+            <button type="button" id="school-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索" data-i18n-title="uniDb.clearSearch" data-i18n-aria-label="uniDb.clearSearch">×</button>
+          </div>
+          <div class="school-filter-bar" id="school-filter-bar">
+            <div class="school-filter-group">
+              <div class="school-filter-heading">
+                <span class="school-filter-title" data-i18n="uniDb.regionFilter">地区筛选</span>
+                <span class="school-filter-title-en lang-en">Region</span>
+              </div>
+              <div class="school-filter-chips" id="school-region-filters" role="tablist" aria-label="地区筛选">
+                <button type="button" class="school-filter-chip is-active" data-region="all" aria-pressed="true" data-i18n="uniDb.regionAll">不限</button>
+                <button type="button" class="school-filter-chip" data-region="hong_kong" aria-pressed="false" data-i18n="uniDb.regionHK">中国香港</button>
+                <button type="button" class="school-filter-chip" data-region="singapore" aria-pressed="false" data-i18n="uniDb.regionSG">新加坡</button>
+                <button type="button" class="school-filter-chip" data-region="uk" aria-pressed="false" data-i18n="uniDb.regionUK">英国</button>
+                <button type="button" class="school-filter-chip" data-region="usa" aria-pressed="false" data-i18n="uniDb.regionUS">美国</button>
+                <button type="button" class="school-filter-chip" data-region="australia" aria-pressed="false" data-i18n="uniDb.regionAU">澳大利亚</button>
+                <button type="button" class="school-filter-chip" data-region="malaysia" aria-pressed="false" data-i18n="uniDb.regionMY">马来西亚</button>
+                <button type="button" class="school-filter-chip" data-region="europe" aria-pressed="false" data-i18n="uniDb.regionEU">欧洲</button>
+                <button type="button" class="school-filter-chip" data-region="other" aria-pressed="false" data-i18n="uniDb.regionOther">其他</button>
+              </div>
             </div>
-            <p class="placeholder-text">院校数据库功能即将上线</p>
-            <p class="placeholder-hint">查询详细的院校数据和录取信息</p>
+            <div class="school-filter-group">
+              <div class="school-filter-heading">
+                <span class="school-filter-title" data-i18n="uniDb.rankingFilter">热门榜单</span>
+                <span class="school-filter-title-en lang-en">Ranking Lists</span>
+              </div>
+              <div class="school-filter-chips" id="school-ranking-filters" role="tablist" aria-label="热门榜单筛选">
+                <button type="button" class="school-filter-chip is-active" data-ranking="qs" aria-pressed="true" data-i18n="uniDb.rankingQs">QS世界大学排名</button>
+                <button type="button" class="school-filter-chip is-disabled" data-ranking="times" aria-pressed="false" aria-disabled="true" title="敬请期待"><span data-i18n="uniDb.rankingTimes">Times英国大学排名</span><span class="school-filter-chip-badge" data-i18n="uniDb.comingSoon">敬请期待</span></button>
+                <button type="button" class="school-filter-chip is-disabled" data-ranking="us_news" aria-pressed="false" aria-disabled="true" title="敬请期待"><span data-i18n="uniDb.rankingUsNews">U.S.News美国大学排名</span><span class="school-filter-chip-badge" data-i18n="uniDb.comingSoon">敬请期待</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="school-list-container" id="school-list-explorer">
+            <div class="school-list-grid" id="school-list-explorer-grid"></div>
+            <div class="school-list-pagination" id="school-list-explorer-pagination"></div>
           </div>
         </div>
       </section>
@@ -709,7 +687,7 @@
       <!-- 申请案例 -->
       <section class="page" id="page-application-cases">
         <div class="page-header">
-          <h1 class="page-title">申请案例</h1>
+          <h1 class="page-title" data-i18n="page.applicationCases.title">申请案例</h1>
           <p class="page-subtitle">Application Cases</p>
         </div>
         <div class="page-body">
@@ -718,63 +696,63 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="application-cases-search-input" class="school-search-input" placeholder="搜索录取院校、项目或案例标签">
+            <input type="text" id="application-cases-search-input" class="school-search-input" placeholder="搜索录取院校、项目或案例标签" data-i18n-placeholder="cases.searchPlaceholder">
             <button type="button" id="application-cases-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索">×</button>
           </div>
 
           <div class="school-filter-bar application-cases-filter-bar">
             <div class="school-filter-group">
               <div class="school-filter-heading">
-                <span class="school-filter-title">本科背景</span>
-                <span class="school-filter-title-en">Undergrad Tier</span>
+                <span class="school-filter-title" data-i18n="cases.tierFilter">本科背景</span>
+                <span class="school-filter-title-en lang-en">Undergrad Tier</span>
               </div>
               <div class="school-filter-chips" id="application-cases-tier-filters" role="tablist" aria-label="本科背景筛选">
-                <button type="button" class="school-filter-chip is-active" data-tier="all" aria-pressed="true">不限</button>
+                <button type="button" class="school-filter-chip is-active" data-tier="all" aria-pressed="true" data-i18n="cases.tierAll">不限</button>
                 <button type="button" class="school-filter-chip" data-tier="985" aria-pressed="false">985</button>
                 <button type="button" class="school-filter-chip" data-tier="211" aria-pressed="false">211</button>
-                <button type="button" class="school-filter-chip" data-tier="海本" aria-pressed="false">海本</button>
-                <button type="button" class="school-filter-chip" data-tier="中外合作" aria-pressed="false">中外合作</button>
-                <button type="button" class="school-filter-chip" data-tier="双非" aria-pressed="false">双非</button>
+                <button type="button" class="school-filter-chip" data-tier="海本" aria-pressed="false" data-i18n="cases.tierOverseas">海本</button>
+                <button type="button" class="school-filter-chip" data-tier="中外合作" aria-pressed="false" data-i18n="cases.tierJoint">中外合作</button>
+                <button type="button" class="school-filter-chip" data-tier="双非" aria-pressed="false" data-i18n="cases.tierNon211">双非</button>
               </div>
             </div>
 
             <div class="school-filter-group application-cases-select-group">
               <div class="school-filter-heading">
-                <span class="school-filter-title">更多筛选</span>
-                <span class="school-filter-title-en">More Filters</span>
+                <span class="school-filter-title" data-i18n="cases.moreFilters">更多筛选</span>
+                <span class="school-filter-title-en lang-en">More Filters</span>
               </div>
               <div class="application-cases-select-row">
                 <label class="application-cases-select-label" for="application-cases-gpa-band">GPA</label>
                 <select id="application-cases-gpa-band" class="application-cases-select">
-                  <option value="all">全部</option>
-                  <option value="high">高 GPA</option>
-                  <option value="mid">中等 GPA</option>
-                  <option value="low">低 GPA</option>
+                  <option value="all" data-i18n="cases.gpaAll">全部</option>
+                  <option value="high" data-i18n="cases.gpaHigh">高 GPA</option>
+                  <option value="mid" data-i18n="cases.gpaMid">中等 GPA</option>
+                  <option value="low" data-i18n="cases.gpaLow">低 GPA</option>
                 </select>
 
-                <label class="application-cases-select-label" for="application-cases-language-band">语言</label>
+                <label class="application-cases-select-label" for="application-cases-language-band" data-i18n="cases.labelLang">语言</label>
                 <select id="application-cases-language-band" class="application-cases-select">
-                  <option value="all">全部</option>
-                  <option value="strong">语言强</option>
-                  <option value="qualified">语言达标</option>
-                  <option value="pending">语言待补强</option>
+                  <option value="all" data-i18n="cases.langAll">全部</option>
+                  <option value="strong" data-i18n="cases.langStrong">语言强</option>
+                  <option value="qualified" data-i18n="cases.langQualified">语言达标</option>
+                  <option value="pending" data-i18n="cases.langPending">语言待补强</option>
                 </select>
 
-                <label class="application-cases-select-label" for="application-cases-bg-focus">软背景</label>
+                <label class="application-cases-select-label" for="application-cases-bg-focus" data-i18n="cases.labelBg">软背景</label>
                 <select id="application-cases-bg-focus" class="application-cases-select">
-                  <option value="all">全部</option>
-                  <option value="research">科研强</option>
-                  <option value="internship">实习丰富</option>
-                  <option value="paper">论文加成</option>
-                  <option value="balanced">综合型</option>
+                  <option value="all" data-i18n="cases.bgAll">全部</option>
+                  <option value="research" data-i18n="cases.bgResearch">科研强</option>
+                  <option value="internship" data-i18n="cases.bgInternship">实习丰富</option>
+                  <option value="paper" data-i18n="cases.bgPaper">论文加成</option>
+                  <option value="balanced" data-i18n="cases.bgBalanced">综合型</option>
                 </select>
 
-                <label class="application-cases-select-label" for="application-cases-sort">排序</label>
+                <label class="application-cases-select-label" for="application-cases-sort" data-i18n="cases.labelSort">排序</label>
                 <select id="application-cases-sort" class="application-cases-select">
-                  <option value="score_desc">背景强度</option>
-                  <option value="qs_asc">主录取 QS</option>
-                  <option value="gpa_desc">GPA</option>
-                  <option value="language_desc">语言成绩</option>
+                  <option value="score_desc" data-i18n="cases.sortScore">背景强度</option>
+                  <option value="qs_asc" data-i18n="cases.sortQs">主录取 QS</option>
+                  <option value="gpa_desc" data-i18n="cases.sortGpa">GPA</option>
+                  <option value="language_desc" data-i18n="cases.sortLang">语言成绩</option>
                 </select>
               </div>
             </div>
@@ -784,45 +762,13 @@
           <div class="application-cases-list" id="application-cases-list"></div>
           <div class="school-list-pagination application-cases-pagination" id="application-cases-pagination"></div>
 
-          <div class="application-case-modal" id="application-case-modal" aria-hidden="true">
-            <div class="application-case-modal-card" role="dialog" aria-modal="true" aria-labelledby="application-case-detail-title">
-              <button type="button" class="application-case-modal-close" id="application-case-modal-close" aria-label="关闭">×</button>
-              <div class="application-case-modal-header">
-                <p class="application-case-modal-kicker" id="application-case-detail-kicker"></p>
-                <h3 class="application-case-modal-title" id="application-case-detail-title"></h3>
-                <p class="application-case-modal-subtitle" id="application-case-detail-subtitle"></p>
-              </div>
-
-              <div class="application-case-modal-body">
-                <section class="application-case-detail-section">
-                  <h4 class="application-case-detail-section-title">背景总览</h4>
-                  <div class="application-case-detail-grid" id="application-case-detail-overview"></div>
-                </section>
-
-                <section class="application-case-detail-section">
-                  <h4 class="application-case-detail-section-title">标化成绩</h4>
-                  <div class="application-case-detail-grid" id="application-case-detail-tests"></div>
-                </section>
-
-                <section class="application-case-detail-section">
-                  <h4 class="application-case-detail-section-title">软背景画像</h4>
-                  <div class="application-case-detail-grid" id="application-case-detail-soft"></div>
-                </section>
-
-                <section class="application-case-detail-section">
-                  <h4 class="application-case-detail-section-title">Offer 列表</h4>
-                  <div class="application-case-detail-offers" id="application-case-detail-offers"></div>
-                </section>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <!-- 资源中心 -->
       <section class="page" id="page-resource-center">
         <div class="page-header">
-          <h1 class="page-title">资源中心</h1>
+          <h1 class="page-title" data-i18n="page.resourceCenter.title">资源中心</h1>
           <p class="page-subtitle">Resource Center</p>
         </div>
         <div class="page-body">
@@ -830,8 +776,8 @@
             <div class="placeholder-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
             </div>
-            <p class="placeholder-text">资源中心功能即将上线</p>
-            <p class="placeholder-hint">获取留学相关的工具、模板和资料</p>
+            <p class="placeholder-text" data-i18n="resource.comingSoon">资源中心功能即将上线</p>
+            <p class="placeholder-hint" data-i18n="resource.hint">获取留学相关的工具、模板和资料</p>
           </div>
         </div>
       </section>
@@ -839,13 +785,13 @@
       <!-- 社区留言 -->
       <section class="page" id="page-community-messages">
         <div class="page-header">
-          <h1 class="page-title">社区留言</h1>
+          <h1 class="page-title" data-i18n="page.communityMessages.title">社区留言</h1>
           <p class="page-subtitle">Community Messages</p>
         </div>
         <div class="page-body">
           <div class="community-board-container">
             <div class="community-board-toolbar">
-              <button type="button" class="form-submit-btn" id="community-new-post-btn">新建帖子</button>
+              <button type="button" class="form-submit-btn" id="community-new-post-btn" data-i18n="community.newPost">新建帖子</button>
             </div>
             <p class="community-board-auth-tip" id="community-board-auth-tip"></p>
             <div class="community-board-list" id="community-board-list"></div>
@@ -854,15 +800,15 @@
 
           <div class="community-modal" id="community-post-modal" aria-hidden="true">
             <div class="community-modal-card" role="dialog" aria-modal="true" aria-labelledby="community-post-modal-title">
-              <h3 class="community-modal-title" id="community-post-modal-title">新建帖子</h3>
-              <label class="community-modal-label" for="community-post-title-input">标题</label>
-              <input id="community-post-title-input" class="community-modal-input" type="text" maxlength="120" placeholder="请输入帖子标题">
+              <h3 class="community-modal-title" id="community-post-modal-title" data-i18n="community.postModalTitle">新建帖子</h3>
+              <label class="community-modal-label" for="community-post-title-input" data-i18n="community.titleLabel">标题</label>
+              <input id="community-post-title-input" class="community-modal-input" type="text" maxlength="120" placeholder="请输入帖子标题" data-i18n-placeholder="community.titlePlaceholder">
               <p class="community-modal-current-user" id="community-post-current-user"></p>
-              <label class="community-modal-label" for="community-post-content-input">帖子内容</label>
-              <textarea id="community-post-content-input" class="community-modal-textarea" maxlength="5000" placeholder="请输入帖子内容"></textarea>
+              <label class="community-modal-label" for="community-post-content-input" data-i18n="community.contentLabel">帖子内容</label>
+              <textarea id="community-post-content-input" class="community-modal-textarea" maxlength="5000" placeholder="请输入帖子内容" data-i18n-placeholder="community.contentPlaceholder"></textarea>
               <div class="community-modal-actions">
-                <button type="button" class="form-submit-btn community-btn-ghost" id="community-post-cancel-btn">取消</button>
-                <button type="button" class="form-submit-btn" id="community-post-submit-btn">发布帖子</button>
+                <button type="button" class="form-submit-btn community-btn-ghost" id="community-post-cancel-btn" data-i18n="community.cancel">取消</button>
+                <button type="button" class="form-submit-btn" id="community-post-submit-btn" data-i18n="community.submitPost">发布帖子</button>
               </div>
             </div>
           </div>
@@ -874,12 +820,12 @@
               <p class="community-detail-meta" id="community-detail-meta"></p>
               <div class="community-detail-content" id="community-detail-content"></div>
               <div class="community-replies-wrap">
-                <h4 class="community-replies-title">回复区</h4>
+                <h4 class="community-replies-title" data-i18n="community.replySection">回复区</h4>
                 <div class="community-replies-list" id="community-replies-list"></div>
               </div>
               <div class="community-detail-actions">
-                <button type="button" class="form-submit-btn" id="community-open-reply-btn">评论</button>
-                <button type="button" class="form-submit-btn community-btn-danger" id="community-delete-post-btn">删除帖子</button>
+                <button type="button" class="form-submit-btn" id="community-open-reply-btn" data-i18n="community.comment">评论</button>
+                <button type="button" class="form-submit-btn community-btn-danger" id="community-delete-post-btn" data-i18n="community.deletePost">删除帖子</button>
               </div>
             </div>
           </div>
@@ -887,14 +833,14 @@
           <div class="community-bottom-sheet" id="community-reply-sheet" aria-hidden="true">
             <div class="community-bottom-sheet-mask" id="community-reply-sheet-mask"></div>
             <div class="community-bottom-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="community-reply-sheet-title">
-              <h3 class="community-modal-title" id="community-reply-sheet-title">评论</h3>
+              <h3 class="community-modal-title" id="community-reply-sheet-title" data-i18n="community.replySheetTitle">评论</h3>
               <p class="community-reply-target-text" id="community-reply-target-text"></p>
               <p class="community-modal-current-user" id="community-reply-current-user"></p>
-              <label class="community-modal-label" for="community-reply-content-input">回复内容</label>
-              <textarea id="community-reply-content-input" class="community-modal-textarea" maxlength="2000" placeholder="请输入回复内容"></textarea>
+              <label class="community-modal-label" for="community-reply-content-input" data-i18n="community.replyLabel">回复内容</label>
+              <textarea id="community-reply-content-input" class="community-modal-textarea" maxlength="2000" placeholder="请输入回复内容" data-i18n-placeholder="community.replyPlaceholder"></textarea>
               <div class="community-modal-actions">
-                <button type="button" class="form-submit-btn community-btn-ghost" id="community-reply-cancel-btn">取消</button>
-                <button type="button" class="form-submit-btn" id="community-reply-submit-btn">发布评论</button>
+                <button type="button" class="form-submit-btn community-btn-ghost" id="community-reply-cancel-btn" data-i18n="community.replyCancel">取消</button>
+                <button type="button" class="form-submit-btn" id="community-reply-submit-btn" data-i18n="community.submitReply">发布评论</button>
               </div>
             </div>
           </div>
@@ -904,9 +850,9 @@
       <!-- 院校详情层（覆盖在主内容区之上） -->
       <div class="school-detail-overlay" id="school-detail-overlay">
         <div class="school-detail-header" style="-webkit-app-region: no-drag;">
-          <button class="school-detail-back" id="school-detail-back" type="button">返回</button>
+          <button class="school-detail-back" id="school-detail-back" type="button" data-i18n="schoolDetail.back">返回</button>
           <h1 class="school-detail-title" id="school-detail-title"></h1>
-          <button class="school-detail-star" id="school-detail-star" title="收藏">
+          <button class="school-detail-star" id="school-detail-star" title="收藏" data-i18n-title="uniDb.favorite">
             <svg class="star-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </button>
@@ -948,13 +894,13 @@
           <p class="usage-guide-desc" id="usage-guide-desc"></p>
           <div class="usage-guide-progress" id="usage-guide-progress"></div>
           <div class="usage-guide-actions">
-            <button type="button" class="usage-guide-skip" id="usage-guide-skip">跳过指南，直接开始~</button>
-            <button type="button" class="usage-guide-btn usage-guide-prev" id="usage-guide-prev">上一步</button>
-            <button type="button" class="usage-guide-btn usage-guide-next" id="usage-guide-next">下一步</button>
-            <button type="button" class="usage-guide-btn usage-guide-done" id="usage-guide-done" style="display: none;">完成</button>
+            <button type="button" class="usage-guide-skip" id="usage-guide-skip" data-i18n="guide.skip">跳过指南，直接开始~</button>
+            <button type="button" class="usage-guide-btn usage-guide-prev" id="usage-guide-prev" data-i18n="guide.prev">上一步</button>
+            <button type="button" class="usage-guide-btn usage-guide-next" id="usage-guide-next" data-i18n="guide.next">下一步</button>
+            <button type="button" class="usage-guide-btn usage-guide-done" id="usage-guide-done" style="display: none;" data-i18n="guide.done">完成</button>
             <label class="usage-guide-no-more" id="usage-guide-no-more-wrap" style="display: none;">
               <input type="checkbox" id="usage-guide-no-more" checked>
-              <span>不再出现</span>
+              <span data-i18n="guide.noMore">不再出现</span>
             </label>
           </div>
         </div>
@@ -963,7 +909,7 @@
       <!-- 设置 -->
       <section class="page" id="page-settings">
         <div class="page-header">
-          <h1 class="page-title">设置</h1>
+          <h1 class="page-title" data-i18n="page.settings.title">设置</h1>
           <p class="page-subtitle">Settings</p>
         </div>
         <div class="page-body">
@@ -984,45 +930,45 @@
                 <button class="settings-profile-card-clickable" id="settings-profile-trigger" data-settings-route="profile" type="button">
                   <div class="settings-profile-meta">
                     <p class="settings-profile-name">测试用户</p>
-                    <p class="settings-profile-tip">点击查看并编辑个人信息</p>
+                    <p class="settings-profile-tip" data-i18n="settings.viewEditProfile">点击查看并编辑个人信息</p>
                   </div>
                 </button>
                 <div class="settings-profile-actions">
-                  <button class="settings-save-btn" id="settings-account-primary-btn" type="button">登录 / 注册</button>
-                  <button class="settings-cancel-btn" id="settings-account-logout-btn" type="button" hidden>退出登录</button>
+                  <button class="settings-save-btn" id="settings-account-primary-btn" type="button" data-i18n="settings.login">登录 / 注册</button>
+                  <button class="settings-cancel-btn" id="settings-account-logout-btn" type="button" hidden data-i18n="settings.logout">退出登录</button>
                 </div>
               </div>
 
               <section class="settings-subview" id="settings-subview-profile">
                 <div class="settings-detail-card settings-form-card">
                   <div class="settings-form-card-header">
-                    <h3 class="settings-subview-title">个人信息</h3>
-                    <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden>编辑</button>
+                    <h3 class="settings-subview-title" data-i18n="settings.profileTitle">个人信息</h3>
+                    <button class="settings-edit-btn" id="settings-edit-btn" type="button" hidden data-i18n="settings.edit">编辑</button>
                   </div>
                   <form class="settings-profile-form" id="settings-profile-form">
                     <label class="settings-form-row">
-                      <span class="settings-form-label">昵称</span>
-                      <input class="settings-form-input" id="settings-profile-nickname" name="nickname" type="text" maxlength="40" placeholder="请输入昵称">
+                      <span class="settings-form-label" data-i18n="settings.profileNickname">昵称</span>
+                      <input class="settings-form-input" id="settings-profile-nickname" name="nickname" type="text" maxlength="40" placeholder="请输入昵称" data-i18n-placeholder="settings.profileNicknamePlaceholder">
                     </label>
                     <label class="settings-form-row">
-                      <span class="settings-form-label">性别</span>
-                      <input class="settings-form-input" id="settings-profile-gender" name="gender" type="text" placeholder="请输入性别">
+                      <span class="settings-form-label" data-i18n="settings.profileGender">性别</span>
+                      <input class="settings-form-input" id="settings-profile-gender" name="gender" type="text" placeholder="请输入性别" data-i18n-placeholder="settings.profileGenderPlaceholder">
                     </label>
                     <label class="settings-form-row">
-                      <span class="settings-form-label">手机</span>
-                      <input class="settings-form-input" id="settings-profile-phone" name="phone" type="text" placeholder="请输入手机号">
+                      <span class="settings-form-label" data-i18n="settings.profilePhone">手机</span>
+                      <input class="settings-form-input" id="settings-profile-phone" name="phone" type="text" placeholder="请输入手机号" data-i18n-placeholder="settings.profilePhonePlaceholder">
                     </label>
                     <label class="settings-form-row">
-                      <span class="settings-form-label">邮箱</span>
-                      <input class="settings-form-input" id="settings-profile-email" name="email" type="text" placeholder="请输入邮箱地址">
+                      <span class="settings-form-label" data-i18n="settings.profileEmail">邮箱</span>
+                      <input class="settings-form-input" id="settings-profile-email" name="email" type="text" placeholder="请输入邮箱地址" data-i18n-placeholder="settings.profileEmailPlaceholder">
                     </label>
                     <label class="settings-form-row">
-                      <span class="settings-form-label">地区</span>
-                      <input class="settings-form-input" id="settings-profile-region" name="region" type="text" placeholder="请输入地区">
+                      <span class="settings-form-label" data-i18n="settings.profileRegion">地区</span>
+                      <input class="settings-form-input" id="settings-profile-region" name="region" type="text" placeholder="请输入地区" data-i18n-placeholder="settings.profileRegionPlaceholder">
                     </label>
                     <div class="settings-form-actions" id="settings-form-actions" hidden>
-                      <button class="settings-save-btn" id="settings-profile-save" type="submit">保存</button>
-                      <button class="settings-cancel-btn" id="settings-profile-cancel" type="button">取消</button>
+                      <button class="settings-save-btn" id="settings-profile-save" type="submit" data-i18n="settings.save">保存</button>
+                      <button class="settings-cancel-btn" id="settings-profile-cancel" type="button" data-i18n="settings.cancel">取消</button>
                     </div>
                   </form>
                 </div>
@@ -1030,32 +976,42 @@
 
               <div class="settings-item-card settings-nav-item" id="settings-night-mode-item">
                 <label class="settings-item">
-                  <span class="settings-item-label">夜间模式 Night Mode</span>
+                  <span class="settings-item-label" data-i18n="settings.nightMode">夜间模式</span>
                   <span class="settings-toggle">
                     <input type="checkbox" id="night-mode-toggle" aria-label="夜间模式">
                   </span>
                 </label>
               </div>
 
+              <div class="settings-item-card settings-nav-item" id="settings-language-item">
+                <label class="settings-item">
+                  <span class="settings-item-label" data-i18n="settings.language">语言选择</span>
+                  <span class="settings-lang-hint" id="settings-lang-hint"></span>
+                  <span class="settings-toggle">
+                    <input type="checkbox" id="language-toggle" aria-label="Language">
+                  </span>
+                </label>
+              </div>
+
               <div class="settings-item-card settings-certify-card" id="settings-certify-item">
                 <button type="button" class="settings-certify-header" id="settings-certify-trigger">
-                  <span class="settings-item-label">账户认证 Account Verification</span>
-                  <span class="settings-certify-status" id="settings-certify-status">未认证</span>
+                  <span class="settings-item-label" data-i18n="settings.certify">账户认证</span>
+                  <span class="settings-certify-status" id="settings-certify-status" data-i18n="settings.notCertified">未认证</span>
                 </button>
                 <div class="settings-certify-body" id="settings-certify-body" hidden>
                   <div class="settings-certify-input-row">
-                    <input id="settings-certify-code" class="settings-certify-input" type="text" placeholder="请输入邀请码" autocomplete="off">
+                    <input id="settings-certify-code" class="settings-certify-input" type="text" placeholder="请输入邀请码" autocomplete="off" data-i18n-placeholder="settings.certifyPlaceholder">
                     <button type="button" class="settings-certify-hint-btn" id="settings-certify-hint-btn" title="输入邀请码可认证为「认证学长/学姐」" aria-label="帮助">?</button>
                   </div>
-                  <button id="settings-certify-submit" class="form-submit-btn settings-certify-btn" type="button">认证</button>
+                  <button id="settings-certify-submit" class="form-submit-btn settings-certify-btn" type="button" data-i18n="settings.certifyBtn">认证</button>
                 </div>
-                <div class="settings-certify-guest-hint" id="settings-certify-guest-hint" hidden>
+                <div class="settings-certify-guest-hint" id="settings-certify-guest-hint" hidden data-i18n="settings.certifyGuestHint">
                   请先登录后使用认证功能
                 </div>
               </div>
 
               <button class="settings-item-card settings-item-button settings-nav-item" id="settings-about-trigger" data-settings-route="about" type="button">
-                <span class="settings-item-label">关于</span>
+                <span class="settings-item-label" data-i18n="settings.about">关于</span>
               </button>
             </div>
 
@@ -1063,11 +1019,11 @@
               <section class="settings-subview" id="settings-subview-about">
                 <div class="settings-detail-card settings-info-card">
                   <div class="settings-detail-row">
-                    <span class="settings-detail-key">当前版本</span>
+                    <span class="settings-detail-key" data-i18n="settings.aboutVersion">当前版本</span>
                     <span class="settings-detail-value">v0.0.1</span>
                   </div>
                   <div class="settings-detail-row">
-                    <span class="settings-detail-key">联系邮箱</span>
+                    <span class="settings-detail-key" data-i18n="settings.aboutEmail">联系邮箱</span>
                     <span class="settings-detail-value">2026@m.scnu.edu.cn</span>
                   </div>
                 </div>
@@ -1078,6 +1034,39 @@
       </section>
 
     </main>
+  </div>
+
+  <div class="application-case-modal" id="application-case-modal" aria-hidden="true">
+    <div class="application-case-modal-card" role="dialog" aria-modal="true" aria-labelledby="application-case-detail-title">
+      <div class="application-case-modal-topbar">
+        <button type="button" class="application-case-modal-close" id="application-case-modal-close" aria-label="关闭">×</button>
+      </div>
+      <div class="application-case-modal-scroll">
+        <div class="application-case-modal-header">
+          <p class="application-case-modal-kicker" id="application-case-detail-kicker"></p>
+          <h3 class="application-case-modal-title" id="application-case-detail-title"></h3>
+          <p class="application-case-modal-subtitle" id="application-case-detail-subtitle"></p>
+        </div>
+        <div class="application-case-modal-body">
+          <section class="application-case-detail-section">
+            <h4 class="application-case-detail-section-title" data-i18n="caseDetail.overview">背景总览</h4>
+            <div class="application-case-detail-grid" id="application-case-detail-overview"></div>
+          </section>
+          <section class="application-case-detail-section">
+            <h4 class="application-case-detail-section-title" data-i18n="caseDetail.tests">标化成绩</h4>
+            <div class="application-case-detail-grid" id="application-case-detail-tests"></div>
+          </section>
+          <section class="application-case-detail-section">
+            <h4 class="application-case-detail-section-title" data-i18n="caseDetail.softBg">软背景画像</h4>
+            <div class="application-case-detail-grid" id="application-case-detail-soft"></div>
+          </section>
+          <section class="application-case-detail-section">
+            <h4 class="application-case-detail-section-title" data-i18n="caseDetail.offerList">Offer 列表</h4>
+            <div class="application-case-detail-offers" id="application-case-detail-offers"></div>
+          </section>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="./app.js"></script>

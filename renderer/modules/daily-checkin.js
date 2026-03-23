@@ -1,5 +1,6 @@
 import { showToast, escapeHtml, toDateKey, toMonthKey, formatDateLabel } from './utils.js'
-import { DAILY_MAX_TASKS, DAILY_TASK_COLORS, DAILY_GRID_FILL_ORDER } from './state.js'
+import { DAILY_MAX_TASKS, DAILY_TASK_COLORS, DAILY_GRID_FILL_ORDER, getTaskColors } from './state.js'
+import { t } from './i18n.js'
 
 let dailyCurrentMonth = new Date()
 let dailySelectedDateKey = ''
@@ -111,9 +112,9 @@ function renderDailyTaskList() {
         <span class="daily-checkin-task-text">${escapeHtml(item.content || '')}</span>
       </div>
       <div class="daily-checkin-task-opbar">
-        <button class="daily-checkin-task-icon-btn task-op-back" type="button" title="返回" aria-label="返回">↩</button>
-        <button class="daily-checkin-task-icon-btn task-op-complete" type="button" title="完成" aria-label="完成">${item.completed ? '↺' : '✓'}</button>
-        <button class="daily-checkin-task-icon-btn task-op-delete" type="button" title="删除" aria-label="删除">🗑</button>
+        <button class="daily-checkin-task-icon-btn task-op-back" type="button" title="${t('daily.taskBack')}" aria-label="${t('daily.taskBack')}">↩</button>
+        <button class="daily-checkin-task-icon-btn task-op-complete" type="button" title="${t('daily.taskComplete')}" aria-label="${t('daily.taskComplete')}">${item.completed ? '↺' : '✓'}</button>
+        <button class="daily-checkin-task-icon-btn task-op-delete" type="button" title="${t('daily.taskDelete')}" aria-label="${t('daily.taskDelete')}">🗑</button>
       </div>
     `
     row.addEventListener('click', () => { if (dailyActiveTaskIndex === idx) return; dailyActiveTaskIndex = idx; renderDailyTaskList() })
@@ -135,7 +136,17 @@ function renderDailyCalendar() {
   const monthTitle = document.getElementById('daily-checkin-month-title')
   const grid = document.getElementById('daily-checkin-calendar-grid')
   if (!monthTitle || !grid) return
-  monthTitle.textContent = `${dailyCurrentMonth.getFullYear()}年 ${dailyCurrentMonth.getMonth() + 1}月`
+  monthTitle.textContent = t('daily.monthTitle', dailyCurrentMonth.getFullYear(), t('month.' + (dailyCurrentMonth.getMonth() + 1)))
+
+  const weekdayContainer = document.getElementById('daily-checkin-weekday-labels')
+  if (weekdayContainer) {
+    const weekdayNames = t('daily.weekdays')
+    const spans = weekdayContainer.querySelectorAll('span')
+    if (Array.isArray(weekdayNames) && spans.length === weekdayNames.length) {
+      spans.forEach((span, i) => { span.textContent = weekdayNames[i] })
+    }
+  }
+
   grid.innerHTML = ''
   const { days } = monthRangeDays(dailyCurrentMonth)
   days.forEach((day) => {
@@ -176,7 +187,7 @@ async function persistDailyTasks() {
     .filter((item) => item.content).slice(0, DAILY_MAX_TASKS)
   if (!window.api?.dailyCheckinSaveByDate) return
   const res = await window.api.dailyCheckinSaveByDate(dailySelectedDateKey, payload)
-  if (!res?.success) { showToast(res?.error || '保存失败，请稍后重试', 'error'); return }
+  if (!res?.success) { showToast(res?.error || t('daily.saveFail'), 'error'); return }
   await loadDailyMonthData(dailyCurrentMonth); await loadDailyTasksByDate(dailySelectedDateKey)
   renderDailyCalendar(); renderDailyTaskList()
 }
@@ -196,7 +207,7 @@ function initDailyTaskModal() {
   const modalConfirm = document.getElementById('daily-checkin-modal-confirm')
   if (!modal || !modalInput || !modalColor || !modalCancel || !modalConfirm) return
 
-  modalColor.innerHTML = DAILY_TASK_COLORS.map((c) => `<option value="${c.value}">${c.label}</option>`).join('')
+  modalColor.innerHTML = getTaskColors().map((c) => `<option value="${c.value}">${c.label}</option>`).join('')
 
   function closeModal() { modal.classList.remove('active'); modal.setAttribute('aria-hidden', 'true'); modalInput.value = ''; modalColor.value = DAILY_TASK_COLORS[0].value }
   function openModal(defaultColor) {
@@ -210,7 +221,7 @@ function initDailyTaskModal() {
   modalCancel.addEventListener('click', closeModal)
   modalConfirm.addEventListener('click', () => {
     const content = modalInput.value.trim()
-    if (!content) { showToast('请先填写任务内容', 'warning'); return }
+    if (!content) { showToast(t('daily.taskEmpty'), 'warning'); return }
     if (dailyTaskItems.length >= DAILY_MAX_TASKS) { closeModal(); return }
     dailyTaskItems.push({ content, color: String(modalColor.value || DAILY_TASK_COLORS[0].value).toUpperCase(), completed: false })
     closeModal(); renderDailyTaskList(); scheduleDailyTasksSave(true)
@@ -268,13 +279,13 @@ export async function initDailyCheckinPage() {
       confirmModal?.setAttribute('aria-hidden', 'true')
       if (!window.api?.dailyCheckinClearAll) return
       const res = await window.api.dailyCheckinClearAll()
-      if (!res?.success) { showToast(res?.error || '清空失败', 'error'); return }
+      if (!res?.success) { showToast(res?.error || t('daily.clearFail'), 'error'); return }
       dailyTaskItems = []
       dailyActiveTaskIndex = -1
       await loadDailyMonthData(dailyCurrentMonth)
       renderDailyCalendar()
       renderDailyTaskList()
-      showToast('已清空全部日程', 'success')
+      showToast(t('daily.cleared'), 'success')
     })
 
     prevBtn?.addEventListener('click', async () => {

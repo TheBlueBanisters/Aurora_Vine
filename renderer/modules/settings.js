@@ -1,4 +1,5 @@
 import { showToast, waitMs } from './utils.js'
+import { t } from './i18n.js'
 import {
   isAccountMode,
   isGuestMode,
@@ -15,10 +16,10 @@ function updateProfileTipText(profileExpanded = false) {
   const profileTip = document.querySelector('.settings-profile-tip')
   if (!profileTip) return
   profileTip.textContent = profileExpanded
-    ? '收起'
+    ? t('settings.collapse')
     : (isAccountMode()
-      ? '点击查看个人资料'
-      : '当前身份可继续浏览，登录后将绑定到账号')
+      ? t('settings.viewProfile')
+      : t('settings.guestHint'))
 }
 
 export function updateSettingsCertifyState() {
@@ -42,10 +43,10 @@ export function updateSettingsCertifyState() {
   const isCertified = !!getAuthState().user?.is_certified
   if (isCertified) {
     certifyBody.hidden = true
-    certifyStatus.textContent = '已认证'
+    certifyStatus.textContent = t('settings.certified')
   } else {
     certifyBody.hidden = true
-    certifyStatus.textContent = '未认证'
+    certifyStatus.textContent = t('settings.notCertified')
     if (codeInput) codeInput.value = ''
   }
 }
@@ -66,7 +67,7 @@ export function updateSettingsAccountState() {
   const profileName = document.querySelector('.settings-profile-name')
   const avatarWrap = document.querySelector('.settings-profile-avatar-wrap')
 
-  if (primaryBtn) primaryBtn.textContent = isAccountMode() ? '切换账号' : '登录 / 注册'
+  if (primaryBtn) primaryBtn.textContent = isAccountMode() ? t('settings.switchAccount') : t('settings.login')
   if (logoutBtn) logoutBtn.hidden = !isAccountMode()
   if (profileAvatar) {
     const initial = getCurrentUserDisplayName().slice(0, 1) || 'A'
@@ -143,7 +144,7 @@ function bindSettingsPanel(settingsNodes, refreshAuthBoundUI) {
       if (profileForm.elements[field]) profileForm.elements[field].disabled = !editable
     })
     if (formActions) formActions.hidden = !editable
-    editBtn.textContent = '编辑'
+    editBtn.textContent = t('settings.edit')
   }
 
   setProfileEditable(false)
@@ -236,7 +237,7 @@ function bindSettingsPanel(settingsNodes, refreshAuthBoundUI) {
     const latestProfile = collectProfileForm(profileForm)
     if (isAccountMode() && latestProfile.nickname && window.api?.authUpdateNickname) {
       const res = await window.api.authUpdateNickname(latestProfile.nickname)
-      if (!res?.success) { showToast(res?.error || '更新昵称失败，请稍后重试', 'error'); return }
+      if (!res?.success) { showToast(res?.error || t('settings.nickUpdateFail'), 'error'); return }
       const authRes = await window.api.authGetCurrentUser()
       if (authRes) applyAuthState(authRes)
     }
@@ -265,13 +266,13 @@ export function initSettingsPanel(refreshAuthBoundUI) {
   const logoutBtn = document.getElementById('settings-account-logout-btn')
 
   primaryBtn?.addEventListener('click', () => {
-    openAuthGate('login', isGuestMode() ? '登录或注册后即可把当前使用内容绑定到账号。' : '')
+    openAuthGate('login', isGuestMode() ? t('settings.loginGateHint') : '')
   })
   logoutBtn?.addEventListener('click', async () => {
     if (!window.api?.authLogout) return
     const res = await window.api.authLogout()
-    if (!res?.success) { showToast(res?.error || '退出登录失败，请稍后重试', 'error'); return }
-    applyAuthStateAndRefresh(res, { previousMode: getAuthState().mode, successToast: '已退出登录' })
+    if (!res?.success) { showToast(res?.error || t('settings.logoutFail'), 'error'); return }
+    applyAuthStateAndRefresh(res, { previousMode: getAuthState().mode, successToast: t('settings.logoutSuccess') })
   })
 
   const profileAvatar = document.getElementById('settings-profile-avatar')
@@ -285,24 +286,24 @@ export function initSettingsPanel(refreshAuthBoundUI) {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file || !window.api?.authUploadAvatar) return
-    if (!file.type.match(/^image\/(jpeg|png|webp)$/i)) { showToast('仅支持 JPEG、PNG、WebP 格式', 'warning'); return }
-    if (file.size > 512 * 1024) { showToast('图片过大，请选择 500KB 以内的图片', 'warning'); return }
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/i)) { showToast(t('settings.avatarFormatError'), 'warning'); return }
+    if (file.size > 512 * 1024) { showToast(t('settings.avatarSizeError'), 'warning'); return }
     return new Promise((resolve) => {
       const reader = new FileReader()
       reader.onload = async () => {
         const base64 = reader.result
-        if (typeof base64 !== 'string') { showToast('图片读取失败', 'error'); resolve(); return }
+        if (typeof base64 !== 'string') { showToast(t('settings.avatarReadFail'), 'error'); resolve(); return }
         const res = await window.api.authUploadAvatar(base64)
-        if (!res?.success) { showToast(res?.error || '头像上传失败', 'error') }
+        if (!res?.success) { showToast(res?.error || t('settings.avatarUploadFail'), 'error') }
         else {
           const authRes = await window.api.authGetCurrentUser()
           if (authRes) applyAuthState(authRes)
           updateSettingsAccountState()
-          showToast('头像已更新', 'success')
+          showToast(t('settings.avatarUpdated'), 'success')
         }
         resolve()
       }
-      reader.onerror = () => { showToast('图片读取失败', 'error'); resolve() }
+      reader.onerror = () => { showToast(t('settings.avatarReadFail'), 'error'); resolve() }
       reader.readAsDataURL(file)
     })
   })
@@ -322,14 +323,14 @@ export function initSettingsPanel(refreshAuthBoundUI) {
   certifySubmit?.addEventListener('click', async () => {
     if (!window.api?.authCertify) return
     const inviteCode = certifyCodeInput?.value?.trim() || ''
-    if (!inviteCode) { showToast('请输入邀请码', 'warning'); return }
+    if (!inviteCode) { showToast(t('settings.certifyCodeEmpty'), 'warning'); return }
     const gender = getProfileInfo().gender || ''
     const res = await window.api.authCertify({ inviteCode, gender })
-    if (!res?.success) { showToast(res?.error || '认证失败', 'error'); return }
+    if (!res?.success) { showToast(res?.error || t('settings.certifyFail'), 'error'); return }
     applyAuthState(res)
     updateSettingsCertifyState()
     updateSettingsAvatarBadge()
-    showToast('认证成功', 'success')
+    showToast(t('settings.certifySuccess'), 'success')
   })
 
   updateSettingsAccountState()

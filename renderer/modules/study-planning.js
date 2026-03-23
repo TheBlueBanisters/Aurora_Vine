@@ -1,6 +1,7 @@
 import { showToast, escapeHtml } from './utils.js'
 import { DAILY_TASK_COLORS } from './state.js'
 import { parseStudyPlanText, expandDateRange } from './study-planning-parser.js'
+import { t } from './i18n.js'
 
 let spInitialized = false
 let spEntries = []
@@ -56,7 +57,7 @@ function renderOutlinePanel() {
           <span class="study-planning-entry-color" style="background:${entry.color}"></span>
           ${escapeHtml(entry.title)}
         </span>
-        <button class="study-planning-entry-delete" type="button" title="删除该条目" aria-label="删除该条目">✕</button>
+        <button class="study-planning-entry-delete" type="button" title="${t('studyPlanning.deleteEntry')}" aria-label="${t('studyPlanning.deleteEntry')}">✕</button>
       </div>
       ${descHtml}
       <div class="study-planning-entry-tasks">${tasksHtml}</div>
@@ -65,10 +66,10 @@ function renderOutlinePanel() {
     el.querySelector('.study-planning-entry-delete')?.addEventListener('click', async () => {
       if (!window.api?.studyPlanDelete) return
       const res = await window.api.studyPlanDelete(entry.id)
-      if (!res?.success) { showToast(res?.error || '删除失败', 'error'); return }
+      if (!res?.success) { showToast(res?.error || t('studyPlanning.deleteFail'), 'error'); return }
       await loadEntries()
       renderOutlinePanel()
-      showToast('已删除该规划条目', 'success')
+      showToast(t('studyPlanning.deleted'), 'success')
     })
 
     listEl.appendChild(el)
@@ -77,7 +78,7 @@ function renderOutlinePanel() {
 
 async function distributeTasksToDailyCheckin(entries) {
   if (!window.api?.dailyCheckinAppendTasks) {
-    showToast('打卡接口不可用', 'error')
+    showToast(t('studyPlanning.checkinUnavailable'), 'error')
     return 0
   }
 
@@ -108,20 +109,20 @@ function initCustomPanel() {
 
   submitBtn.addEventListener('click', async () => {
     const text = textarea.value.trim()
-    if (!text) { showToast('请先输入规划内容', 'warning'); return }
+    if (!text) { showToast(t('studyPlanning.inputEmpty'), 'warning'); return }
 
     const { entries: parsed, errors } = parseStudyPlanText(text)
 
     if (errors.length > 0 && parsed.length === 0) {
-      showToast('输入内容格式有误：\n' + errors.join('\n'), 'error')
+      showToast(t('studyPlanning.formatError') + errors.join('\n'), 'error')
       return
     }
 
     if (errors.length > 0) {
-      showToast('部分内容格式有误已跳过：\n' + errors.join('\n'), 'warning')
+      showToast(t('studyPlanning.partialError') + errors.join('\n'), 'warning')
     }
 
-    if (parsed.length === 0) { showToast('未识别到有效的规划条目（需以 # 开头）', 'warning'); return }
+    if (parsed.length === 0) { showToast(t('studyPlanning.noEntries'), 'warning'); return }
 
     const existingCount = spEntries.length
     const enriched = parsed.map((entry, idx) => ({
@@ -129,12 +130,12 @@ function initCustomPanel() {
       color: pickColorByIndex(existingCount + idx)
     }))
 
-    if (!window.api?.studyPlanSave) { showToast('存储接口不可用', 'error'); return }
+    if (!window.api?.studyPlanSave) { showToast(t('studyPlanning.storageUnavailable'), 'error'); return }
 
     submitBtn.disabled = true
     try {
       const saveRes = await window.api.studyPlanSave(enriched)
-      if (!saveRes?.success) { showToast(saveRes?.error || '保存失败', 'error'); return }
+      if (!saveRes?.success) { showToast(saveRes?.error || t('studyPlanning.saveFail'), 'error'); return }
 
       const appended = await distributeTasksToDailyCheckin(enriched)
 
@@ -142,10 +143,10 @@ function initCustomPanel() {
       renderOutlinePanel()
       textarea.value = ''
 
-      showToast(`已添加 ${enriched.length} 条规划，分发了 ${appended} 条任务到每日打卡`, 'success')
+      showToast(t('studyPlanning.submitSuccess', enriched.length, appended), 'success')
     } catch (err) {
       console.error('study-planning submit error:', err)
-      showToast('操作失败，请稍后重试', 'error')
+      showToast(t('studyPlanning.submitFail'), 'error')
     } finally {
       submitBtn.disabled = false
     }

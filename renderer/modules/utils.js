@@ -1,5 +1,6 @@
 import NotifyX from 'notifyx'
 import 'notifyx/style.css'
+import { t, getLang } from './i18n.js'
 
 export function showToast(message, type = 'info') {
   const options = { position: 'top-center', duration: 3000, showProgress: false }
@@ -57,8 +58,14 @@ export function formatDateTime(dateTimeText) {
 export function formatDateLabel(dateKey) {
   const date = parseDateKey(dateKey)
   if (!date) return dateKey
-  const weekNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${weekNames[date.getDay()]}`
+  const weekNames = t('daily.weekdaysFull')
+  const weekday = Array.isArray(weekNames) ? weekNames[date.getDay()] : ''
+  if (getLang() === 'en') {
+    const monthNames = t('daily.monthNameShort')
+    const monthLabel = Array.isArray(monthNames) ? monthNames[date.getMonth()] : String(date.getMonth() + 1)
+    return `${weekday}, ${monthLabel} ${date.getDate()}, ${date.getFullYear()}`
+  }
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${weekday}`
 }
 
 export function renderAuthorWithBadgeAndAvatar(authorName, isCertified, authorId, hasAvatar) {

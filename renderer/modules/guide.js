@@ -1,4 +1,4 @@
-import { USAGE_GUIDE_STEPS, USAGE_GUIDE_FINAL_STEP, USAGE_GUIDE_NO_MORE_KEY } from './state.js'
+import { getUsageGuideSteps, getUsageGuideFinalStep, USAGE_GUIDE_NO_MORE_KEY } from './state.js'
 
 let usageGuideCurrentStep = 0
 let usageGuideManualReplay = false
@@ -46,13 +46,14 @@ function runUsageGuideStep(stepIndex) {
   const noMoreWrap = document.getElementById('usage-guide-no-more-wrap')
   const skipBtn = document.getElementById('usage-guide-skip')
   const spotlight = document.getElementById('usage-guide-spotlight')
-  const totalSteps = USAGE_GUIDE_STEPS.length
+  const steps = getUsageGuideSteps()
+  const totalSteps = steps.length
   const isFinal = stepIndex >= totalSteps
 
   if (!overlay || !titleEl || !descEl) return
 
   if (isFinal) {
-    const step = USAGE_GUIDE_FINAL_STEP
+    const step = getUsageGuideFinalStep()
     titleEl.textContent = step.title
     descEl.textContent = step.desc
     const usageGuideNav = document.getElementById('nav-item-usage-guide')
@@ -70,7 +71,7 @@ function runUsageGuideStep(stepIndex) {
     if (skipBtn) skipBtn.style.display = 'none'
     progressEl.innerHTML = ''
   } else {
-    const step = USAGE_GUIDE_STEPS[stepIndex]
+    const step = steps[stepIndex]
     const targetNav = document.querySelector(`.nav-item[data-page="${step.pageId}"]`)
     titleEl.textContent = step.title
     descEl.textContent = step.desc
@@ -137,7 +138,7 @@ export function initUsageGuide() {
     if (usageGuideCurrentStep > 0) { usageGuideCurrentStep--; runUsageGuideStep(usageGuideCurrentStep) }
   })
   nextBtn.addEventListener('click', () => {
-    if (usageGuideCurrentStep < USAGE_GUIDE_STEPS.length) { usageGuideCurrentStep++; runUsageGuideStep(usageGuideCurrentStep) }
+    if (usageGuideCurrentStep < getUsageGuideSteps().length) { usageGuideCurrentStep++; runUsageGuideStep(usageGuideCurrentStep) }
   })
   doneBtn.addEventListener('click', () => {
     const saveNoMore = noMoreCheckbox.checked && !usageGuideManualReplay
@@ -150,13 +151,13 @@ export function initUsageGuide() {
   })
   window.addEventListener('resize', () => {
     if (!overlay.classList.contains('active')) return
-    const totalSteps = USAGE_GUIDE_STEPS.length
-    const isFinal = usageGuideCurrentStep >= totalSteps
+    const resizeSteps = getUsageGuideSteps()
+    const isFinal = usageGuideCurrentStep >= resizeSteps.length
     if (isFinal) {
       const usageGuideNav = document.getElementById('nav-item-usage-guide')
       if (usageGuideNav) { positionUsageGuideSpotlight(usageGuideNav); positionUsageGuideCard(usageGuideNav) }
     } else {
-      const step = USAGE_GUIDE_STEPS[usageGuideCurrentStep]
+      const step = resizeSteps[usageGuideCurrentStep]
       const targetNav = document.querySelector(`.nav-item[data-page="${step.pageId}"]`)
       if (targetNav) { positionUsageGuideSpotlight(targetNav); positionUsageGuideCard(targetNav) }
     }

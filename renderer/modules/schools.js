@@ -1,3 +1,4 @@
+import { t } from './i18n.js'
 import { escapeHtml } from './utils.js'
 import { PAGE_SIZE } from './state.js'
 import { isFavorite, toggleFavorite, getTargetSchools } from './storage.js'
@@ -10,7 +11,7 @@ let explorerKeyword = ''
 let explorerRegion = 'all'
 let explorerRanking = 'qs'
 let explorerSearchTimer = null
-let detailBackPage = 'university-explorer'
+let detailBackPage = 'university-database'
 let currentDetailSchool = null
 const schoolAssetDataUrlCache = new Map()
 
@@ -76,14 +77,14 @@ async function getSchoolAssetDataUrl(rankingQs, filename) {
 function formatProgramTuition(value) {
   const amount = Number(value)
   if (!Number.isFinite(amount)) return ''
-  return `约 ${amount.toLocaleString('zh-CN')}`
+  return t('schoolDetail.tuitionPrefix', amount.toLocaleString())
 }
 
 function formatProgramDifficulty(value) {
   const score = Number(value)
   if (!Number.isFinite(score)) return ''
   const formatted = Number.isInteger(score) ? String(score) : score.toFixed(1)
-  return `难度 ${formatted}/10`
+  return t('schoolDetail.difficulty', formatted)
 }
 
 function buildProgramPills(program) {
@@ -109,8 +110,8 @@ function renderProgramsLoading() {
   programsEl.innerHTML = `
     <div class="school-detail-section-block school-programs-section">
       <div class="school-programs-heading">
-        <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
-        <p class="school-programs-subtitle">正在加载该院校的专业数据...</p>
+        <h3 class="school-detail-section-title">${t('schoolDetail.programs')}</h3>
+        <p class="school-programs-subtitle">${t('schoolDetail.programsLoading')}</p>
       </div>
     </div>`
 }
@@ -121,7 +122,7 @@ function renderProgramsSection(items = [], error = '') {
     programsEl.innerHTML = `
       <div class="school-detail-section-block school-programs-section">
         <div class="school-programs-heading">
-          <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
+          <h3 class="school-detail-section-title">${t('schoolDetail.programs')}</h3>
           <p class="placeholder-hint">${escapeHtml(error)}</p>
         </div>
       </div>`
@@ -132,8 +133,8 @@ function renderProgramsSection(items = [], error = '') {
     programsEl.innerHTML = `
       <div class="school-detail-section-block school-programs-section">
         <div class="school-programs-heading">
-          <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
-          <p class="placeholder-hint">暂无专业数据</p>
+          <h3 class="school-detail-section-title">${t('schoolDetail.programs')}</h3>
+          <p class="placeholder-hint">${t('schoolDetail.programsNone')}</p>
         </div>
       </div>`
     return
@@ -147,20 +148,20 @@ function renderProgramsSection(items = [], error = '') {
       <details class="school-program-card">
         <summary class="school-program-summary">
           <div class="school-program-title-wrap">
-            <h4 class="school-program-title">${escapeHtml(program.program_name_cn || program.program_name_en || '未命名专业')}</h4>
+            <h4 class="school-program-title">${escapeHtml(program.program_name_cn || program.program_name_en || t('schoolDetail.programUnnamed'))}</h4>
             ${program.program_name_en ? `<p class="school-program-title-en">${escapeHtml(program.program_name_en)}</p>` : ''}
           </div>
           <div class="school-program-pills">${buildProgramPills(program)}</div>
         </summary>
         <div class="school-program-body">
           <div class="school-program-grid">
-            ${buildProgramField('学制', program.duration)}
-            ${buildProgramField('语言要求', program.language_requirement)}
-            ${buildProgramField('预估学费', tuition)}
-            ${buildProgramField('难度系数', formatProgramDifficulty(program.difficulty_score).replace(/^难度\s*/, ''))}
+            ${buildProgramField(t('schoolDetail.fieldDuration'), program.duration)}
+            ${buildProgramField(t('schoolDetail.fieldLanguage'), program.language_requirement)}
+            ${buildProgramField(t('schoolDetail.fieldTuition'), tuition)}
+            ${buildProgramField(t('schoolDetail.fieldDifficulty'), formatProgramDifficulty(program.difficulty_score).replace(/^(难度|Difficulty)\s*/i, ''))}
           </div>
-          ${summaryCn ? `<div class="school-program-copy"><h5>培养方案简述</h5><p>${escapeHtml(summaryCn)}</p></div>` : ''}
-          ${summaryEn ? `<div class="school-program-copy"><h5>Curriculum Summary</h5><p>${escapeHtml(summaryEn)}</p></div>` : ''}
+          ${summaryCn ? `<div class="school-program-copy"><h5>${t('schoolDetail.curriculumCn')}</h5><p>${escapeHtml(summaryCn)}</p></div>` : ''}
+          ${summaryEn ? `<div class="school-program-copy"><h5>${t('schoolDetail.curriculumEn')}</h5><p>${escapeHtml(summaryEn)}</p></div>` : ''}
         </div>
       </details>`
   }).join('')
@@ -169,8 +170,8 @@ function renderProgramsSection(items = [], error = '') {
     <div class="school-detail-section-block school-programs-section">
       <div class="school-programs-heading">
         <div>
-          <h3 class="school-detail-section-title">专业项目 (Programs)</h3>
-          <p class="school-programs-subtitle">共 ${items.length} 个专业，点击卡片可展开查看培养方向与要求。</p>
+          <h3 class="school-detail-section-title">${t('schoolDetail.programs')}</h3>
+          <p class="school-programs-subtitle">${t('schoolDetail.programCount', items.length)}</p>
         </div>
       </div>
       <div class="school-programs-list">${cards}</div>
@@ -189,7 +190,7 @@ function loadSchoolPrograms(school) {
     renderProgramsSection(res?.items || [], res?.error || '')
   }).catch((err) => {
     if (currentDetailSchool?.school_id !== school.school_id) return
-    renderProgramsSection([], err?.message || '专业数据加载失败')
+    renderProgramsSection([], err?.message || t('schoolDetail.programsFail'))
   })
 }
 
@@ -198,8 +199,8 @@ function renderRelatedCasesLoading() {
   relatedCasesEl.innerHTML = `
     <div class="school-detail-section-block school-related-cases-section">
       <div class="school-related-cases-heading">
-        <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
-        <p class="school-programs-subtitle">正在加载该院校的申请案例...</p>
+        <h3 class="school-detail-section-title">${t('schoolDetail.relatedCases')}</h3>
+        <p class="school-programs-subtitle">${t('schoolDetail.relatedCasesLoading')}</p>
       </div>
     </div>`
 }
@@ -210,7 +211,7 @@ function renderRelatedCases(items = [], error = '') {
     relatedCasesEl.innerHTML = `
       <div class="school-detail-section-block school-related-cases-section">
         <div class="school-related-cases-heading">
-          <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
+          <h3 class="school-detail-section-title">${t('schoolDetail.relatedCases')}</h3>
           <p class="placeholder-hint">${escapeHtml(error)}</p>
         </div>
       </div>`
@@ -221,8 +222,8 @@ function renderRelatedCases(items = [], error = '') {
     relatedCasesEl.innerHTML = `
       <div class="school-detail-section-block school-related-cases-section">
         <div class="school-related-cases-heading">
-          <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
-          <p class="placeholder-hint">暂无相关案例</p>
+          <h3 class="school-detail-section-title">${t('schoolDetail.relatedCases')}</h3>
+          <p class="placeholder-hint">${t('schoolDetail.relatedCasesNone')}</p>
         </div>
       </div>`
     return
@@ -233,8 +234,8 @@ function renderRelatedCases(items = [], error = '') {
       ? `IELTS ${item.ielts_score}`
       : Number(item.toefl_score) > 0
         ? `TOEFL ${item.toefl_score}`
-        : '语言待补强'
-    const gre = Number(item.gre_score) > 0 ? `GRE ${item.gre_score}` : 'GRE 未提供'
+        : t('schoolDetail.langWeak')
+    const gre = Number(item.gre_score) > 0 ? `GRE ${item.gre_score}` : t('schoolDetail.greNone')
     const tags = Array.isArray(item.tags) ? item.tags.slice(0, 4) : []
     const programCn = String(item.program_name_cn || '').trim() || '—'
     const programEn = String(item.program_name_en || '').trim()
@@ -242,20 +243,20 @@ function renderRelatedCases(items = [], error = '') {
       <article class="school-related-case-card" data-case-id="${item.id}">
         <div class="school-related-case-top">
           <div>
-            <p class="school-related-case-kicker">案例 #${escapeHtml(String(item.case_no || '-'))} · ${escapeHtml(item.undergrad_tier || '-')}</p>
+            <p class="school-related-case-kicker">${escapeHtml(t('schoolDetail.caseKicker', item.case_no || '-', item.undergrad_tier || '-'))}</p>
             <div class="school-related-case-program">
-              <span class="school-related-case-program-label">录取专业</span>
+              <span class="school-related-case-program-label">${t('schoolDetail.admittedProgram')}</span>
               <div class="school-related-case-program-body">
                 <p class="school-related-case-program-cn">
                   <span>${escapeHtml(programCn)}</span>
-                  <span class="school-related-case-offer-mark" title="该院校录取项目">Offer</span>
+                  <span class="school-related-case-offer-mark" title="${escapeHtml(t('schoolDetail.offerMark'))}">Offer</span>
                 </p>
                 ${programEn ? `<p class="school-related-case-program-en">${escapeHtml(programEn)}</p>` : ''}
               </div>
             </div>
           </div>
           <div class="school-related-case-score">
-            <span>背景评分</span>
+            <span>${t('schoolDetail.profileScore')}</span>
             <strong>${escapeHtml(String(item.profile_tier_score || '-'))}</strong>
           </div>
         </div>
@@ -263,7 +264,7 @@ function renderRelatedCases(items = [], error = '') {
           <span>GPA ${escapeHtml(String(item.gpa_value || '-'))}</span>
           <span>${escapeHtml(language)}</span>
           <span>${escapeHtml(gre)}</span>
-          <span>${escapeHtml(item.offer_tier || '匹配')}</span>
+          <span>${escapeHtml(item.offer_tier || t('schoolDetail.offerTierMatch'))}</span>
         </div>
         ${tags.length ? `<div class="school-related-case-tags">${tags.map((tag) => `<span class="school-related-case-tag">${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
       </article>`
@@ -273,8 +274,8 @@ function renderRelatedCases(items = [], error = '') {
     <div class="school-detail-section-block school-related-cases-section">
       <div class="school-related-cases-heading">
         <div>
-          <h3 class="school-detail-section-title">相关案例 (Related Cases)</h3>
-          <p class="school-programs-subtitle">已为该院校匹配 ${items.length} 条背景相近案例。</p>
+          <h3 class="school-detail-section-title">${t('schoolDetail.relatedCases')}</h3>
+          <p class="school-programs-subtitle">${t('schoolDetail.relatedCasesCount', items.length)}</p>
         </div>
       </div>
       <div class="school-related-cases-list">${cards}</div>
@@ -300,7 +301,7 @@ function loadRelatedCases(school) {
     renderRelatedCases(res?.items || [], res?.error || '')
   }).catch((err) => {
     if (currentDetailSchool?.school_id !== school.school_id) return
-    renderRelatedCases([], err?.message || '相关案例加载失败')
+    renderRelatedCases([], err?.message || t('schoolDetail.relatedCasesFail'))
   })
 }
 
@@ -398,7 +399,7 @@ function schoolMatchesKeyword(school, keyword) {
 }
 
 async function searchSchoolsFallback(keyword) {
-  if (!window.api?.schoolsList) return { items: [], total: 0, error: '无法加载院校数据' }
+  if (!window.api?.schoolsList) return { items: [], total: 0, error: t('uniDb.noData') }
   const res = await window.api.schoolsList(1, 1000, getExplorerFilters())
   const { items = [], error } = res || {}
   if (error) return { items: [], total: 0, error }
@@ -419,14 +420,14 @@ function renderSchoolCard(school, container, onClick) {
         <span class="school-card-name-en">${escapeHtml(stripChineseAliasSuffixFromEnglishName(school.school_name_en || ''))}</span>
       </div>
       <div class="school-card-meta-block school-card-meta-block-location">
-        <span class="school-card-meta-label">地区 (Location)</span>
+        <span class="school-card-meta-label">${t('uniDb.locationLabel')}</span>
         <span class="school-card-meta-value school-card-meta-location">${formatLocationZh(school.country_zh, school.city_zh)}</span>
       </div>
       <div class="school-card-meta-block school-card-meta-block-qs">
         <span class="school-card-meta-label">QS</span>
         <span class="school-card-meta-value school-card-meta-qs">${school.ranking_qs || '-'}</span>
       </div>
-      <button class="school-card-star ${fav ? 'favorited' : ''}" data-school-id="${school.school_id}" title="${fav ? '取消收藏' : '收藏'}" aria-label="${fav ? '取消收藏' : '收藏'}">
+      <button class="school-card-star ${fav ? 'favorited' : ''}" data-school-id="${school.school_id}" title="${fav ? t('uniDb.unfavorite') : t('uniDb.favorite')}" aria-label="${fav ? t('uniDb.unfavorite') : t('uniDb.favorite')}">
         <svg class="star-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
         <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
       </button>
@@ -443,7 +444,7 @@ function renderSchoolCard(school, container, onClick) {
     e.stopPropagation()
     const nowFav = toggleFavorite(school.school_id)
     starBtnEl.classList.toggle('favorited', nowFav)
-    starBtnEl.title = nowFav ? '取消收藏' : '收藏'
+    starBtnEl.title = nowFav ? t('uniDb.unfavorite') : t('uniDb.favorite')
     if (container.closest('#school-list-target')) loadSchoolListTarget()
   })
   if (onClick) {
@@ -530,19 +531,19 @@ function openSchoolDetail(school, fromPage) {
     window.api.schoolsGetIntro(rq).then((intro) => {
       if (intro && intro.intro && intro.intro.zh) {
         let html = '<div class="school-detail-section-block">'
-        html += '<h3 class="school-detail-section-title">院校简介 (School Introduction)</h3>'
+        html += `<h3 class="school-detail-section-title">${t('schoolDetail.intro')}</h3>`
         html += intro.intro.zh.map((p) => `<p>${escapeHtml(p)}</p>`).join('')
         if (intro.intro.en && intro.intro.en.length) html += intro.intro.en.map((p) => `<p>${escapeHtml(p)}</p>`).join('')
         html += '</div>'
         if (intro.contact) {
           html += '<div class="school-detail-section-block">'
-          html += '<h3 class="school-detail-section-title">联系方式 (Contact)</h3>'
+          html += `<h3 class="school-detail-section-title">${t('schoolDetail.contact')}</h3>`
           html += `<p class="school-detail-contact"><a href="${escapeHtml(intro.contact)}" target="_blank" rel="noopener">${escapeHtml(intro.contact)}</a></p>`
           html += '</div>'
         }
         if (intro.address && (intro.address.zh || intro.address.en)) {
           html += '<div class="school-detail-section-block">'
-          html += '<h3 class="school-detail-section-title">院校地址 (Address)</h3>'
+          html += `<h3 class="school-detail-section-title">${t('schoolDetail.address')}</h3>`
           const zh = intro.address.zh ? escapeHtml(intro.address.zh) : ''
           const en = intro.address.en ? escapeHtml(intro.address.en) : ''
           html += '<p class="school-detail-address">'
@@ -550,7 +551,7 @@ function openSchoolDetail(school, fromPage) {
           html += '</p></div>'
         }
         introEl.innerHTML = html
-      } else introEl.innerHTML = '<p class="placeholder-hint">暂无院校介绍</p>'
+      } else introEl.innerHTML = `<p class="placeholder-hint">${t('schoolDetail.noIntro')}</p>`
     })
   } else introEl.innerHTML = ''
 
@@ -587,7 +588,7 @@ export function closeSchoolDetail() {
   overlay.classList.remove('active')
   document.body.classList.remove('school-detail-open')
   resetSchoolViewScroll()
-  if (detailBackPage === 'university-explorer') loadSchoolListExplorer()
+  if (detailBackPage === 'university-database') loadSchoolListExplorer()
   if (detailBackPage === 'target-universities') loadSchoolListTarget()
 }
 
@@ -602,7 +603,7 @@ export async function loadSchoolListExplorer() {
   const canSearch = !!window.api?.schoolsSearch
   const canList = !!window.api?.schoolsList
   if (!canList && !canSearch) {
-    grid.innerHTML = '<p class="placeholder-hint">无法加载院校数据</p>'
+    grid.innerHTML = `<p class="placeholder-hint">${escapeHtml(t('uniDb.noData'))}</p>`
     return
   }
 
@@ -645,25 +646,25 @@ export async function loadSchoolListExplorer() {
     explorerTotal = total
 
     if (items.length === 0) {
-      grid.innerHTML = `<div class="school-list-empty"><p class="placeholder-text">未找到匹配院校</p><p class="placeholder-hint">请尝试搜索院校名称、国家或城市</p></div>`
+      grid.innerHTML = `<div class="school-list-empty"><p class="placeholder-text">${escapeHtml(t('uniDb.noMatch'))}</p><p class="placeholder-hint">${escapeHtml(t('uniDb.noMatchHint'))}</p></div>`
       return
     }
 
-    items.forEach((school) => renderSchoolCard(school, grid, (s) => openSchoolDetail(s, 'university-explorer')))
+    items.forEach((school) => renderSchoolCard(school, grid, (s) => openSchoolDetail(s, 'university-database')))
 
     const totalPages = Math.ceil(total / PAGE_SIZE) || 1
     const prev = document.createElement('button')
-    prev.className = 'pagination-btn pagination-prev'; prev.innerHTML = '‹'; prev.title = '上一页'; prev.disabled = explorerPage <= 1
+    prev.className = 'pagination-btn pagination-prev'; prev.innerHTML = '‹'; prev.title = t('uniDb.prevPage'); prev.disabled = explorerPage <= 1
     prev.addEventListener('click', () => { if (explorerPage > 1) { explorerPage--; loadSchoolListExplorer() } })
     const next = document.createElement('button')
-    next.className = 'pagination-btn pagination-next'; next.innerHTML = '›'; next.title = '下一页'; next.disabled = explorerPage >= totalPages
+    next.className = 'pagination-btn pagination-next'; next.innerHTML = '›'; next.title = t('uniDb.nextPage'); next.disabled = explorerPage >= totalPages
     next.addEventListener('click', () => { if (explorerPage < totalPages) { explorerPage++; loadSchoolListExplorer() } })
     const info = document.createElement('span')
-    info.className = 'pagination-info'; info.textContent = `第 ${explorerPage} / ${totalPages} 页，共 ${total} 所院校`
+    info.className = 'pagination-info'; info.textContent = t('uniDb.pagination', explorerPage, totalPages, total)
     paginationEl.appendChild(prev); paginationEl.appendChild(info); paginationEl.appendChild(next)
   } catch (err) {
     console.error('loadSchoolListExplorer:', err)
-    grid.innerHTML = `<p class="placeholder-hint">加载失败：${escapeHtml(err?.message || '请刷新重试')}</p>`
+    grid.innerHTML = `<p class="placeholder-hint">${escapeHtml(t('uniDb.loadFail', err?.message || t('uniDb.refreshRetry')))}</p>`
   }
 }
 

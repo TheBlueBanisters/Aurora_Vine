@@ -11,6 +11,7 @@ import {
   getGuestSchoolPlanningProfile,
   promptGuestProfileMigrationForAccount
 } from './storage.js'
+import { t } from './i18n.js'
 
 let _navigateTo = null
 let _maybeShowUsageGuide = null
@@ -115,10 +116,10 @@ export function initAuthGate() {
     if (!window.api?.authEnterGuest) return
     const res = await window.api.authEnterGuest()
     if (!res?.success) {
-      showToast(res?.error || '进入游客模式失败', 'error')
+      showToast(res?.error || t('auth.enterGuestFail'), 'error')
       return
     }
-    applyAuthStateAndRefresh(res, { previousMode: getAuthState().mode, successToast: '已进入游客模式' })
+    applyAuthStateAndRefresh(res, { previousMode: getAuthState().mode, successToast: t('auth.enteredGuest') })
   })
 
   document.getElementById('auth-login-form')?.addEventListener('submit', async (event) => {
@@ -126,12 +127,12 @@ export function initAuthGate() {
     if (!window.api?.authLogin) return
     const email = document.getElementById('auth-login-email')?.value?.trim() || ''
     const password = document.getElementById('auth-login-password')?.value || ''
-    if (!email) { showToast('请输入邮箱地址', 'warning'); return }
-    if (!password) { showToast('请输入密码', 'warning'); return }
+    if (!email) { showToast(t('auth.enterEmail'), 'warning'); return }
+    if (!password) { showToast(t('auth.enterPassword'), 'warning'); return }
     const previousMode = getAuthState().mode
     const res = await window.api.authLogin({ email, password })
-    if (!res?.success) { showToast(res?.error || '登录失败，请稍后重试', 'error'); return }
-    applyAuthStateAndRefresh(res, { previousMode, shouldPromptGuestMigration: true, successToast: '登录成功，欢迎回来' })
+    if (!res?.success) { showToast(res?.error || t('auth.loginFail'), 'error'); return }
+    applyAuthStateAndRefresh(res, { previousMode, shouldPromptGuestMigration: true, successToast: t('auth.loginSuccess') })
   })
 
   document.getElementById('auth-register-form')?.addEventListener('submit', async (event) => {
@@ -141,13 +142,13 @@ export function initAuthGate() {
     const nickname = document.getElementById('auth-register-nickname')?.value?.trim() || ''
     const password = document.getElementById('auth-register-password')?.value || ''
     const passwordConfirm = document.getElementById('auth-register-password-confirm')?.value || ''
-    if (!email) { showToast('请输入邮箱地址', 'warning'); return }
-    if (password.length < 6) { showToast('密码至少需要 6 位', 'warning'); return }
-    if (password !== passwordConfirm) { showToast('两次输入的密码不一致', 'warning'); return }
+    if (!email) { showToast(t('auth.enterEmail'), 'warning'); return }
+    if (password.length < 6) { showToast(t('auth.passwordMin6'), 'warning'); return }
+    if (password !== passwordConfirm) { showToast(t('auth.passwordMismatch'), 'warning'); return }
     const previousMode = getAuthState().mode
     const res = await window.api.authRegister({ email, nickname, password })
-    if (!res?.success) { showToast(res?.error || '注册失败，请稍后重试', 'error'); return }
-    applyAuthStateAndRefresh(res, { previousMode, shouldPromptGuestMigration: true, successToast: '注册成功，欢迎使用' })
+    if (!res?.success) { showToast(res?.error || t('auth.registerFail'), 'error'); return }
+    applyAuthStateAndRefresh(res, { previousMode, shouldPromptGuestMigration: true, successToast: t('auth.registerSuccess') })
   })
 }
 

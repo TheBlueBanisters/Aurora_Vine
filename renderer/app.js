@@ -1,6 +1,7 @@
 import 'echarts-gl'
 import { registerRefreshHook } from './modules/state.js'
 import { initTheme } from './modules/theme.js'
+import { initLang, registerLangChangeHook, applyLang } from './modules/i18n.js'
 import { initAuthGate, initAuthState, closeAuthModal, setNavigateTo, setMaybeShowUsageGuide } from './modules/auth.js'
 import { initSettingsPanel, updateSettingsAccountState } from './modules/settings.js'
 import { initUsageGuide, startUsageGuide, maybeShowUsageGuideOnFirstEntry } from './modules/guide.js'
@@ -10,8 +11,9 @@ import { initCommunityMessagesPage, updateCommunityComposerState, communityDetai
 import { initDailyCheckinPage } from './modules/daily-checkin.js'
 import { initStudyPlanningPage } from './modules/study-planning.js'
 import { initSchoolPlanningForm } from './modules/planning.js'
-import { initApplicationCasesPage, closeApplicationCaseModal } from './modules/application-cases.js'
+import { initApplicationCasesPage, initApplicationCaseModal, closeApplicationCaseModal } from './modules/application-cases.js'
 import { showToast } from './modules/utils.js'
+import { t } from './modules/i18n.js'
 import { applyAuthState } from './modules/state.js'
 import { openAuthModal, showLanding } from './modules/auth.js'
 
@@ -45,12 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
   registerRefreshHook(refreshAuthBoundUI)
 
   initTheme()
+  initLang()
+  registerLangChangeHook(() => applyLang())
   initAuthGate()
   initSettingsPanel(refreshAuthBoundUI)
   initUsageGuide()
   initSchools()
   initProfile(navigateTo)
   initSchoolPlanningForm()
+  initApplicationCaseModal()
 
   navItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -64,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (overlay?.classList.contains('active')) closeSchoolDetail()
       navigateTo(pageId)
       if (pageId === 'school-planning') syncSchoolPlanningIdentityState()
-      if (pageId === 'university-explorer') loadSchoolListExplorer()
+      if (pageId === 'university-database') loadSchoolListExplorer()
       if (pageId === 'target-universities') loadSchoolListTarget()
       if (pageId === 'my-profile') loadMyProfile()
       if (pageId === 'study-planning') initStudyPlanningPage()
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAuthState().then(() => {
     refreshAuthBoundUI()
     const activePage = document.querySelector('.page.active')
-    if (activePage?.id === 'page-university-explorer') loadSchoolListExplorer()
+    if (activePage?.id === 'page-university-database') loadSchoolListExplorer()
     if (activePage?.id === 'page-target-universities') loadSchoolListTarget()
     if (activePage?.id === 'page-study-planning') initStudyPlanningPage()
     if (activePage?.id === 'page-daily-checkin') initDailyCheckinPage()
@@ -95,6 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }).catch((err) => {
     console.error('initAuthState:', err)
     showLanding()
-    openAuthModal('login', '账号状态初始化失败，请重新登录。')
+    openAuthModal('login', t('auth.initFail'))
   })
 })
