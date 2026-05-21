@@ -48,6 +48,12 @@ export function setSchoolPlanningProfile(data, accountId = getCurrentAccountId()
   }
 }
 
+export function clearSchoolPlanningProfile(accountId = getCurrentAccountId()) {
+  localStorage.removeItem(getSchoolPlanningStorageKey(accountId))
+  localStorage.removeItem(GUEST_SCHOOL_PLANNING_PROFILE_KEY)
+  localStorage.removeItem(LEGACY_SCHOOL_PLANNING_PROFILE_KEY)
+}
+
 export function promptGuestProfileMigrationForAccount(accountId) {
   const guestProfile = getGuestSchoolPlanningProfile()
   if (!guestProfile || !accountId) return
@@ -61,30 +67,47 @@ export function promptGuestProfileMigrationForAccount(accountId) {
   }
 }
 
+export function normalizeSchoolId(schoolId) {
+  const id = String(schoolId ?? '').trim()
+  if (!id || id === 'NaN' || id === 'undefined' || id === 'null') return ''
+  return id
+}
+
 export function getTargetSchools() {
   try {
     const raw = localStorage.getItem(TARGET_SCHOOLS_KEY)
-    return raw ? JSON.parse(raw) : []
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return [...new Set(parsed.map(normalizeSchoolId).filter(Boolean))]
   } catch {
     return []
   }
 }
 
 export function setTargetSchools(ids) {
-  localStorage.setItem(TARGET_SCHOOLS_KEY, JSON.stringify(ids))
+  const normalized = [...new Set((Array.isArray(ids) ? ids : []).map(normalizeSchoolId).filter(Boolean))]
+  localStorage.setItem(TARGET_SCHOOLS_KEY, JSON.stringify(normalized))
 }
 
 export function toggleFavorite(schoolId) {
+  const normalizedId = normalizeSchoolId(schoolId)
+  if (!normalizedId) return false
   const ids = getTargetSchools()
-  const idx = ids.indexOf(schoolId)
+  const idx = ids.indexOf(normalizedId)
   if (idx >= 0) ids.splice(idx, 1)
-  else ids.push(schoolId)
+  else ids.push(normalizedId)
   setTargetSchools(ids)
-  return ids.includes(schoolId)
+  const favorited = ids.includes(normalizedId)
+  document.dispatchEvent(new CustomEvent('aurora:favorites-changed', {
+    detail: { schoolId: normalizedId, favorited }
+  }))
+  return favorited
 }
 
 export function isFavorite(schoolId) {
-  return getTargetSchools().includes(schoolId)
+  const normalizedId = normalizeSchoolId(schoolId)
+  return normalizedId ? getTargetSchools().includes(normalizedId) : false
 }
 
 export function getProfileInfo() {

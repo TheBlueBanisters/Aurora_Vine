@@ -1,5 +1,6 @@
 import { escapeHtml, showToast } from './utils.js'
 import { t } from './i18n.js'
+import { pickLocalized } from './localized-content.js'
 
 const APPLICATION_CASE_PAGE_SIZE = 12
 
@@ -13,6 +14,7 @@ let casesGpaBand = 'all'
 let casesLanguageBand = 'all'
 let casesBgFocus = 'all'
 let casesSort = 'score_desc'
+let lastOpenedCaseId = null
 
 function getCaseFilters() {
   return {
@@ -47,6 +49,37 @@ function formatLanguageSummary(item) {
 function formatGreSummary(item) {
   if (Number(item.gre_score) > 0) return `GRE ${item.gre_score}`
   return t('cases.greNone')
+}
+
+function pickCaseProgramName(item) {
+  return pickLocalized({
+    zh: item.primary_program_name_cn,
+    en: item.primary_program_name_en
+  }) || t('cases.programPending')
+}
+
+function pickCaseSchoolName(item) {
+  return item.primary_school_name_zh || t('cases.schoolPending')
+}
+
+function pickOfferSchoolName(offer) {
+  return pickLocalized({
+    zh: offer.school_name_zh,
+    en: offer.school_name_en
+  }) || '-'
+}
+
+function pickOfferProgramName(offer) {
+  return pickLocalized({
+    zh: offer.program_name_cn,
+    en: offer.program_name_en
+  }) || ''
+}
+
+function formatOfferLocation(offer) {
+  const country = pickLocalized({ zh: offer.country_zh, en: offer.country_en })
+  const city = pickLocalized({ zh: offer.city_zh, en: offer.city_en })
+  return [country, city].filter(Boolean).join(' · ') || t('caseDetail.noLocation')
 }
 
 function renderCaseTags(tags = []) {
@@ -134,6 +167,7 @@ function closeApplicationCaseModal() {
   modal.classList.remove('active')
   modal.setAttribute('aria-hidden', 'true')
   document.body.classList.remove('application-case-modal-open')
+  lastOpenedCaseId = null
 }
 
 function openApplicationCaseModal() {
@@ -154,6 +188,7 @@ export async function openApplicationCaseDetail(caseId) {
     return
   }
 
+  lastOpenedCaseId = caseId
   const { caseItem, offers = [] } = res
   const kickerEl = document.getElementById('application-case-detail-kicker')
   const titleEl = document.getElementById('application-case-detail-title')
@@ -165,18 +200,16 @@ export async function openApplicationCaseDetail(caseId) {
 
   if (!kickerEl || !titleEl || !subtitleEl || !overviewEl || !testsEl || !softEl || !offersEl) return
 
-  kickerEl.textContent = t('cases.kicker', caseItem.case_no, caseItem.undergrad_tier) + ' · ' + t('cases.profileScore') + ' ' + caseItem.profile_tier_score
-  titleEl.textContent = caseItem.primary_school_name_zh || t('caseDetail.title')
-  subtitleEl.textContent = caseItem.primary_program_name_cn
-    ? `${caseItem.primary_program_name_cn}${caseItem.primary_program_name_en ? ` / ${caseItem.primary_program_name_en}` : ''}`
-    : t('caseDetail.subtitleDefault')
+  kickerEl.textContent = `${t('cases.kicker', caseItem.case_no, caseItem.undergrad_tier)} · ${t('cases.profileScore')} ${caseItem.profile_tier_score}`
+  titleEl.textContent = pickCaseSchoolName(caseItem)
+  subtitleEl.textContent = pickCaseProgramName(caseItem)
 
   overviewEl.innerHTML = [
     buildDetailField(t('caseDetail.labelTier'), caseItem.undergrad_tier || '-'),
     buildDetailField(t('caseDetail.labelGpa'), `${formatMaybeNumber(caseItem.gpa_value)} / ${escapeHtml(caseItem.gpa_scale || '-')}`),
     buildDetailField(t('caseDetail.labelGpaRank'), formatRankPercent(caseItem.gpa_rank_percent)),
-    buildDetailField(t('caseDetail.labelPrimarySchool'), caseItem.primary_school_name_zh || '-'),
-    buildDetailField(t('caseDetail.labelPrimaryProgram'), caseItem.primary_program_name_cn || '-'),
+    buildDetailField(t('caseDetail.labelPrimarySchool'), pickCaseSchoolName(caseItem)),
+    buildDetailField(t('caseDetail.labelPrimaryProgram'), pickCaseProgramName(caseItem)),
     buildDetailField(t('caseDetail.labelTags'), (caseItem.tags || []).join(' · ') || '-')
   ].join('')
 
@@ -198,16 +231,16 @@ export async function openApplicationCaseDetail(caseId) {
       <div class="application-case-offer-card ${offer.is_primary_offer ? 'is-primary' : ''}">
         <div class="application-case-offer-top">
           <div>
-            <h5 class="application-case-offer-school">${escapeHtml(offer.school_name_zh || '')}</h5>
-            <p class="application-case-offer-program">${escapeHtml(offer.program_name_cn || '')}${offer.program_name_en ? ` / ${escapeHtml(offer.program_name_en)}` : ''}</p>
+            <h5 class="application-case-offer-school">${escapeHtml(pickOfferSchoolName(offer))}</h5>
+            <p class="application-case-offer-program">${escapeHtml(pickOfferProgramName(offer))}</p>
           </div>
           <div class="application-case-offer-badges">
-            <span class="application-case-offer-badge">${escapeHtml(`QS #${offer.ranking_qs || '-'}`)}</span>
+            <span class="application-case-offer-badge">${escapeHtml(t('cases.qsRank', offer.ranking_qs || '-'))}</span>
             <span class="application-case-offer-badge">${escapeHtml(offer.offer_tier || t('caseDetail.offerTierMatch'))}</span>
             ${offer.is_primary_offer ? `<span class="application-case-offer-badge is-primary">${t('caseDetail.primaryBadge')}</span>` : ''}
           </div>
         </div>
-        <p class="application-case-offer-meta">${escapeHtml([offer.country_zh, offer.city_zh].filter(Boolean).join(' · ') || t('caseDetail.noLocation'))}</p>
+        <p class="application-case-offer-meta">${escapeHtml(formatOfferLocation(offer))}</p>
       </div>`).join('')
     : `<p class="placeholder-hint">${t('caseDetail.noOffers')}</p>`
 
@@ -220,8 +253,8 @@ function renderCaseCard(item) {
       <div class="application-case-card-top">
         <div>
           <p class="application-case-card-kicker">${escapeHtml(t('cases.kicker', item.case_no || '-', item.undergrad_tier || '-'))}</p>
-          <h3 class="application-case-card-title">${escapeHtml(item.primary_school_name_zh || t('cases.schoolPending'))}</h3>
-          <p class="application-case-card-subtitle">${escapeHtml(item.primary_program_name_cn || t('cases.programPending'))}</p>
+          <h3 class="application-case-card-title">${escapeHtml(pickCaseSchoolName(item))}</h3>
+          <p class="application-case-card-subtitle">${escapeHtml(pickCaseProgramName(item))}</p>
         </div>
         <div class="application-case-card-score">
           <span class="application-case-card-score-label">${t('cases.profileScore')}</span>
@@ -235,7 +268,7 @@ function renderCaseCard(item) {
           <span class="application-case-card-metric-value">${escapeHtml(item.undergrad_tier || '-')}</span>
         </div>
         <div class="application-case-card-metric">
-          <span class="application-case-card-metric-label">GPA</span>
+          <span class="application-case-card-metric-label">${t('cases.labelGpa')}</span>
           <span class="application-case-card-metric-value">${escapeHtml(String(item.gpa_value || '-'))}</span>
         </div>
         <div class="application-case-card-metric">
@@ -243,7 +276,7 @@ function renderCaseCard(item) {
           <span class="application-case-card-metric-value">${escapeHtml(formatLanguageSummary(item))}</span>
         </div>
         <div class="application-case-card-metric">
-          <span class="application-case-card-metric-label">GRE</span>
+          <span class="application-case-card-metric-label">${t('caseDetail.labelGre')}</span>
           <span class="application-case-card-metric-value">${escapeHtml(formatGreSummary(item))}</span>
         </div>
       </div>
@@ -252,14 +285,11 @@ function renderCaseCard(item) {
         <span>${t('cases.labelInternship')} ${escapeHtml(String(item.internship_count || 0))}</span>
         <span>${t('cases.labelResearch')} ${escapeHtml(String(item.research_count || 0))}</span>
         <span>${t('cases.labelPaper')} ${escapeHtml(String(item.paper_count || 0))}</span>
-        <span>${escapeHtml(`Offer ${item.offer_count || 0}`)}</span>
-        <span>${escapeHtml(`QS #${item.primary_ranking_qs || '-'}`)}</span>
+        <span>${escapeHtml(t('cases.offerCount', item.offer_count || 0))}</span>
+        <span>${escapeHtml(t('cases.qsRank', item.primary_ranking_qs || '-'))}</span>
       </div>
 
       <div class="application-case-card-tags">${renderCaseTags(item.tags)}</div>
-      <div class="application-case-card-actions">
-        <button type="button" class="form-submit-btn application-case-card-btn" data-case-detail-id="${item.id}">${t('cases.viewOffer')}</button>
-      </div>
     </article>`
 }
 
@@ -290,15 +320,8 @@ export async function loadApplicationCases() {
     }
 
     listEl.innerHTML = items.map(renderCaseCard).join('')
-    listEl.querySelectorAll('[data-case-detail-id]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const caseId = Number(button.getAttribute('data-case-detail-id'))
-        if (caseId) openApplicationCaseDetail(caseId)
-      })
-    })
     listEl.querySelectorAll('.application-case-card').forEach((card) => {
-      card.addEventListener('click', (event) => {
-        if (event.target.closest('[data-case-detail-id]')) return
+      card.addEventListener('click', () => {
         const caseId = Number(card.getAttribute('data-case-id'))
         if (caseId) openApplicationCaseDetail(caseId)
       })
@@ -307,6 +330,17 @@ export async function loadApplicationCases() {
   } catch (err) {
     console.error('loadApplicationCases:', err)
     renderCaseEmptyState(t('cases.loadFail', err?.message || ''))
+  }
+}
+
+export function refreshApplicationCasesOnLangChange() {
+  if (!casesInitialized) return
+  loadApplicationCases()
+  if (lastOpenedCaseId) {
+    const modal = document.getElementById('application-case-modal')
+    if (modal?.classList.contains('active')) {
+      openApplicationCaseDetail(lastOpenedCaseId)
+    }
   }
 }
 

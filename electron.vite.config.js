@@ -15,7 +15,7 @@ export default defineConfig({
       },
       outDir: 'out/main',
       rollupOptions: {
-        external: ['better-sqlite3']
+        external: ['better-sqlite3', 'pdf-parse', 'mammoth', 'word-extractor', 'openai']
       }
     }
   },

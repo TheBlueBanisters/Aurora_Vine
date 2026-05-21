@@ -5,8 +5,34 @@ import { isAccountMode, getCurrentUserDisplayName } from './state.js'
 import { getSchoolPlanningProfile } from './storage.js'
 import { getTheme } from './theme.js'
 import { computeStudentScore, profileToScoreInput } from './scoring.js'
+import { pickLocalized } from './localized-content.js'
+import { decorateFireflyHosts } from './firefly-effect.js'
 
 let myProfileChartInstance = null
+let schoolPlanningEditing = false
+let myProfileChartResizeObserver = null
+
+function resizeMyProfileChart() {
+  if (!myProfileChartInstance) return
+  const page = document.getElementById('page-my-profile')
+  if (!page?.classList.contains('active')) return
+  myProfileChartInstance.resize()
+}
+
+function bindMyProfileChartResize(chartEl) {
+  if (myProfileChartResizeObserver) {
+    myProfileChartResizeObserver.disconnect()
+    myProfileChartResizeObserver = null
+  }
+  if (!chartEl || typeof ResizeObserver === 'undefined') return
+
+  myProfileChartResizeObserver = new ResizeObserver(() => {
+    requestAnimationFrame(resizeMyProfileChart)
+  })
+  myProfileChartResizeObserver.observe(chartEl)
+  const card = chartEl.closest('.my-profile-chart-card')
+  if (card && card !== chartEl) myProfileChartResizeObserver.observe(card)
+}
 
 export function loadMyProfile() {
   const emptyEl = document.getElementById('my-profile-empty')
@@ -41,6 +67,7 @@ export function loadMyProfile() {
     infoGrid.innerHTML = infoItems
       .map((item) => `<div class="my-profile-info-item"><span class="my-profile-info-label">${escapeHtml(item.label)}</span><span class="my-profile-info-value">${escapeHtml(String(item.value))}</span></div>`)
       .join('')
+    decorateFireflyHosts(infoGrid, '.my-profile-info-item', 'dark')
   }
 
   const chartData = []
@@ -102,6 +129,10 @@ export function loadMyProfile() {
 
   if (chartEl && typeof echarts !== 'undefined') {
     if (chartData.length === 0) {
+      if (myProfileChartResizeObserver) {
+        myProfileChartResizeObserver.disconnect()
+        myProfileChartResizeObserver = null
+      }
       if (myProfileChartInstance) { myProfileChartInstance.dispose(); myProfileChartInstance = null }
       chartEl.innerHTML = `<p class="placeholder-hint" style="padding: 40px; text-align: center;">${escapeHtml(t('profile.noTestData'))}</p>`
     } else {
@@ -132,7 +163,8 @@ export function loadMyProfile() {
         series: [{
           type: 'bar',
           data: barData,
-          barWidth: '50%',
+          barMaxWidth: 22,
+          barCategoryGap: '40%',
           animation: true,
           animationDuration: 700,
           animationDelay: (idx) => (chartData.length - 1 - idx) * 120,
@@ -144,17 +176,55 @@ export function loadMyProfile() {
           emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.2)' } },
         }],
       })
+      bindMyProfileChartResize(chartEl)
+      requestAnimationFrame(resizeMyProfileChart)
     }
   }
+
+  const statementEl = document.getElementById('my-profile-statement-box')
+  if (statementEl) {
+    const stmtText = profile.personalStatement ? pickLocalized(profile.personalStatement) : ''
+    if (stmtText) {
+      statementEl.textContent = stmtText
+      statementEl.classList.add('has-content')
+      statementEl.removeAttribute('data-i18n')
+    } else {
+      statementEl.textContent = t('profile.statementNone')
+      statementEl.classList.remove('has-content')
+      statementEl.setAttribute('data-i18n', 'profile.statementNone')
+    }
+  }
+}
+
+export function isSchoolPlanningEditing() {
+  return schoolPlanningEditing
+}
+
+export function enterSchoolPlanningEditMode() {
+  schoolPlanningEditing = true
+  setSchoolPlanningView(false)
+}
+
+export function exitSchoolPlanningEditMode() {
+  schoolPlanningEditing = false
 }
 
 export function setSchoolPlanningView(showScore) {
   const introBox = document.querySelector('#page-school-planning .planning-intro-box')
   const form = document.getElementById('school-planning-form')
   const scoreView = document.getElementById('school-planning-thanks')
-  if (introBox) introBox.style.display = showScore ? 'none' : ''
-  if (form) form.style.display = showScore ? 'none' : ''
-  if (scoreView) scoreView.style.display = showScore ? '' : 'none'
+  if (introBox) {
+    introBox.hidden = showScore
+    introBox.classList.toggle('is-hidden', showScore)
+  }
+  if (form) {
+    form.hidden = showScore
+    form.classList.toggle('is-hidden', showScore)
+  }
+  if (scoreView) {
+    scoreView.hidden = !showScore
+    scoreView.classList.toggle('is-hidden', !showScore)
+  }
 }
 
 export function renderScoreResult(result) {
@@ -192,10 +262,36 @@ export function renderScoreResult(result) {
     }
     if (val) val.textContent = raw.toFixed(1)
   })
+
+  const llmWrap = document.getElementById('score-bar-llm-wrap')
+  const llmRaw = detail.llm
+  if (llmWrap) {
+    if (llmRaw != null) {
+      llmWrap.style.display = ''
+      const pct = Math.max(0, Math.min(100, llmRaw))
+      const bar = document.getElementById('score-bar-llm')
+      const val = document.getElementById('score-val-llm')
+      if (bar) {
+        bar.style.width = '0'
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            bar.style.width = `${pct}%`
+          })
+        })
+      }
+      if (val) val.textContent = llmRaw.toFixed(1)
+    } else {
+      llmWrap.style.display = 'none'
+    }
+  }
 }
 
 export function syncSchoolPlanningIdentityState() {
   const currentProfile = getSchoolPlanningProfile()
+  if (schoolPlanningEditing) {
+    setSchoolPlanningView(false)
+    return
+  }
   setSchoolPlanningView(!!currentProfile)
   if (currentProfile) {
     const scoreInput = profileToScoreInput(currentProfile)
@@ -205,9 +301,8 @@ export function syncSchoolPlanningIdentityState() {
 }
 
 export function initProfile(navigateTo) {
+  window.addEventListener('resize', resizeMyProfileChart)
   document.getElementById('my-profile-go-planning')?.addEventListener('click', () => navigateTo('school-planning'))
-  document.getElementById('my-profile-refill')?.addEventListener('click', () => {
-    setSchoolPlanningView(false)
-    navigateTo('school-planning')
-  })
+  document.getElementById('score-go-my-profile')?.addEventListener('click', () => navigateTo('my-profile'))
+  document.getElementById('score-go-study-planning')?.addEventListener('click', () => navigateTo('study-planning'))
 }

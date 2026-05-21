@@ -1,9 +1,11 @@
 import { t } from './i18n.js'
 import { escapeHtml } from './utils.js'
 import { PAGE_SIZE } from './state.js'
-import { isFavorite, toggleFavorite, getTargetSchools } from './storage.js'
+import { isFavorite, toggleFavorite, getTargetSchools, setTargetSchools } from './storage.js'
+import { getFavoriteStarMarkup, bindFavoriteStar } from './favorite-star.js'
 import { getTheme } from './theme.js'
 import { openApplicationCaseDetail } from './application-cases.js'
+import { decorateFireflyHost } from './firefly-effect.js'
 
 let explorerPage = 1
 let explorerTotal = 0
@@ -427,10 +429,7 @@ function renderSchoolCard(school, container, onClick) {
         <span class="school-card-meta-label">QS</span>
         <span class="school-card-meta-value school-card-meta-qs">${school.ranking_qs || '-'}</span>
       </div>
-      <button class="school-card-star ${fav ? 'favorited' : ''}" data-school-id="${school.school_id}" title="${fav ? t('uniDb.unfavorite') : t('uniDb.favorite')}" aria-label="${fav ? t('uniDb.unfavorite') : t('uniDb.favorite')}">
-        <svg class="star-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-      </button>
+      ${getFavoriteStarMarkup(school.school_id, fav)}
     </div>
   `
   const logoImg = card.querySelector('.school-card-logo')
@@ -439,12 +438,7 @@ function renderSchoolCard(school, container, onClick) {
       if (dataUrl && logoImg.isConnected) logoImg.src = dataUrl
     }).catch(() => {})
   }
-  const starBtnEl = card.querySelector('.school-card-star')
-  starBtnEl.addEventListener('click', (e) => {
-    e.stopPropagation()
-    const nowFav = toggleFavorite(school.school_id)
-    starBtnEl.classList.toggle('favorited', nowFav)
-    starBtnEl.title = nowFav ? t('uniDb.unfavorite') : t('uniDb.favorite')
+  bindFavoriteStar(card.querySelector('.school-card-star'), school.school_id, () => {
     if (container.closest('#school-list-target')) loadSchoolListTarget()
   })
   if (onClick) {
@@ -452,6 +446,7 @@ function renderSchoolCard(school, container, onClick) {
     main.addEventListener('click', () => { main.blur(); onClick(school) })
     main.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); main.blur(); onClick(school) } })
   }
+  decorateFireflyHost(card, 'dark-hover')
   container.appendChild(card)
 }
 
@@ -489,7 +484,7 @@ function updateCarousel() {
   if (imgs.length < 4) carouselTrack.classList.remove('carousel-animate')
 }
 
-function openSchoolDetail(school, fromPage) {
+export function openSchoolDetail(school, fromPage) {
   if (fromPage) detailBackPage = fromPage
   currentDetailSchool = school
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
@@ -712,6 +707,8 @@ function createParticleBurst(container, x, y, count = 24) {
 }
 
 export function initSchools() {
+  setTargetSchools(getTargetSchools())
+
   overlay = document.getElementById('school-detail-overlay')
   backBtn = document.getElementById('school-detail-back')
   titleEl = document.getElementById('school-detail-title')

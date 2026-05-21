@@ -2,7 +2,7 @@
 set -e
 
 # ===== 用户手动控制区（只改这里） =====
-TAG_NAME="整合了中英文模式；进行了案例展开界面的滚动优化"
+TAG_NAME="雷霆大更新"
 REMOTE_NAME="origin"
 BRANCH_NAME="main"
 REMOTE_URL="https://github.com/TheBlueBanisters/Aurora_Vine.git"

@@ -3,16 +3,28 @@ import { getUsageGuideSteps, getUsageGuideFinalStep, USAGE_GUIDE_NO_MORE_KEY } f
 let usageGuideCurrentStep = 0
 let usageGuideManualReplay = false
 const USAGE_GUIDE_CARD_GAP = 16
+const USAGE_GUIDE_SPOTLIGHT_PADDING_X = 3
+const USAGE_GUIDE_SPOTLIGHT_PADDING_Y = 1
+const USAGE_GUIDE_SPOTLIGHT_HEIGHT_TRIM = 8
+
+function getUsageGuideTargetRect(targetEl) {
+  if (!targetEl) return null
+  return targetEl.getBoundingClientRect()
+}
 
 function positionUsageGuideSpotlight(targetEl) {
   const spotlight = document.getElementById('usage-guide-spotlight')
   if (!spotlight || !targetEl) return
-  const rect = targetEl.getBoundingClientRect()
-  const padding = 4
-  spotlight.style.top = `${rect.top - padding}px`
-  spotlight.style.left = `${rect.left - padding}px`
-  spotlight.style.width = `${rect.width + padding * 2}px`
-  spotlight.style.height = `${rect.height + padding * 2}px`
+  const rect = getUsageGuideTargetRect(targetEl)
+  if (!rect) return
+  const padX = USAGE_GUIDE_SPOTLIGHT_PADDING_X
+  const padY = USAGE_GUIDE_SPOTLIGHT_PADDING_Y
+  const trim = USAGE_GUIDE_SPOTLIGHT_HEIGHT_TRIM
+  const height = Math.max(rect.height + padY * 2 - trim, rect.height * 0.72)
+  spotlight.style.top = `${rect.top + (rect.height - height) / 2}px`
+  spotlight.style.left = `${rect.left - padX}px`
+  spotlight.style.width = `${rect.width + padX * 2}px`
+  spotlight.style.height = `${height}px`
   spotlight.style.display = ''
 }
 
@@ -33,6 +45,17 @@ function positionUsageGuideCard(targetEl) {
   card.style.top = `${top}px`
   card.style.right = 'auto'
   card.style.bottom = 'auto'
+}
+
+function positionUsageGuideForTarget(targetEl) {
+  if (!targetEl) return
+  positionUsageGuideSpotlight(targetEl)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      positionUsageGuideSpotlight(targetEl)
+      positionUsageGuideCard(targetEl)
+    })
+  })
 }
 
 function runUsageGuideStep(stepIndex) {
@@ -59,8 +82,7 @@ function runUsageGuideStep(stepIndex) {
     const usageGuideNav = document.getElementById('nav-item-usage-guide')
     if (usageGuideNav) {
       usageGuideNav.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-      positionUsageGuideSpotlight(usageGuideNav)
-      requestAnimationFrame(() => { requestAnimationFrame(() => positionUsageGuideCard(usageGuideNav)) })
+      positionUsageGuideForTarget(usageGuideNav)
     } else {
       spotlight.style.display = 'none'
     }
@@ -77,8 +99,7 @@ function runUsageGuideStep(stepIndex) {
     descEl.textContent = step.desc
     if (targetNav) {
       targetNav.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-      positionUsageGuideSpotlight(targetNav)
-      requestAnimationFrame(() => { requestAnimationFrame(() => positionUsageGuideCard(targetNav)) })
+      positionUsageGuideForTarget(targetNav)
     } else {
       spotlight.style.display = 'none'
     }
@@ -155,11 +176,11 @@ export function initUsageGuide() {
     const isFinal = usageGuideCurrentStep >= resizeSteps.length
     if (isFinal) {
       const usageGuideNav = document.getElementById('nav-item-usage-guide')
-      if (usageGuideNav) { positionUsageGuideSpotlight(usageGuideNav); positionUsageGuideCard(usageGuideNav) }
+      if (usageGuideNav) positionUsageGuideForTarget(usageGuideNav)
     } else {
       const step = resizeSteps[usageGuideCurrentStep]
       const targetNav = document.querySelector(`.nav-item[data-page="${step.pageId}"]`)
-      if (targetNav) { positionUsageGuideSpotlight(targetNav); positionUsageGuideCard(targetNav) }
+      if (targetNav) positionUsageGuideForTarget(targetNav)
     }
   })
 }

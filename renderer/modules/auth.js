@@ -49,21 +49,29 @@ export function closeAuthModal() {
 }
 
 export function showLanding() {
+  document.body.classList.remove('auth-boot')
   document.body.classList.add('landing-mode')
   document.body.classList.remove('app-mode')
   const landing = document.getElementById('landing-page')
   const appLayout = document.querySelector('.app-layout')
-  if (landing) landing.style.display = ''
+  if (landing) {
+    landing.style.display = ''
+    landing.style.visibility = ''
+  }
   if (appLayout) appLayout.style.display = 'none'
 }
 
 export function showMainApp() {
+  document.body.classList.remove('auth-boot')
   document.body.classList.remove('landing-mode')
   document.body.classList.add('app-mode')
   const landing = document.getElementById('landing-page')
   const appLayout = document.querySelector('.app-layout')
   if (landing) landing.style.display = 'none'
-  if (appLayout) appLayout.style.display = ''
+  if (appLayout) {
+    appLayout.style.display = ''
+    appLayout.style.visibility = ''
+  }
 }
 
 export function openAuthGate(preferredTab = 'login', message = '') {
@@ -160,11 +168,12 @@ export async function initAuthState() {
   }
   const res = await window.api.authGetCurrentUser()
   applyAuthState(res)
-  if (getAuthState().mode === 'account') {
+  const mode = getAuthState().mode
+  if (mode === 'account' || mode === 'guest') {
     showMainApp()
     closeAuthModal()
     if (_navigateTo) _navigateTo('school-planning')
-    if (_maybeShowUsageGuide) _maybeShowUsageGuide()
+    if (mode === 'account' && _maybeShowUsageGuide) _maybeShowUsageGuide()
   } else {
     showLanding()
   }

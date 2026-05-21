@@ -2,6 +2,7 @@ import { showToast, escapeHtml, formatDateTime, renderAuthorWithBadgeAndAvatar, 
 import { isAccountMode, getCurrentUserDisplayName, COMMUNITY_PAGE_SIZE } from './state.js'
 import { openAuthGate } from './auth.js'
 import { t } from './i18n.js'
+import picnicEmptyImg from '../../image/picnic.png'
 
 let communityCurrentPage = 1
 let communityTotal = 0
@@ -28,7 +29,7 @@ export function updateCommunityComposerState() {
 
 function renderCommunityEmptyState(listEl, text) {
   if (!listEl) return
-  listEl.innerHTML = `<div class="community-empty-card"><p class="placeholder-text">${escapeHtml(text || t('community.emptyPosts'))}</p><p class="placeholder-hint">${t('community.emptyPostsHint')}</p></div>`
+  listEl.innerHTML = `<div class="community-empty-card"><div class="empty-state-figure"><img src="${picnicEmptyImg}" alt=""></div><p class="placeholder-text">${escapeHtml(text || t('community.emptyPosts'))}</p><p class="placeholder-hint">${t('community.emptyPostsHint')}</p></div>`
 }
 
 function closeCommunityPostModal() {

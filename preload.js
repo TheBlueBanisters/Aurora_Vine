@@ -69,5 +69,31 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('community:deletePost', postId),
   communityDeleteReply: (payload) =>
     ipcRenderer.invoke('community:deleteReply', payload),
-  themeApply: (theme) => ipcRenderer.invoke('theme:apply', theme)
+  themeApply: (theme) => ipcRenderer.invoke('theme:apply', theme),
+  resumeUpload: (payload) =>
+    ipcRenderer.invoke('resume:upload', payload),
+  resumeClearAll: () =>
+    ipcRenderer.invoke('resume:clearAll'),
+  resumeGetText: (md5) =>
+    ipcRenderer.invoke('resume:getText', md5),
+  settingsGetDeepseekApiKey: () =>
+    ipcRenderer.invoke('settings:getDeepseekApiKey'),
+  settingsSetDeepseekApiKey: (apiKey) =>
+    ipcRenderer.invoke('settings:setDeepseekApiKey', apiKey),
+  llmScoreResume: (payload) =>
+    ipcRenderer.invoke('llm:scoreResume', payload),
+  llmGenerateOutline: (payload) =>
+    ipcRenderer.invoke('llm:generateOutline', payload),
+  llmGenerateSchedule: (payload) =>
+    ipcRenderer.invoke('llm:generateSchedule', payload),
+  llmGenerateDailyTasks: (payload) =>
+    ipcRenderer.invoke('llm:generateDailyTasks', payload),
+  llmGeneratePersonalStatement: (payload) =>
+    ipcRenderer.invoke('llm:generatePersonalStatement', payload),
+  studyPlanClearBySource: (source) =>
+    ipcRenderer.invoke('studyPlan:clearBySource', source),
+  studyPlanClearBySourceAndKind: (payload) =>
+    ipcRenderer.invoke('studyPlan:clearBySourceAndKind', payload),
+  studyPlanClearAll: () =>
+    ipcRenderer.invoke('studyPlan:clearAll'),
 });

@@ -73,7 +73,7 @@ export const SETTINGS_ANIMATION = {
   fadeOut: 220,
   moveAndCollapse: 320,
   aboutMoveAndCollapse: 460,
-  revealSubview: 260,
+  revealSubview: 360,
   showTopActions: 240
 }
 

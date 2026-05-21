@@ -1,6 +1,7 @@
 import { showToast, escapeHtml, toDateKey, toMonthKey, formatDateLabel } from './utils.js'
 import { DAILY_MAX_TASKS, DAILY_TASK_COLORS, DAILY_GRID_FILL_ORDER, getTaskColors } from './state.js'
 import { t } from './i18n.js'
+import { parseCheckinTaskContent, pickTaskTitle, pickTaskSubtitle, serializeCheckinTaskContent } from './localized-content.js'
 
 let dailyCurrentMonth = new Date()
 let dailySelectedDateKey = ''
@@ -101,15 +102,26 @@ function renderDailyTaskList() {
   emptyEl.style.display = dailyTaskItems.length === 0 ? 'flex' : 'none'
 
   dailyTaskItems.forEach((item, idx) => {
+    const parsed = parseCheckinTaskContent(item.content)
+    const title = pickTaskTitle(parsed)
+    const subtitle = pickTaskSubtitle(parsed)
     const row = document.createElement('div')
     row.className = 'daily-checkin-task-item'
     if (idx === dailyActiveTaskIndex) row.classList.add('is-operating')
     if (item.completed) row.classList.add('is-completed')
     row.style.setProperty('--task-color', String(item.color || DAILY_TASK_COLORS[0].value))
+
+    const subtitleHtml = subtitle
+      ? `<span class="daily-checkin-task-subtitle">${escapeHtml(subtitle)}</span>`
+      : ''
+
     row.innerHTML = `
       <div class="daily-checkin-task-content">
         <span class="daily-checkin-task-pin" aria-hidden="true">📌</span>
-        <span class="daily-checkin-task-text">${escapeHtml(item.content || '')}</span>
+        <div class="daily-checkin-task-text-wrap">
+          <span class="daily-checkin-task-title">${escapeHtml(title)}</span>
+          ${subtitleHtml}
+        </div>
       </div>
       <div class="daily-checkin-task-opbar">
         <button class="daily-checkin-task-icon-btn task-op-back" type="button" title="${t('daily.taskBack')}" aria-label="${t('daily.taskBack')}">↩</button>
@@ -201,30 +213,49 @@ function scheduleDailyTasksSave(immediate = false) {
 function initDailyTaskModal() {
   if (dailyModalInitialized) return
   const modal = document.getElementById('daily-checkin-modal')
-  const modalInput = document.getElementById('daily-checkin-modal-input')
+  const titleInput = document.getElementById('daily-checkin-modal-title-input')
+  const subtitleInput = document.getElementById('daily-checkin-modal-subtitle')
   const modalColor = document.getElementById('daily-checkin-modal-color')
   const modalCancel = document.getElementById('daily-checkin-modal-cancel')
   const modalConfirm = document.getElementById('daily-checkin-modal-confirm')
-  if (!modal || !modalInput || !modalColor || !modalCancel || !modalConfirm) return
+  if (!modal || !titleInput || !subtitleInput || !modalColor || !modalCancel || !modalConfirm) return
 
   modalColor.innerHTML = getTaskColors().map((c) => `<option value="${c.value}">${c.label}</option>`).join('')
 
-  function closeModal() { modal.classList.remove('active'); modal.setAttribute('aria-hidden', 'true'); modalInput.value = ''; modalColor.value = DAILY_TASK_COLORS[0].value }
+  function closeModal() {
+    modal.classList.remove('active')
+    modal.setAttribute('aria-hidden', 'true')
+    titleInput.value = ''
+    subtitleInput.value = ''
+    modalColor.value = DAILY_TASK_COLORS[0].value
+  }
+
   function openModal(defaultColor) {
     if (dailyTaskItems.length >= DAILY_MAX_TASKS) return
-    modal.classList.add('active'); modal.setAttribute('aria-hidden', 'false')
-    modalInput.value = ''; modalColor.value = defaultColor || DAILY_TASK_COLORS[0].value
-    setTimeout(() => modalInput.focus(), 0)
+    modal.classList.add('active')
+    modal.setAttribute('aria-hidden', 'false')
+    titleInput.value = ''
+    subtitleInput.value = ''
+    modalColor.value = defaultColor || DAILY_TASK_COLORS[0].value
+    setTimeout(() => titleInput.focus(), 0)
   }
 
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModal() })
   modalCancel.addEventListener('click', closeModal)
   modalConfirm.addEventListener('click', () => {
-    const content = modalInput.value.trim()
-    if (!content) { showToast(t('daily.taskEmpty'), 'warning'); return }
+    const title = titleInput.value.trim()
+    const subtitle = subtitleInput.value.trim()
+    if (!title) { showToast(t('daily.taskTitleEmpty'), 'warning'); return }
     if (dailyTaskItems.length >= DAILY_MAX_TASKS) { closeModal(); return }
-    dailyTaskItems.push({ content, color: String(modalColor.value || DAILY_TASK_COLORS[0].value).toUpperCase(), completed: false })
-    closeModal(); renderDailyTaskList(); scheduleDailyTasksSave(true)
+    const content = serializeCheckinTaskContent({ zh: title, en: title }, { zh: subtitle, en: subtitle })
+    dailyTaskItems.push({
+      content,
+      color: String(modalColor.value || DAILY_TASK_COLORS[0].value).toUpperCase(),
+      completed: false
+    })
+    closeModal()
+    renderDailyTaskList()
+    scheduleDailyTasksSave(true)
   })
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('active')) closeModal() })
 

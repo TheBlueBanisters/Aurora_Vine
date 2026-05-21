@@ -160,5 +160,6 @@ export function profileToScoreInput(profile) {
     paperCount: parseInt(profile.paperCount, 10) || 0,
     schoolLevel: profile.institutionTier || '双非',
     graduationYear,
+    llmScore: profile.llmScore != null && profile.llmScore !== '' ? Number(profile.llmScore) : undefined,
   }
 }

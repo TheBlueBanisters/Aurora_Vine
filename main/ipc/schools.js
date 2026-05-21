@@ -128,11 +128,13 @@ export function registerSchoolsIpc() {
   });
 
   ipcMain.handle('schools:getById', async (event, schoolId) => {
+    const normalizedId = String(schoolId ?? '').trim();
+    if (!normalizedId) return null;
     try {
       const db = getReadOnlyDb();
       if (!db) return null;
       const stmt = db.prepare('SELECT * FROM schools WHERE school_id = ?');
-      const row = stmt.get(schoolId) || null;
+      const row = stmt.get(normalizedId) || null;
       db.close();
       return row;
     } catch (err) {
@@ -143,12 +145,16 @@ export function registerSchoolsIpc() {
 
   ipcMain.handle('schools:getByIds', async (event, schoolIds) => {
     if (!Array.isArray(schoolIds) || schoolIds.length === 0) return [];
+    const normalizedIds = [...new Set(
+      schoolIds.map((id) => String(id ?? '').trim()).filter(Boolean)
+    )];
+    if (normalizedIds.length === 0) return [];
     try {
       const db = getReadOnlyDb();
       if (!db) return [];
-      const placeholders = schoolIds.map(() => '?').join(',');
+      const placeholders = normalizedIds.map(() => '?').join(',');
       const stmt = db.prepare(`SELECT * FROM schools WHERE school_id IN (${placeholders})`);
-      const rows = stmt.all(...schoolIds);
+      const rows = stmt.all(...normalizedIds);
       db.close();
       return rows;
     } catch (err) {

@@ -11,6 +11,8 @@ import {
 } from './state.js'
 import { getProfileInfo, setProfileInfo } from './storage.js'
 import { openAuthGate, applyAuthStateAndRefresh } from './auth.js'
+import { clearAllPersonalData } from './personal-data.js'
+import { showAppConfirm } from './confirm-dialog.js'
 
 function updateProfileTipText(profileExpanded = false) {
   const profileTip = document.querySelector('.settings-profile-tip')
@@ -167,10 +169,6 @@ function bindSettingsPanel(settingsNodes, refreshAuthBoundUI) {
     transitioning = true
     layout.classList.add('is-transitioning')
 
-    const targetView = subviews[route]
-    if (targetView) { targetView.classList.add('is-visible'); await waitMs(16); targetView.classList.add('is-shown') }
-    await waitMs(SETTINGS_ANIMATION.revealSubview)
-
     if (route === 'profile') {
       const profileToShow = getProfileInfo()
       if (isAccountMode() && getAuthState().user) {
@@ -179,6 +177,17 @@ function bindSettingsPanel(settingsNodes, refreshAuthBoundUI) {
       }
       populateProfileForm(profileForm, profileToShow)
       setProfileEditable(false)
+    }
+
+    const targetView = subviews[route]
+    if (targetView) {
+      targetView.classList.add('is-visible')
+      await waitMs(16)
+      targetView.classList.add('is-shown')
+    }
+    await waitMs(SETTINGS_ANIMATION.revealSubview)
+
+    if (route === 'profile') {
       showActionButton(editBtn)
       updateProfileTipText(true)
     } else {
@@ -246,6 +255,13 @@ function bindSettingsPanel(settingsNodes, refreshAuthBoundUI) {
     setProfileEditable(false)
     refreshAuthBoundUI()
   })
+}
+
+async function refreshApiKeyStatus() {
+  const statusEl = document.getElementById('settings-api-status')
+  if (!statusEl || !window.api?.settingsGetDeepseekApiKey) return
+  const res = await window.api.settingsGetDeepseekApiKey()
+  statusEl.textContent = res?.configured ? t('settings.apiKeyConfigured') : t('settings.apiKeyNotConfigured')
 }
 
 export function initSettingsPanel(refreshAuthBoundUI) {
@@ -333,5 +349,45 @@ export function initSettingsPanel(refreshAuthBoundUI) {
     showToast(t('settings.certifySuccess'), 'success')
   })
 
+  const apiTrigger = document.getElementById('settings-api-trigger')
+  const apiBody = document.getElementById('settings-api-body')
+  apiTrigger?.addEventListener('click', () => {
+    if (!apiBody) return
+    apiBody.hidden = !apiBody.hidden
+  })
+
+  const apiSaveBtn = document.getElementById('settings-api-save')
+  const apiInput = document.getElementById('settings-api-key-input')
+  apiSaveBtn?.addEventListener('click', async () => {
+    if (!window.api?.settingsSetDeepseekApiKey) return
+    const apiKey = apiInput?.value?.trim() || ''
+    const res = await window.api.settingsSetDeepseekApiKey(apiKey)
+    if (!res?.success) {
+      showToast(res?.error || t('settings.apiKeySaveFail'), 'error')
+      return
+    }
+    if (apiInput) apiInput.value = ''
+    await refreshApiKeyStatus()
+    showToast(t('settings.apiKeySaved'), 'success')
+  })
+
+  document.getElementById('settings-clear-personal-data')?.addEventListener('click', async () => {
+    const confirmed = await showAppConfirm({
+      title: t('settings.clearPersonalDataConfirmTitle'),
+      description: t('settings.clearPersonalDataConfirmDesc'),
+      confirmText: t('settings.clearPersonalDataConfirmOk'),
+      cancelText: t('daily.cancel'),
+      danger: true
+    })
+    if (!confirmed) return
+    const res = await clearAllPersonalData()
+    if (!res?.success) {
+      showToast(res?.error || t('settings.clearPersonalDataFail'), 'error')
+      return
+    }
+    showToast(t('settings.clearPersonalDataSuccess'), 'success')
+  })
+
   updateSettingsAccountState()
+  refreshApiKeyStatus()
 }

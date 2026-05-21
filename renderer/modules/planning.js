@@ -1,8 +1,86 @@
-import { showToast } from './utils.js'
 import { t } from './i18n.js'
-import { getSchoolPlanningProfile, setSchoolPlanningProfile } from './storage.js'
-import { setSchoolPlanningView, syncSchoolPlanningIdentityState, renderScoreResult } from './profile.js'
-import { computeStudentScore, profileToScoreInput } from './scoring.js'
+import {
+  setSchoolPlanningView,
+  syncSchoolPlanningIdentityState,
+  enterSchoolPlanningEditMode,
+  exitSchoolPlanningEditMode
+} from './profile.js'
+import { executeSchoolPlanningSubmit } from './llm-planning-service.js'
+import { getSchoolPlanningProfile } from './storage.js'
+
+const REFILL_EVENT = 'aurora:school-planning-refill'
+
+export function populateSchoolPlanningForm(profile) {
+  if (!profile) return
+
+  const setValue = (id, value) => {
+    const el = document.getElementById(id)
+    if (el) el.value = value ?? ''
+  }
+
+  setValue('sp-graduation-year', profile.graduationYear)
+  setValue('sp-institution-tier', profile.institutionTier)
+  setValue('sp-school-name', profile.schoolName)
+  setValue('sp-major', profile.major)
+  setValue('sp-gpa', profile.gpa)
+  setValue('sp-gpa-percentile', profile.gpaPercentile)
+
+  const scaleRadio = document.querySelector(`input[name="sp-gpa-scale"][value="${profile.gpaScale}"]`)
+  if (scaleRadio) scaleRadio.checked = true
+
+  const ieltsNone = document.getElementById('sp-ielts-none')
+  const toeflNone = document.getElementById('sp-toefl-none')
+  const greNone = document.getElementById('sp-gre-none')
+  if (ieltsNone) ieltsNone.checked = profile.ielts == null
+  if (toeflNone) toeflNone.checked = profile.toefl == null
+  if (greNone) greNone.checked = profile.gre == null
+
+  if (profile.ielts != null) setValue('sp-ielts', profile.ielts)
+  if (profile.toefl != null) setValue('sp-toefl', profile.toefl)
+  if (profile.gre != null) setValue('sp-gre', profile.gre)
+  if (profile.greWriting != null) setValue('sp-gre-writing', profile.greWriting)
+
+  setValue('sp-research-count', String(profile.researchCount ?? 0))
+  setValue('sp-internship-count', String(profile.internshipCount ?? 0))
+  setValue('sp-paper-count', String(profile.paperCount ?? 0))
+
+  document.getElementById('sp-resume')?.replaceChildren()
+
+  document.dispatchEvent(new CustomEvent('aurora:school-planning-form-populated'))
+}
+
+export function resetSchoolPlanningForm() {
+  const form = document.getElementById('school-planning-form')
+  if (!form) return
+
+  form.querySelectorAll('input[type="text"], input[type="number"]').forEach((input) => {
+    input.value = ''
+    input.disabled = false
+  })
+  form.querySelectorAll('select').forEach((select) => {
+    select.selectedIndex = 0
+    select.disabled = false
+  })
+  form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.checked = false
+  })
+  form.querySelectorAll('input[type="radio"]').forEach((radio) => {
+    radio.checked = false
+  })
+  document.getElementById('sp-resume')?.replaceChildren()
+  form.querySelectorAll('.form-field').forEach((field) => {
+    field.classList.remove('error')
+    const err = field.querySelector('.form-error')
+    if (err) err.textContent = ''
+  })
+
+  document.dispatchEvent(new CustomEvent('aurora:school-planning-form-populated'))
+}
+
+function beginSchoolPlanningRefill() {
+  enterSchoolPlanningEditMode()
+  populateSchoolPlanningForm(getSchoolPlanningProfile())
+}
 
 export function initSchoolPlanningForm() {
   const form = document.getElementById('school-planning-form')
@@ -58,6 +136,12 @@ export function initSchoolPlanningForm() {
   ieltsNone?.addEventListener('change', syncIeltsNone)
   toeflNone?.addEventListener('change', syncToeflNone)
   greNone?.addEventListener('change', syncGreNone)
+  document.addEventListener('aurora:school-planning-form-populated', () => {
+    syncIeltsNone()
+    syncToeflNone()
+    syncGreNone()
+    syncGpaRangeByScale()
+  })
 
   function syncGpaRangeByScale() {
     if (!gpaInput) return
@@ -131,19 +215,25 @@ export function initSchoolPlanningForm() {
     }
   }
 
-  submitBtn.addEventListener('click', () => {
+  submitBtn.addEventListener('click', async () => {
     const { valid } = validateSchoolPlanningForm()
-    if (valid) {
-      const profile = collectSchoolPlanningData()
-      setSchoolPlanningProfile(profile)
-      const scoreInput = profileToScoreInput(profile)
-      const result = computeStudentScore(scoreInput)
+    if (!valid) return
+
+    const profile = collectSchoolPlanningData()
+    const resumeInput = document.getElementById('sp-resume')
+    const resumeFile = resumeInput?.files?.[0] || null
+
+    try {
+      await executeSchoolPlanningSubmit(profile, resumeFile)
+      exitSchoolPlanningEditMode()
       setSchoolPlanningView(true)
-      renderScoreResult(result)
+    } catch {
+      /* toast already shown */
     }
   })
 
-  document.getElementById('school-planning-refill')?.addEventListener('click', () => setSchoolPlanningView(false))
+  document.getElementById('school-planning-refill')?.addEventListener('click', beginSchoolPlanningRefill)
+  document.addEventListener(REFILL_EVENT, beginSchoolPlanningRefill)
 
   syncSchoolPlanningIdentityState()
 }

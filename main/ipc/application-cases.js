@@ -190,7 +190,9 @@ export function registerApplicationCasesIpc() {
           o.is_primary_offer,
           o.display_order,
           s.country_zh,
-          s.city_zh
+          s.country_en,
+          s.city_zh,
+          s.city_en
         FROM application_case_offers o
         LEFT JOIN schools s ON s.school_id = o.school_id
         WHERE o.case_id = ?

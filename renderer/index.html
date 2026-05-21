@@ -17,7 +17,7 @@
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="landing-mode">
+<body class="auth-boot">
   <!-- 启动页：功能简介 -->
   <div class="landing-page" id="landing-page">
     <button type="button" class="landing-auth-btn" id="landing-auth-btn" data-i18n="landing.authBtn">登录 / 注册 / 游客</button>
@@ -413,7 +413,7 @@
                   <span class="form-label-zh lang-zh">简历（选填）</span>
                   <span class="form-label-en lang-en">Resume（Optional）</span>
                 </label>
-                <input type="file" id="sp-resume" class="form-file" accept=".pdf,.doc,.docx">
+                <input type="file" id="sp-resume" class="form-file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg">
                 <span class="form-error"></span>
               </div>
             </div>
@@ -423,7 +423,7 @@
             </div>
           </div>
 
-          <div id="school-planning-thanks" class="school-planning-score-view" style="display: none;">
+          <div id="school-planning-thanks" class="school-planning-score-view is-hidden" hidden>
             <div class="score-card">
               <div class="score-ring-wrapper">
                 <svg class="score-ring" viewBox="0 0 160 160">
@@ -457,6 +457,20 @@
                   <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-school"></div></div>
                   <span class="score-bar-value" id="score-val-school">0</span>
                 </div>
+                <div class="score-bar-item score-bar-item-llm" id="score-bar-llm-wrap" style="display: none;">
+                  <span class="score-bar-label" data-i18n="score.llm">简历评估</span>
+                  <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-llm"></div></div>
+                  <span class="score-bar-value" id="score-val-llm">0</span>
+                </div>
+              </div>
+
+              <div class="score-next-hint">
+                <p class="score-next-hint-text" data-i18n="planningNextHint.text">接下来，你可以前往「我的背景」查看水平详情，或前往「留学规划」查看 AI 规划。</p>
+                <div class="score-next-hint-actions">
+                  <button type="button" class="score-next-hint-link" id="score-go-my-profile" data-i18n="planningNextHint.goProfile">我的背景</button>
+                  <span class="score-next-hint-sep" aria-hidden="true">·</span>
+                  <button type="button" class="score-next-hint-link" id="score-go-study-planning" data-i18n="planningNextHint.goPlanning">留学规划</button>
+                </div>
               </div>
 
               <button type="button" id="school-planning-refill" class="form-submit-btn school-planning-refill-btn" data-i18n="planning.refillBtn">重新填写</button>
@@ -473,8 +487,8 @@
         </div>
         <div class="page-body">
           <div id="my-profile-empty" class="placeholder-card my-profile-empty">
-            <div class="placeholder-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div class="placeholder-icon placeholder-icon--asset">
+              <img src="../image/lecture.png" alt="">
             </div>
             <p class="placeholder-text" data-i18n="profile.empty">暂无背景信息</p>
             <p class="placeholder-hint" data-i18n="profile.emptyHint">请先在定校规划中填写您的学术背景，提交后将在此展示</p>
@@ -491,10 +505,7 @@
             </div>
             <div class="my-profile-statement-card">
               <h3 class="form-section-title" data-i18n="profile.sectionStatement">个人陈述</h3>
-              <div class="my-profile-statement-box" data-i18n="profile.statementNone">无</div>
-            </div>
-            <div class="my-profile-actions">
-              <button type="button" id="my-profile-refill" class="form-submit-btn" data-i18n="profile.refill">重新填写定校规划</button>
+              <div class="my-profile-statement-box" id="my-profile-statement-box" data-i18n="profile.statementNone">无</div>
             </div>
           </div>
         </div>
@@ -523,37 +534,54 @@
           <h1 class="page-title" data-i18n="page.studyPlanning.title">留学规划</h1>
           <p class="page-subtitle">Study Planning</p>
         </div>
+
         <div class="page-body">
           <div class="study-planning-layout">
             <!-- 左侧：留学规划大纲 -->
             <section class="study-planning-outline-panel">
               <h3 class="study-planning-panel-title" data-i18n="studyPlanning.outlineTitle">留学规划大纲</h3>
-              <div class="study-planning-outline-list" id="study-planning-outline-list">
-                <div class="study-planning-outline-empty" id="study-planning-outline-empty">
-                  <p data-i18n="studyPlanning.outlineEmpty">暂无规划条目</p>
-                  <p class="study-planning-outline-empty-hint" data-i18n="studyPlanning.outlineEmptyHint">在右侧「自定义规划」中添加规划内容</p>
+              <div class="study-planning-outline-scroll app-scrollbar">
+                <div class="study-planning-outline-list" id="study-planning-outline-list">
+                  <div class="study-planning-outline-empty" id="study-planning-outline-empty">
+                    <div class="empty-state-figure">
+                      <img src="../image/board.png" alt="">
+                    </div>
+                    <p data-i18n="studyPlanning.outlineEmpty">暂无规划条目</p>
+                    <p class="study-planning-outline-empty-hint" data-i18n="studyPlanning.outlineEmptyHint">完成定校规划后将自动生成 AI 大纲，或在下方自定义规划</p>
+                  </div>
+                </div>
+                <div class="study-planning-school-tiers" id="study-planning-school-tiers" hidden>
+                  <h4 class="study-planning-tiers-title" data-i18n="studyPlanning.tiersTitle">冲 / 稳 / 保 院校推荐</h4>
+                  <div class="study-planning-tiers-list" id="study-planning-tiers-list"></div>
+                </div>
+                <div class="study-planning-intended-schools" id="study-planning-intended-schools" hidden>
+                  <h4 class="study-planning-tiers-title" data-i18n="studyPlanning.intendedTitle">我的意向学校</h4>
+                  <div class="study-planning-intended-list" id="study-planning-intended-list"></div>
+                  <p class="study-planning-intended-empty" id="study-planning-intended-empty" hidden data-i18n="studyPlanning.intendedEmpty">在院校库或详情页收藏学校后，将显示在此处</p>
                 </div>
               </div>
             </section>
 
             <!-- 右侧上：智能留学规划 -->
             <section class="study-planning-smart-panel">
-              <h3 class="study-planning-panel-title" data-i18n="studyPlanning.smartTitle">智能留学规划</h3>
-              <div class="placeholder-card study-planning-smart-placeholder">
-                <div class="placeholder-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <div class="study-planning-smart-header">
+                <h3 class="study-planning-panel-title" data-i18n="studyPlanning.smartTitle">智能留学规划</h3>
+                <button type="button" class="form-submit-btn study-planning-regenerate-btn" id="study-planning-regenerate" data-i18n="studyPlanning.regenerate">重新生成</button>
+              </div>
+              <div class="study-planning-smart-body app-scrollbar" id="study-planning-smart-body">
+                <div class="study-planning-smart-empty" id="study-planning-smart-empty">
+                  <p data-i18n="studyPlanning.smartEmpty">完成定校规划后将自动生成带日期的待办事项</p>
                 </div>
-                <p class="placeholder-text" data-i18n="studyPlanning.smartComingSoon">智能留学规划即将上线</p>
-                <p class="placeholder-hint" data-i18n="studyPlanning.smartHint">AI 将根据你的背景自动生成个性化留学规划</p>
+                <div class="study-planning-smart-list" id="study-planning-smart-list"></div>
               </div>
             </section>
 
             <!-- 右侧下：自定义规划 -->
             <section class="study-planning-custom-panel">
               <h3 class="study-planning-panel-title" data-i18n="studyPlanning.customTitle">自定义规划</h3>
-              <textarea id="study-planning-custom-input" class="study-planning-custom-input" placeholder="#英语水平提升&#10;*外语对申请欧洲学校来说很重要&#10;[2025.3.1-2025.3.10]背诵5个单词&#10;[2025.3.8-2025.3.15]练一篇作文&#10;&#10;#学术成绩提升&#10;[2025.4.1-2025.4.30]复习高数"></textarea>
-              <p class="study-planning-custom-hint lang-zh">格式：<code>#标题</code>（必填）、<code>*简介</code>（可选）、<code>[年.月.日-年.月.日]任务内容</code></p>
-              <p class="study-planning-custom-hint study-planning-custom-hint-en lang-en">Format: <code>#Title</code> (required), <code>*Description</code> (optional), <code>[YYYY.M.D-YYYY.M.D]Task</code></p>
+              <div class="study-planning-custom-body app-scrollbar">
+                <textarea id="study-planning-custom-input" class="study-planning-custom-input" data-i18n-placeholder="studyPlanning.customExamplePlaceholder"></textarea>
+              </div>
               <div class="study-planning-custom-actions">
                 <button type="button" class="form-submit-btn" id="study-planning-custom-submit" data-i18n="studyPlanning.parseAndAdd">解析并添加</button>
               </div>
@@ -605,10 +633,12 @@
                   <button type="button" class="daily-checkin-clear-btn" id="daily-checkin-clear-all" title="清空所有任务" aria-label="清空所有任务" data-i18n-title="daily.clearDayLabel" data-i18n-aria-label="daily.clearDayLabel">🗑</button>
                 </div>
               </div>
-              <div class="daily-checkin-task-list" id="daily-checkin-task-list"></div>
-              <div class="daily-checkin-task-empty" id="daily-checkin-task-empty">
-                <p class="daily-checkin-task-empty-en lang-en">No tasks today~</p>
-                <p class="daily-checkin-task-empty-zh lang-zh">今天没有任务~</p>
+              <div class="daily-checkin-task-body">
+                <div class="daily-checkin-task-list" id="daily-checkin-task-list"></div>
+                <div class="daily-checkin-task-empty" id="daily-checkin-task-empty">
+                  <p class="daily-checkin-task-empty-en lang-en">No tasks today~</p>
+                  <p class="daily-checkin-task-empty-zh lang-zh">今天没有任务~</p>
+                </div>
               </div>
               <div class="daily-checkin-task-actions">
                 <button type="button" class="form-submit-btn" id="daily-checkin-add-task" data-i18n="daily.addTask">新建条目</button>
@@ -617,10 +647,12 @@
           </div>
 
           <div class="daily-checkin-modal" id="daily-checkin-modal" aria-hidden="true">
-            <div class="daily-checkin-modal-card" role="dialog" aria-modal="true" aria-labelledby="daily-checkin-modal-title">
-              <h3 class="daily-checkin-modal-title" id="daily-checkin-modal-title" data-i18n="daily.modalTitle">新增任务</h3>
-              <label class="daily-checkin-modal-label" for="daily-checkin-modal-input" data-i18n="daily.modalContentLabel">任务内容</label>
-              <textarea id="daily-checkin-modal-input" class="daily-checkin-modal-input" maxlength="200" placeholder="请输入任务内容（可详细一点）" data-i18n-placeholder="daily.modalContentPlaceholder"></textarea>
+            <div class="daily-checkin-modal-card" role="dialog" aria-modal="true" aria-labelledby="daily-checkin-modal-heading">
+              <h3 class="daily-checkin-modal-heading" id="daily-checkin-modal-heading" data-i18n="daily.modalTitle">新增任务</h3>
+              <label class="daily-checkin-modal-label" for="daily-checkin-modal-title-input" data-i18n="daily.modalTitleLabel">一级标题</label>
+              <input id="daily-checkin-modal-title-input" class="daily-checkin-modal-input" type="text" maxlength="80" placeholder="例如：英语听力练习" data-i18n-placeholder="daily.modalTitlePlaceholder">
+              <label class="daily-checkin-modal-label" for="daily-checkin-modal-subtitle" data-i18n="daily.modalSubtitleLabel">二级说明</label>
+              <input id="daily-checkin-modal-subtitle" class="daily-checkin-modal-input daily-checkin-modal-subtitle" type="text" maxlength="120" placeholder="例如：完成机经第 3 套听力部分" data-i18n-placeholder="daily.modalSubtitlePlaceholder">
               <label class="daily-checkin-modal-label" for="daily-checkin-modal-color" data-i18n="daily.modalColorLabel">任务颜色</label>
               <select id="daily-checkin-modal-color" class="daily-checkin-modal-color"></select>
               <div class="daily-checkin-modal-actions">
@@ -697,7 +729,7 @@
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="text" id="application-cases-search-input" class="school-search-input" placeholder="搜索录取院校、项目或案例标签" data-i18n-placeholder="cases.searchPlaceholder">
-            <button type="button" id="application-cases-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索">×</button>
+            <button type="button" id="application-cases-search-clear" class="school-search-clear" aria-label="清空搜索" title="清空搜索" data-i18n-aria-label="cases.searchClear" data-i18n-title="cases.searchClear">×</button>
           </div>
 
           <div class="school-filter-bar application-cases-filter-bar">
@@ -767,17 +799,36 @@
 
       <!-- 资源中心 -->
       <section class="page" id="page-resource-center">
-        <div class="page-header">
-          <h1 class="page-title" data-i18n="page.resourceCenter.title">资源中心</h1>
-          <p class="page-subtitle">Resource Center</p>
-        </div>
-        <div class="page-body">
-          <div class="placeholder-card">
-            <div class="placeholder-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <div class="resource-center-list-view" id="resource-center-list-view">
+          <div class="page-header">
+            <h1 class="page-title" data-i18n="page.resourceCenter.title">资源中心</h1>
+            <p class="page-subtitle">Resource Center</p>
+          </div>
+          <div class="page-body">
+            <div class="resource-center-layout">
+              <div class="resource-category-bar" id="resource-category-bar" role="tablist" aria-label="Resource categories"></div>
+              <div class="resource-items-panel">
+                <h3 class="resource-items-title" id="resource-items-title"></h3>
+                <div class="resource-items-list" id="resource-items-grid"></div>
+                <div class="resource-items-pagination" id="resource-items-pagination" hidden></div>
+              </div>
             </div>
-            <p class="placeholder-text" data-i18n="resource.comingSoon">资源中心功能即将上线</p>
-            <p class="placeholder-hint" data-i18n="resource.hint">获取留学相关的工具、模板和资料</p>
+          </div>
+        </div>
+
+        <div class="resource-detail-page" id="resource-detail-page" hidden>
+          <div class="resource-detail-page-toolbar">
+            <button type="button" class="resource-detail-back" id="resource-detail-back" data-i18n="resource.back">返回</button>
+          </div>
+          <div class="resource-detail-page-body app-scrollbar">
+            <article class="resource-detail-article">
+              <p class="resource-detail-date" id="resource-detail-date"></p>
+              <h2 class="resource-detail-title" id="resource-detail-title"></h2>
+              <p class="resource-detail-desc" id="resource-detail-desc"></p>
+              <div class="resource-detail-placeholder" id="resource-detail-placeholder">
+                <p data-i18n="resource.detailEmpty">内容筹备中，敬请期待</p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -794,7 +845,15 @@
               <button type="button" class="form-submit-btn" id="community-new-post-btn" data-i18n="community.newPost">新建帖子</button>
             </div>
             <p class="community-board-auth-tip" id="community-board-auth-tip"></p>
-            <div class="community-board-list" id="community-board-list"></div>
+            <div class="community-board-list" id="community-board-list">
+              <div class="community-empty-card">
+                <div class="empty-state-figure">
+                  <img src="../image/picnic.png" alt="">
+                </div>
+                <p class="placeholder-text" data-i18n="community.emptyPosts">暂无帖子</p>
+                <p class="placeholder-hint" data-i18n="community.emptyPostsHint">点击上方「新建帖子」，发表第一条内容吧</p>
+              </div>
+            </div>
             <div class="community-board-pagination" id="community-board-pagination"></div>
           </div>
 
@@ -857,7 +916,7 @@
             <svg class="star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </button>
         </div>
-        <div class="school-detail-body">
+        <div class="school-detail-body app-scrollbar">
           <div class="school-detail-hero" id="school-detail-hero">
             <div class="school-detail-hero-bg" id="school-detail-hero-bg"></div>
             <div class="school-detail-carousel-wrap" id="school-detail-carousel-wrap">
@@ -993,6 +1052,17 @@
                 </label>
               </div>
 
+              <div class="settings-item-card settings-nav-item settings-expand-card" id="settings-api-item">
+                <button type="button" class="settings-expand-header" id="settings-api-trigger">
+                  <span class="settings-item-label" data-i18n="settings.apiKey">API Key</span>
+                  <span class="settings-expand-status" id="settings-api-status">-</span>
+                </button>
+                <div class="settings-expand-body" id="settings-api-body" hidden>
+                  <input id="settings-api-key-input" class="settings-form-input settings-api-input" type="password" autocomplete="off" placeholder="sk-..." data-i18n-placeholder="settings.apiKeyPlaceholder">
+                  <button type="button" class="form-submit-btn settings-api-save-btn" id="settings-api-save" data-i18n="settings.saveApiKey">保存 Key</button>
+                </div>
+              </div>
+
               <div class="settings-item-card settings-certify-card" id="settings-certify-item">
                 <button type="button" class="settings-certify-header" id="settings-certify-trigger">
                   <span class="settings-item-label" data-i18n="settings.certify">账户认证</span>
@@ -1007,6 +1077,13 @@
                 </div>
                 <div class="settings-certify-guest-hint" id="settings-certify-guest-hint" hidden data-i18n="settings.certifyGuestHint">
                   请先登录后使用认证功能
+                </div>
+              </div>
+
+              <div class="settings-item-card settings-nav-item" id="settings-clear-data-item">
+                <div class="settings-item">
+                  <span class="settings-item-label" data-i18n="settings.clearPersonalData">清空个人资料</span>
+                  <button type="button" class="settings-cancel-btn" id="settings-clear-personal-data" data-i18n="settings.clearPersonalDataBtn">清空</button>
                 </div>
               </div>
 
@@ -1066,6 +1143,29 @@
           </section>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="app-confirm-modal" id="app-confirm-modal" aria-hidden="true">
+    <div class="app-confirm-card" role="dialog" aria-modal="true" aria-labelledby="app-confirm-title">
+      <h3 class="app-confirm-title" id="app-confirm-title"></h3>
+      <p class="app-confirm-desc" id="app-confirm-desc"></p>
+      <div class="app-confirm-actions">
+        <button type="button" class="form-submit-btn app-confirm-cancel" id="app-confirm-cancel" data-i18n="daily.cancel">取消</button>
+        <button type="button" class="form-submit-btn app-confirm-ok" id="app-confirm-ok" data-i18n="common.confirm">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-loading-overlay" id="ai-loading-overlay" aria-hidden="true">
+    <div class="ai-loading-card">
+      <img src="../image/planting.png" alt="" class="ai-loading-logo">
+      <p class="ai-loading-message" id="ai-loading-message" data-i18n="loading.waitTitle">请稍候，正在加载中…</p>
+      <div class="ai-loading-progress-track" aria-hidden="true">
+        <div class="ai-loading-progress-bar" id="ai-loading-progress-bar"></div>
+      </div>
+      <p class="ai-loading-percent" id="ai-loading-percent">0%</p>
+      <p class="ai-loading-hint" data-i18n="loading.waitHint">AI 正在为您生成内容，这可能需要一点时间</p>
     </div>
   </div>
 

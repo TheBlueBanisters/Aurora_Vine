@@ -8,6 +8,8 @@ import { registerDailyCheckinIpc, ensureDailyCheckinTable } from './main/ipc/dai
 import { registerStudyPlanIpc, ensureStudyPlanTable } from './main/ipc/study-planning';
 import { registerCommunityIpc, ensureCommunityTables } from './main/ipc/community';
 import { registerApplicationCasesIpc } from './main/ipc/application-cases';
+import { registerResumeIpc } from './main/ipc/resume';
+import { registerLlmIpc, registerSettingsConfigIpc } from './main/ipc/llm';
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'avatar', privileges: { standard: true, secure: true } },
@@ -73,6 +75,9 @@ registerDailyCheckinIpc();
 registerStudyPlanIpc();
 registerCommunityIpc();
 registerApplicationCasesIpc();
+registerResumeIpc();
+registerSettingsConfigIpc();
+registerLlmIpc();
 
 app.whenReady()
   .then(() => {
