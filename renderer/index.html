@@ -223,7 +223,7 @@
         <div class="page-body">
           <div class="planning-intro-box">
             <img src="../image/plan.png" alt="Plan" class="planning-intro-image">
-            <h2 class="planning-intro-title" data-i18n="planning.introTitle">定校规划 · School Planning</h2>
+            <h2 class="planning-intro-title" data-i18n="planning.introTitle">欢迎你的加入！</h2>
             <p class="planning-intro-text lang-zh" data-i18n="planning.introZh">
               欢迎来到 Aurora Vine 的定校规划模块。在这里，我们会根据你的本科背景、成绩情况和语言成绩，为你生成一份个性化的留学定校建议。填写这些信息只需要几分钟，但它将帮助系统更准确地评估你的申请竞争力，并为你推荐合适的目标院校梯度，同时生成一份未来申请规划路径。请尽量如实填写，你随时可以返回修改；准备好了的话，就从下面开始吧。
             </p>
@@ -1060,20 +1060,18 @@
                 <div class="settings-expand-body" id="settings-api-body" hidden>
                   <input id="settings-api-key-input" class="settings-form-input settings-api-input" type="password" autocomplete="off" placeholder="sk-..." data-i18n-placeholder="settings.apiKeyPlaceholder">
                   <button type="button" class="form-submit-btn settings-api-save-btn" id="settings-api-save" data-i18n="settings.saveApiKey">保存 Key</button>
+                  <button type="button" class="settings-cancel-btn settings-api-clear-btn" id="settings-api-clear" data-i18n="settings.clearApiKey">清除</button>
                 </div>
               </div>
 
-              <div class="settings-item-card settings-certify-card" id="settings-certify-item">
-                <button type="button" class="settings-certify-header" id="settings-certify-trigger">
+              <div class="settings-item-card settings-nav-item settings-expand-card" id="settings-certify-item">
+                <button type="button" class="settings-expand-header" id="settings-certify-trigger">
                   <span class="settings-item-label" data-i18n="settings.certify">账户认证</span>
-                  <span class="settings-certify-status" id="settings-certify-status" data-i18n="settings.notCertified">未认证</span>
                 </button>
-                <div class="settings-certify-body" id="settings-certify-body" hidden>
-                  <div class="settings-certify-input-row">
-                    <input id="settings-certify-code" class="settings-certify-input" type="text" placeholder="请输入邀请码" autocomplete="off" data-i18n-placeholder="settings.certifyPlaceholder">
-                    <button type="button" class="settings-certify-hint-btn" id="settings-certify-hint-btn" title="输入邀请码可认证为「认证学长/学姐」" aria-label="帮助">?</button>
-                  </div>
-                  <button id="settings-certify-submit" class="form-submit-btn settings-certify-btn" type="button" data-i18n="settings.certifyBtn">认证</button>
+                <div class="settings-expand-body" id="settings-certify-body" hidden>
+                  <input id="settings-certify-code" class="settings-form-input settings-api-input" type="text" placeholder="请输入邀请码" autocomplete="off" data-i18n-placeholder="settings.certifyPlaceholder">
+                  <button type="button" class="settings-certify-hint-btn" id="settings-certify-hint-btn" title="输入邀请码可认证为「认证学长/学姐」" aria-label="帮助">?</button>
+                  <button type="button" class="form-submit-btn settings-api-save-btn" id="settings-certify-submit" data-i18n="settings.certifyBtn">认证</button>
                 </div>
                 <div class="settings-certify-guest-hint" id="settings-certify-guest-hint" hidden data-i18n="settings.certifyGuestHint">
                   请先登录后使用认证功能

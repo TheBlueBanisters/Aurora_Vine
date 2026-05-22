@@ -2,6 +2,7 @@ import { t, getLang } from './i18n.js'
 import { escapeHtml } from './utils.js'
 import { EXTRA_PLACEHOLDER_ITEMS } from './resource-placeholder-extra.js'
 import { RESOURCE_CONTENT } from './resource-content.js'
+import { renderResourceSections } from './resource-content-renderer.js'
 import { decorateFireflyHosts } from './firefly-effect.js'
 
 const ITEMS_PER_PAGE = 7
@@ -328,40 +329,6 @@ function getResourceContent(item) {
   }
 }
 
-function renderResourceSection(section, index) {
-  const title = section.title ? `<h4 class="resource-detail-section-title">${escapeHtml(section.title)}</h4>` : ''
-  if (section.type === 'list') {
-    const items = Array.isArray(section.items) ? section.items : []
-    return `
-      <section class="resource-detail-section resource-detail-section-list" data-section-index="${index}">
-        ${title}
-        <ul class="resource-detail-list">
-          ${items.map((text) => `<li>${escapeHtml(text)}</li>`).join('')}
-        </ul>
-      </section>`
-  }
-  if (section.type === 'template') {
-    const lines = Array.isArray(section.lines) ? section.lines : []
-    return `
-      <section class="resource-detail-section resource-detail-section-template" data-section-index="${index}">
-        ${title}
-        <pre class="resource-detail-template"><code>${escapeHtml(lines.join('\n'))}</code></pre>
-      </section>`
-  }
-  if (section.type === 'note') {
-    return `
-      <section class="resource-detail-section resource-detail-note" data-section-index="${index}">
-        ${title}
-        <p>${escapeHtml(section.text || '')}</p>
-      </section>`
-  }
-  return `
-    <section class="resource-detail-section resource-detail-section-paragraph" data-section-index="${index}">
-      ${title}
-      <p>${escapeHtml(section.text || '')}</p>
-    </section>`
-}
-
 function renderResourceDetailContent(item) {
   const contentEl = document.getElementById('resource-detail-placeholder')
   if (!contentEl) return
@@ -375,7 +342,7 @@ function renderResourceDetailContent(item) {
   }
 
   contentEl.className = 'resource-detail-content'
-  contentEl.innerHTML = sections.map(renderResourceSection).join('')
+  contentEl.innerHTML = renderResourceSections(sections)
 }
 
 function openResourceDetail(item) {

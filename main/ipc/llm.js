@@ -18,11 +18,20 @@ import {
   resolveSchoolTiers
 } from '../llm/school-matcher.js';
 import { tasksToDbJson, taskToCheckinContent } from '../llm/i18n-content.js';
+import { buildProfileForLlm } from '../llm/profile-context.js';
 
 async function getResumeTextSafe(md5) {
   if (!md5) return '';
   const result = await extractResumeText(md5);
   return typeof result === 'string' ? result : '';
+}
+
+function profilePayloadForPrompt(profile, resumeText, scorePayload = {}) {
+  return buildProfileForLlm(profile, {
+    resumeText,
+    totalScore: scorePayload.totalScore,
+    scoreDetail: scorePayload.scoreDetail
+  });
 }
 
 export function registerSettingsConfigIpc() {
@@ -52,7 +61,7 @@ export function registerLlmIpc() {
       if (!resumeText) return { success: false, error: '无法读取简历文本，请重新上传' };
 
       const raw = await runPromptTemplate('score-resume', {
-        profileJson: profile,
+        profileJson: profilePayloadForPrompt(profile, resumeText),
         resumeText
       });
       const parsed = validateScoreResponse(parseJsonFromLlm(raw));
@@ -68,6 +77,7 @@ export function registerLlmIpc() {
       const profile = payload?.profile || {};
       const md5 = String(payload?.md5 || '').trim();
       const totalScore = Number(payload?.totalScore ?? 70);
+      const scoreDetail = payload?.scoreDetail || null;
       const resumeText = md5 ? await getResumeTextSafe(md5) : '';
       const timeline = buildApplicationTimeline(profile);
       const catalog = loadSchoolCatalog();
@@ -76,7 +86,7 @@ export function registerLlmIpc() {
       }
 
       const raw = await runPromptTemplate('plan-outline', {
-        profileJson: profile,
+        profileJson: profilePayloadForPrompt(profile, resumeText, { totalScore, scoreDetail }),
         resumeText,
         timelineJson: timeline,
         schoolCatalogJson: catalogForPrompt(catalog)
@@ -115,10 +125,14 @@ export function registerLlmIpc() {
     try {
       const profile = payload?.profile || {};
       const outline = payload?.outline || {};
+      const scoreDetail = payload?.scoreDetail || null;
+      const totalScore = payload?.totalScore != null ? Number(payload.totalScore) : undefined;
+      const md5 = String(payload?.md5 || profile?.resumeMd5 || '').trim();
+      const resumeText = md5 ? await getResumeTextSafe(md5) : '';
       const timeline = buildApplicationTimeline(profile);
 
       const raw = await runPromptTemplate('plan-schedule', {
-        profileJson: profile,
+        profileJson: profilePayloadForPrompt(profile, resumeText, { totalScore, scoreDetail }),
         timelineJson: timeline,
         outlineJson: outline
       });
@@ -144,15 +158,19 @@ export function registerLlmIpc() {
   ipcMain.handle('llm:generateDailyTasks', async (_event, payload = {}) => {
     const profile = payload?.profile || {};
     const schedule = payload?.schedule || {};
+    const scoreDetail = payload?.scoreDetail || null;
+    const totalScore = payload?.totalScore != null ? Number(payload.totalScore) : undefined;
+    const md5 = String(payload?.md5 || profile?.resumeMd5 || '').trim();
+    const resumeText = md5 ? await getResumeTextSafe(md5) : '';
     const timeline = buildApplicationTimeline(profile);
     const variables = {
-      profileJson: profile,
+      profileJson: profilePayloadForPrompt(profile, resumeText, { totalScore, scoreDetail }),
       timelineJson: timeline,
       scheduleJson: schedule
     };
 
     let lastError = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const raw = await runPromptTemplate('plan-daily-tasks', variables, { maxTokens: 8192 });
         const parsed = validateDailyTasksResponse(parseJsonFromLlm(raw));
@@ -177,10 +195,11 @@ export function registerLlmIpc() {
       const profile = payload?.profile || {};
       const md5 = String(payload?.md5 || '').trim();
       const totalScore = Number(payload?.totalScore ?? 70);
+      const scoreDetail = payload?.scoreDetail || null;
       const resumeText = md5 ? await getResumeTextSafe(md5) : '';
 
       const raw = await runPromptTemplate('personal-statement', {
-        profileJson: profile,
+        profileJson: profilePayloadForPrompt(profile, resumeText, { totalScore, scoreDetail }),
         resumeText,
         totalScore
       });

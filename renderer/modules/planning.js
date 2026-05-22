@@ -7,6 +7,7 @@ import {
 } from './profile.js'
 import { executeSchoolPlanningSubmit } from './llm-planning-service.js'
 import { getSchoolPlanningProfile } from './storage.js'
+import { enhanceSelectsIn, refreshSelect, refreshSelectsIn } from './custom-select.js'
 
 const REFILL_EVENT = 'aurora:school-planning-refill'
 
@@ -125,12 +126,20 @@ export function initSchoolPlanningForm() {
   populateCountSelect(internshipCountSelect)
   populateCountSelect(paperCountSelect)
 
-  function syncIeltsNone() { if (ieltsSelect) { ieltsSelect.disabled = !!ieltsNone?.checked; if (ieltsNone?.checked) ieltsSelect.value = '' } }
-  function syncToeflNone() { if (toeflSelect) { toeflSelect.disabled = !!toeflNone?.checked; if (toeflNone?.checked) toeflSelect.value = '' } }
+  function syncIeltsNone() {
+    if (ieltsSelect) { ieltsSelect.disabled = !!ieltsNone?.checked; if (ieltsNone?.checked) ieltsSelect.value = '' }
+    refreshSelect(ieltsSelect)
+  }
+  function syncToeflNone() {
+    if (toeflSelect) { toeflSelect.disabled = !!toeflNone?.checked; if (toeflNone?.checked) toeflSelect.value = '' }
+    refreshSelect(toeflSelect)
+  }
   function syncGreNone() {
     const checked = greNone?.checked
     if (greSelect) { greSelect.disabled = !!checked; if (checked) greSelect.value = '' }
     if (greWritingSelect) { greWritingSelect.disabled = !!checked; if (checked) greWritingSelect.value = '' }
+    refreshSelect(greSelect)
+    refreshSelect(greWritingSelect)
   }
 
   ieltsNone?.addEventListener('change', syncIeltsNone)
@@ -141,6 +150,7 @@ export function initSchoolPlanningForm() {
     syncToeflNone()
     syncGreNone()
     syncGpaRangeByScale()
+    refreshSelectsIn(form)
   })
 
   function syncGpaRangeByScale() {
@@ -235,5 +245,6 @@ export function initSchoolPlanningForm() {
   document.getElementById('school-planning-refill')?.addEventListener('click', beginSchoolPlanningRefill)
   document.addEventListener(REFILL_EVENT, beginSchoolPlanningRefill)
 
+  enhanceSelectsIn(form)
   syncSchoolPlanningIdentityState()
 }

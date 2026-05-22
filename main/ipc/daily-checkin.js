@@ -131,6 +131,60 @@ export function registerDailyCheckinIpc() {
     }
   });
 
+  ipcMain.handle('dailyCheckin:importPlan', async (_event, payload = {}) => {
+    const byDate = payload?.byDate;
+    if (!byDate || typeof byDate !== 'object') {
+      return { success: false, error: '导入数据格式不正确' };
+    }
+
+    try {
+      ensureDailyCheckinTable();
+      const db = getWritableDb();
+      const insertStmt = db.prepare(`
+        INSERT INTO daily_checkin (date_key, content, color, completed, sort_order)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      let imported = 0;
+      let days = 0;
+
+      const importAll = db.transaction((entries) => {
+        db.prepare('DELETE FROM daily_checkin').run();
+        for (const [rawDateKey, rawTasks] of Object.entries(entries)) {
+          const dateKey = normalizeDateKey(rawDateKey);
+          if (!dateKey) continue;
+
+          const tasks = (Array.isArray(rawTasks) ? rawTasks : [])
+            .map((task) => {
+              const content = String(task?.content ?? '').trim();
+              if (!content) return null;
+              return {
+                content,
+                color: sanitizeTaskColor(task?.color),
+                completed: task?.completed ? 1 : 0
+              };
+            })
+            .filter(Boolean)
+            .slice(0, 9);
+
+          if (tasks.length === 0) continue;
+          days += 1;
+          tasks.forEach((task, idx) => {
+            insertStmt.run(dateKey, task.content, task.color, task.completed, idx);
+            imported += 1;
+          });
+        }
+      });
+
+      importAll(byDate);
+      db.close();
+      return { success: true, imported, days };
+    } catch (err) {
+      console.error('dailyCheckin:importPlan error:', err);
+      return { success: false, error: err.message || '导入失败' };
+    }
+  });
+
   ipcMain.handle('dailyCheckin:saveByDate', async (event, dateKey, items = []) => {
     const normalizedDateKey = normalizeDateKey(dateKey);
     if (!normalizedDateKey) return { success: false, error: '日期格式不正确' };

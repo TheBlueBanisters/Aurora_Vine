@@ -119,15 +119,28 @@
 }
 
 [data-theme="dark"] .score-card.firefly-host,
-[data-theme="dark"] .my-profile-info-card.firefly-host,
 [data-theme="dark"] .my-profile-chart-card.firefly-host,
-[data-theme="dark"] .my-profile-statement-card.firefly-host,
-[data-theme="dark"] .my-profile-info-item.firefly-host {
+[data-theme="dark"] .my-profile-statement-card.firefly-host {
   border-color: color-mix(in srgb, #f9e2af 28%, var(--card-border));
   box-shadow:
     0 0 0 1px color-mix(in srgb, #f9e2af 12%, transparent),
     0 0 20px rgba(249, 226, 175, 0.1),
     inset 0 0 22px rgba(249, 226, 175, 0.04);
+}
+
+/* 我的背景 · 基本信息：仅外框少量光晕，内部字段无荧光 */
+[data-theme="dark"] .my-profile-info-card.firefly-host {
+  overflow: hidden;
+  border-color: color-mix(in srgb, #f9e2af 24%, var(--card-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #f9e2af 10%, transparent),
+    0 0 14px rgba(249, 226, 175, 0.08);
+}
+
+[data-theme="dark"] .my-profile-info-card .my-profile-info-item {
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 [data-theme="dark"] .school-card.firefly-host:hover,

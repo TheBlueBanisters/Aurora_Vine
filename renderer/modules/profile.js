@@ -6,7 +6,6 @@ import { getSchoolPlanningProfile } from './storage.js'
 import { getTheme } from './theme.js'
 import { computeStudentScore, profileToScoreInput } from './scoring.js'
 import { pickLocalized } from './localized-content.js'
-import { decorateFireflyHosts } from './firefly-effect.js'
 
 let myProfileChartInstance = null
 let schoolPlanningEditing = false
@@ -67,7 +66,6 @@ export function loadMyProfile() {
     infoGrid.innerHTML = infoItems
       .map((item) => `<div class="my-profile-info-item"><span class="my-profile-info-label">${escapeHtml(item.label)}</span><span class="my-profile-info-value">${escapeHtml(String(item.value))}</span></div>`)
       .join('')
-    decorateFireflyHosts(infoGrid, '.my-profile-info-item', 'dark')
   }
 
   const chartData = []
@@ -115,7 +113,9 @@ export function loadMyProfile() {
   }
 
   const isDark = getTheme() === 'dark'
-  const barColors = ['#89b4fa', '#74c7ec', '#a6e3a1', '#f9e2af', '#fab387']
+  const barColors = isDark
+    ? ['#ffe066', '#fff176', '#a6e3a1', '#f9e2af', '#fab387']
+    : ['#62c492', '#a8e4c8', '#a6e3a1', '#f9e2af', '#fab387']
 
   const roundedStarSvg = (color) =>
     `data:image/svg+xml,${encodeURIComponent(

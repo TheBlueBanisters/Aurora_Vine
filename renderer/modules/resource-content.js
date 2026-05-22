@@ -1,40 +1,11 @@
+import { greVocabContent } from './resource-content/gre-vocab.js'
+import { greVocab2Content } from './resource-content/gre-vocab-2.js'
+import { greMathContent } from './resource-content/gre-math.js'
+
 export const RESOURCE_CONTENT = {
-  'gre-vocab': {
-    zh: {
-      sections: [
-        { type: 'paragraph', text: 'GRE 词汇复习不要只背中文释义，更重要的是识别词性、常见搭配和句子里的逻辑方向。建议把词表拆成“熟词僻义、态度词、逻辑词、学科词”四组循环复习。' },
-        { type: 'list', title: '核心复习法', items: ['每天固定 60-80 个词，先看英文释义再看中文提示。', '把同义词和反义词放在一起记，例如 support / corroborate / substantiate。', '每周用阅读长句回看词义，不单独孤立背诵。'] },
-        { type: 'template', title: '高频逻辑词速记', lines: ['concede = admit reluctantly', 'undermine = weaken an argument', 'bolster = support with evidence', 'ambivalent = having mixed feelings', 'scrutinize = examine carefully'] },
-        { type: 'note', title: '使用提示', text: '如果备考时间少于 30 天，优先背态度词和逻辑词，它们对填空和阅读的收益最高。' }
-      ]
-    },
-    en: {
-      sections: [
-        { type: 'paragraph', text: 'GRE vocabulary review should go beyond Chinese meanings. Focus on part of speech, collocations, and the logical direction a word creates in a sentence.' },
-        { type: 'list', title: 'Core Method', items: ['Review 60-80 words per day and check the English definition first.', 'Group synonyms and antonyms together, such as support / corroborate / substantiate.', 'Revisit words inside reading sentences every week instead of memorizing them in isolation.'] },
-        { type: 'template', title: 'High-Frequency Logic Words', lines: ['concede = admit reluctantly', 'undermine = weaken an argument', 'bolster = support with evidence', 'ambivalent = having mixed feelings', 'scrutinize = examine carefully'] },
-        { type: 'note', title: 'Tip', text: 'If you have less than 30 days, prioritize attitude words and logical connectors because they help most with text completion and reading.' }
-      ]
-    }
-  },
-  'gre-math': {
-    zh: {
-      sections: [
-        { type: 'paragraph', text: 'GRE Quant 的难点通常不是公式本身，而是英文题干、单位转换和条件陷阱。复习时建议把公式和典型错误放在一起整理。' },
-        { type: 'list', title: '必备公式', items: ['圆：C = 2πr，A = πr²。', '三角形面积：A = 1/2 × base × height。', '平均数：mean = sum / count。', '排列组合：nCr = n! / r!(n-r)!。'] },
-        { type: 'list', title: '检查清单', items: ['题目问的是整数、正数还是所有实数？', '单位是否发生变化，例如 minutes 与 hours？', '图形是否明确写了 not drawn to scale？'] },
-        { type: 'note', title: '使用提示', text: '做错题时记录“错因类型”，比单纯记录题目更有用。' }
-      ]
-    },
-    en: {
-      sections: [
-        { type: 'paragraph', text: 'The challenge in GRE Quant is often not the formula itself, but English wording, unit conversion, and hidden conditions. Keep formulas and common traps together.' },
-        { type: 'list', title: 'Essential Formulas', items: ['Circle: C = 2πr, A = πr².', 'Triangle area: A = 1/2 × base × height.', 'Mean: mean = sum / count.', 'Combinations: nCr = n! / r!(n-r)!.'] },
-        { type: 'list', title: 'Check Before Answering', items: ['Does the question ask for integers, positive numbers, or all real numbers?', 'Did the unit change, such as minutes to hours?', 'Does the figure say not drawn to scale?'] },
-        { type: 'note', title: 'Tip', text: 'For mistakes, track the type of error rather than only saving the original question.' }
-      ]
-    }
-  },
+  'gre-vocab': greVocabContent,
+  'gre-vocab-2': greVocab2Content,
+  'gre-math': greMathContent,
   'ielts-speaking': {
     zh: {
       sections: [

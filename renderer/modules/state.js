@@ -52,7 +52,7 @@ export function getUsageGuideFinalStep() {
 export const USAGE_GUIDE_STEPS = GUIDE_STEP_KEYS.map((s) => ({ pageId: s.pageId, title: s.titleKey, desc: s.descKey }))
 export const USAGE_GUIDE_FINAL_STEP = { title: 'guide.step.final', desc: 'guide.step.finalDesc', isFinal: true }
 const TASK_COLOR_DEFS = [
-  { value: '#89B4FA', labelKey: 'color.skyBlue' },
+  { value: '#62C492', labelKey: 'color.skyBlue' },
   { value: '#A6E3A1', labelKey: 'color.mint' },
   { value: '#F9E2AF', labelKey: 'color.lightYellow' },
   { value: '#F5C2E7', labelKey: 'color.pinkPurple' },
@@ -60,7 +60,7 @@ const TASK_COLOR_DEFS = [
   { value: '#CBA6F7', labelKey: 'color.purple' },
   { value: '#94E2D5', labelKey: 'color.teal' },
   { value: '#F38BA8', labelKey: 'color.rose' },
-  { value: '#B4BEFE', labelKey: 'color.fogBlue' }
+  { value: '#A8E4C8', labelKey: 'color.fogBlue' }
 ]
 
 export function getTaskColors() {

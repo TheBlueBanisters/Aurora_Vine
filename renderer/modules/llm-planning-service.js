@@ -11,36 +11,63 @@ import { getSchoolPlanningProfile, setSchoolPlanningProfile } from './storage.js
 import { computeStudentScore, profileToScoreInput } from './scoring.js'
 import { renderScoreResult } from './profile.js'
 import { DAILY_TASK_COLORS } from './state.js'
-import { expandDateRange } from './study-planning-parser.js'
-import { pickTaskTitle, pickTaskSubtitle } from './localized-content.js'
-import { serializeCheckinTaskContent } from './localized-content.js'
+import {
+  buildDailyTasksFromSchedule,
+  mergeDailyTaskLists,
+  fillTimelineGaps,
+  summarizeDailyTaskCoverage,
+  distributeDailyTasksToCheckin
+} from './daily-task-distributor.js'
 
 function pickColorByIndex(index) {
   return DAILY_TASK_COLORS[index % DAILY_TASK_COLORS.length].value
 }
 
-async function distributeDailyTasksToCheckin(dailyTasks, color) {
-  if (!window.api?.dailyCheckinAppendTasks) return 0
+function buildTimelineFromProfile(profile = {}) {
+  const now = new Date()
+  const gradYearRaw = parseInt(profile.graduationYear, 10)
+  const gradYear = Number.isFinite(gradYearRaw) && gradYearRaw >= 2020
+    ? gradYearRaw
+    : now.getFullYear() + 1
+  const applicationSeasonYear = gradYear - 1
+  const pad = (n) => String(n).padStart(2, '0')
+  const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+  const planStart = new Date(now)
+  planStart.setHours(0, 0, 0, 0)
+  const planEnd = new Date(`${applicationSeasonYear}-12-15T00:00:00`)
+  return { planStartDate: fmt(planStart), planEndDate: fmt(planEnd) }
+}
 
-  const dateTaskMap = new Map()
-  dailyTasks.forEach((task) => {
-    const title = pickTaskTitle(task)
-    const subtitle = pickTaskSubtitle(task)
-    if (!title && !subtitle) return
-    const content = serializeCheckinTaskContent(task.title, task.subtitle)
-    const dateKeys = expandDateRange(task.dateStart, task.dateEnd)
-    dateKeys.forEach((dk) => {
-      if (!dateTaskMap.has(dk)) dateTaskMap.set(dk, [])
-      dateTaskMap.get(dk).push({ content, color, completed: false })
+async function generateDailyTasksWithRetry(profile, schedulePayload, llmScorePayload, maxAttempts = 3) {
+  let lastError = null
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const res = await window.api.llmGenerateDailyTasks({
+      profile,
+      schedule: schedulePayload,
+      ...llmScorePayload
     })
-  })
-
-  let totalAppended = 0
-  for (const [dateKey, tasks] of dateTaskMap) {
-    const res = await window.api.dailyCheckinAppendTasks(dateKey, tasks)
-    if (res?.success) totalAppended += (res.appended || 0)
+    if (res?.success && Array.isArray(res.dailyTasks) && res.dailyTasks.length > 0) {
+      return { dailyTasks: res.dailyTasks, error: null, attempts: attempt + 1 }
+    }
+    lastError = res?.error || t('planning.dailyTasksFail')
+    console.warn(`daily tasks generation attempt ${attempt + 1} failed:`, lastError)
   }
-  return totalAppended
+  return { dailyTasks: [], error: lastError, attempts: maxAttempts }
+}
+
+function resolveDailyTasksForCheckin(scheduleEntries, llmDailyTasks, profile) {
+  const fallbackTasks = buildDailyTasksFromSchedule(scheduleEntries)
+  const merged = mergeDailyTaskLists(llmDailyTasks, fallbackTasks)
+  const timeline = buildTimelineFromProfile(profile)
+  const dailyTasks = fillTimelineGaps(merged, scheduleEntries, timeline)
+  const coverage = summarizeDailyTaskCoverage(dailyTasks, timeline)
+  return {
+    dailyTasks,
+    fallbackCount: fallbackTasks.length,
+    llmCount: llmDailyTasks.length,
+    coverage,
+    usedFallbackOnly: llmDailyTasks.length === 0
+  }
 }
 
 function enrichEntries(entries, startIndex = 0) {
@@ -106,12 +133,16 @@ export async function runSchoolPlanningLlmPipeline(profile, options = {}) {
   const scoreInput = profileToScoreInput(workingProfile)
   if (workingProfile.llmScore != null) scoreInput.llmScore = workingProfile.llmScore
   const scoreResult = computeStudentScore(scoreInput)
+  const llmScorePayload = {
+    totalScore: scoreResult.totalScore,
+    scoreDetail: scoreResult.detail
+  }
 
   const parallelTasks = [
     window.api.llmGenerateOutline({
       profile: workingProfile,
       md5: resumeMd5,
-      totalScore: scoreResult.totalScore
+      ...llmScorePayload
     }).then((res) => {
       progress.tick()
       return res
@@ -123,7 +154,7 @@ export async function runSchoolPlanningLlmPipeline(profile, options = {}) {
       window.api.llmGeneratePersonalStatement({
         profile: workingProfile,
         md5: resumeMd5,
-        totalScore: scoreResult.totalScore
+        ...llmScorePayload
       })
         .then((res) => {
           if (res?.success && res.statement) {
@@ -170,13 +201,17 @@ export async function runSmartScheduleRegeneratePipeline() {
   const profile = getSchoolPlanningProfile()
   if (!profile) throw new Error(t('studyPlanning.needProfile'))
 
+  const scoreInput = profileToScoreInput(profile)
+  if (profile.llmScore != null) scoreInput.llmScore = profile.llmScore
+  const scoreResult = computeStudentScore(scoreInput)
+  const llmScorePayload = {
+    totalScore: scoreResult.totalScore,
+    scoreDetail: scoreResult.detail,
+    md5: profile.resumeMd5 || null
+  }
+
   const progress = createLoadingProgressTracker(countSmartRegenerateSteps())
   const outlinePayload = await loadOutlinePayloadForSchedule(profile)
-
-  if (window.api?.dailyCheckinClearAll) {
-    const clearRes = await window.api.dailyCheckinClearAll()
-    if (!clearRes?.success) throw new Error(clearRes?.error || t('daily.clearFail'))
-  }
 
   if (window.api?.studyPlanClearBySourceAndKind) {
     await window.api.studyPlanClearBySourceAndKind({ source: 'llm', kind: 'schedule' })
@@ -184,27 +219,37 @@ export async function runSmartScheduleRegeneratePipeline() {
 
   const scheduleRes = await window.api.llmGenerateSchedule({
     profile,
-    outline: outlinePayload
+    outline: outlinePayload,
+    ...llmScorePayload
   })
   progress.tick()
   if (!scheduleRes?.success) throw new Error(scheduleRes?.error || t('planning.scheduleFail'))
 
-  const dailyRes = await window.api.llmGenerateDailyTasks({
-    profile,
-    schedule: {
-      entries: scheduleRes.scheduleEntries,
-      encouragementNote: scheduleRes.encouragementNote
-    }
-  })
+  const schedulePayload = {
+    entries: scheduleRes.scheduleEntries,
+    encouragementNote: scheduleRes.encouragementNote
+  }
+
+  const dailyGen = await generateDailyTasksWithRetry(profile, schedulePayload, llmScorePayload)
   progress.tick()
 
-  let dailyTasks = []
+  const outlineCount = outlinePayload.entries.length
+  const scheduleEntries = enrichEntries(scheduleRes.scheduleEntries || [], outlineCount)
+
+  const resolved = resolveDailyTasksForCheckin(scheduleEntries, dailyGen.dailyTasks, profile)
+
   let dailyWarning = null
-  if (dailyRes?.success) {
-    dailyTasks = dailyRes.dailyTasks || []
-  } else {
-    dailyWarning = dailyRes?.error || t('planning.dailyTasksFail')
-    console.warn('daily tasks generation skipped:', dailyWarning)
+  if (dailyGen.error) {
+    dailyWarning = dailyGen.error
+  }
+  if (resolved.usedFallbackOnly) {
+    dailyWarning = dailyWarning
+      ? `${dailyWarning} · ${t('planning.dailyTasksFallback')}`
+      : t('planning.dailyTasksFallback')
+  } else if (resolved.coverage.coverageRatio < 0.12 && resolved.fallbackCount > 0) {
+    dailyWarning = dailyWarning
+      ? `${dailyWarning} · ${t('planning.dailyTasksCoverageLow')}`
+      : t('planning.dailyTasksCoverageLow')
   }
 
   const updatedProfile = {
@@ -214,23 +259,33 @@ export async function runSmartScheduleRegeneratePipeline() {
       : profile.llmEncouragementNote
   }
 
-  const outlineCount = outlinePayload.entries.length
-  const scheduleEntries = enrichEntries(scheduleRes.scheduleEntries || [], outlineCount)
-
   if (window.api?.studyPlanSave) {
     const saveRes = await window.api.studyPlanSave(scheduleEntries)
     if (!saveRes?.success) throw new Error(saveRes?.error || t('studyPlanning.saveFail'))
   }
 
   const checkinColor = scheduleEntries[0]?.color || pickColorByIndex(outlineCount)
-  const appended = await distributeDailyTasksToCheckin(dailyTasks, checkinColor)
+  const distribution = await distributeDailyTasksToCheckin(resolved.dailyTasks, checkinColor)
   progress.tick()
+
+  if (distribution.error === 'no_tasks') {
+    throw new Error(t('planning.dailyTasksEmpty'))
+  }
+  if (distribution.error) {
+    throw new Error(distribution.error === 'import_failed'
+      ? t('planning.dailyTasksImportFail')
+      : distribution.error)
+  }
 
   return {
     profile: updatedProfile,
     scheduleCount: scheduleEntries.length,
-    dailyCount: dailyTasks.length,
-    appended,
+    dailyCount: resolved.dailyTasks.length,
+    appended: distribution.appended,
+    skipped: distribution.skipped,
+    days: distribution.days,
+    expectedTasks: distribution.expectedTasks,
+    coverage: resolved.coverage,
     dailyWarning
   }
 }
@@ -282,6 +337,9 @@ export async function regenerateSmartSchedule() {
     )
     if (result.dailyWarning) {
       showToast(result.dailyWarning, 'warning')
+    }
+    if (result.skipped > 0) {
+      showToast(t('planning.dailyTasksPartial', result.appended, result.expectedTasks || result.appended), 'warning')
     }
     return result
   } catch (err) {

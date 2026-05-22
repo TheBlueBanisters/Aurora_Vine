@@ -24,8 +24,9 @@ Rules:
 - Do NOT exceed 9 distinct tasks per calendar day (merge if needed).
 - All strings bilingual { zh, en } with identical meaning.
 - Dates must fall within timeline.planStartDate .. timeline.planEndDate.
+- When no resume is provided, base daily language/GRE tasks on `standardizedTests` status (e.g. prep if not_taken, maintenance if reported).
 
-Applicant profile:
+Structured applicant profile (includes standardized tests & background narrative):
 {{profileJson}}
 
 Application timeline context:

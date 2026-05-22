@@ -69,7 +69,7 @@ const translations = {
   'page.settings.title': { zh: '设置', en: 'Settings' },
 
   // ── School Planning Form ──
-  'planning.introTitle': { zh: '定校规划 · School Planning', en: 'School Planning' },
+  'planning.introTitle': { zh: '欢迎你的加入！', en: 'Welcome aboard!' },
   'planning.introTextZh': {
     zh: '欢迎来到 Aurora Vine 的定校规划模块。在这里，我们会根据你的本科背景、成绩情况和语言成绩，为你生成一份个性化的留学定校建议。填写这些信息只需要几分钟，但它将帮助系统更准确地评估你的申请竞争力，并为你推荐合适的目标院校梯度，同时生成一份未来申请规划路径。请尽量如实填写，你随时可以返回修改；准备好了的话，就从下面开始吧。',
     en: 'Welcome to the School Planning module of Aurora Vine. Here, we will generate personalized study-abroad school recommendations based on your undergraduate background, academic performance, and language test scores. Completing this information only takes a few minutes, but it will help the system evaluate your application competitiveness more accurately, recommend appropriate tiers of target universities, and outline a future application roadmap. Please fill in the information as accurately as possible — you can always return to edit it later. When you\'re ready, simply begin below.'
@@ -142,6 +142,11 @@ const translations = {
   'loading.generateDailyTasks': { zh: '正在拆解每日打卡任务…', en: 'Breaking down daily check-in tasks…' },
   'loading.generateStatement': { zh: '正在撰写个人陈述…', en: 'Drafting personal statement…' },
   'planning.dailyTasksFail': { zh: '生成每日打卡任务失败', en: 'Failed to generate daily check-in tasks' },
+  'planning.dailyTasksFallback': { zh: '已使用智能日程自动补全每日打卡', en: 'Daily check-in filled from smart schedule fallback' },
+  'planning.dailyTasksCoverageLow': { zh: '部分日期任务较少，已从日程补充', en: 'Some dates had few tasks; schedule fallback applied' },
+  'planning.dailyTasksEmpty': { zh: '未能生成可导入的每日打卡任务', en: 'No daily check-in tasks could be generated for import' },
+  'planning.dailyTasksImportFail': { zh: '每日打卡导入失败，请重试', en: 'Failed to import daily check-in tasks, please retry' },
+  'planning.dailyTasksPartial': { zh: '打卡任务部分导入（{0}/{1}）', en: 'Partial check-in import ({0}/{1})' },
 
   'common.more': { zh: '更多', en: 'More' },
   'common.collapse': { zh: '收起', en: 'Less' },
@@ -675,6 +680,10 @@ const translations = {
   'settings.saveApiKey': { zh: '保存 Key', en: 'Save Key' },
   'settings.apiKeySaved': { zh: 'API Key 已保存', en: 'API Key saved' },
   'settings.apiKeySaveFail': { zh: 'API Key 保存失败', en: 'Failed to save API Key' },
+  'settings.apiKeyEmpty': { zh: '请输入 API Key', en: 'Please enter an API Key' },
+  'settings.clearApiKey': { zh: '清除', en: 'Clear' },
+  'settings.apiKeyCleared': { zh: 'API Key 已清除', en: 'API Key cleared' },
+  'settings.apiKeyClearFail': { zh: 'API Key 清除失败', en: 'Failed to clear API Key' },
   'settings.apiKeyConfigured': { zh: '已配置', en: 'Configured' },
   'settings.apiKeyNotConfigured': { zh: '未配置', en: 'Not configured' },
   'settings.clearPersonalData': { zh: '清空个人资料', en: 'Clear Personal Data' },
@@ -736,7 +745,7 @@ const translations = {
   'state.loginMeta': { zh: '登录后可绑定背景与社区身份', en: 'Log in to bind your profile and community identity' },
 
   // ── Task color labels ──
-  'color.skyBlue': { zh: '天蓝', en: 'Sky Blue' },
+  'color.skyBlue': { zh: '浅绿', en: 'Sage Green' },
   'color.mint': { zh: '薄荷', en: 'Mint' },
   'color.lightYellow': { zh: '淡黄', en: 'Light Yellow' },
   'color.pinkPurple': { zh: '粉紫', en: 'Pink Purple' },
@@ -744,7 +753,7 @@ const translations = {
   'color.purple': { zh: '紫色', en: 'Purple' },
   'color.teal': { zh: '青绿', en: 'Teal' },
   'color.rose': { zh: '玫红', en: 'Rose' },
-  'color.fogBlue': { zh: '雾蓝', en: 'Fog Blue' },
+  'color.fogBlue': { zh: '雾绿', en: 'Fog Green' },
 
   // ── Month names (for en mode) ──
   'month.1': { zh: '1', en: 'Jan' },

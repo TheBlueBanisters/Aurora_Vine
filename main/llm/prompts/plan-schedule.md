@@ -27,8 +27,9 @@ Rules:
 - dateStart/dateEnd MUST be YYYY-MM-DD within the planning window.
 - Align with outline priorities; avoid vague tasks like “提升英语”.
 - All strings bilingual { zh, en } with identical meaning.
+- When no resume is provided, infer gaps from `standardizedTests` and `experience` in the structured profile.
 
-Applicant profile:
+Structured applicant profile (includes standardized tests & background narrative):
 {{profileJson}}
 
 Application timeline context:

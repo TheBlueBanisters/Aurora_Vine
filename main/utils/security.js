@@ -50,7 +50,7 @@ export function normalizeMonthKey(monthKey) {
 
 export function sanitizeTaskColor(color) {
   const value = String(color ?? '').trim();
-  return /^#[0-9A-Fa-f]{6}$/.test(value) ? value.toUpperCase() : '#89B4FA';
+  return /^#[0-9A-Fa-f]{6}$/.test(value) ? value.toUpperCase() : '#62C492';
 }
 
 export function normalizePositiveInt(value, defaultValue = null) {

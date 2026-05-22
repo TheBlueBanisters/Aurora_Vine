@@ -689,8 +689,8 @@ export async function loadSchoolListTarget() {
 function createParticleBurst(container, x, y, count = 24) {
   const isDark = getTheme() === 'dark'
   const colors = isDark
-    ? ['#89b4fa', '#b4befe', '#a6e3a1', '#f9e2af', '#fab387']
-    : ['#89b4fa', '#cdd6f4', '#b4befe', '#a6e3a1', '#f9e2af']
+    ? ['#ffe066', '#fff176', '#a6e3a1', '#f9e2af', '#fab387']
+    : ['#62c492', '#a8e4c8', '#c5f0dc', '#a6e3a1', '#f9e2af']
   const particles = []
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5

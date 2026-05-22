@@ -282,12 +282,21 @@ export function validateScheduleResponse(data) {
   };
 }
 
-export function validateDailyTasksResponse(data) {
-  const dailyTasks = Array.isArray(data?.dailyTasks) ? data.dailyTasks : [];
-  if (dailyTasks.length === 0) throw new Error('dailyTasks 不能为空');
-  return {
-    dailyTasks: dailyTasks.map((task, idx) => validateTask(task, idx, { requireSubtitle: true }))
-  };
+export function validateDailyTasksResponse(data, { allowPartial = true } = {}) {
+  const raw = Array.isArray(data?.dailyTasks) ? data.dailyTasks : [];
+  if (raw.length === 0) throw new Error('dailyTasks 不能为空');
+
+  const dailyTasks = [];
+  raw.forEach((task, idx) => {
+    try {
+      dailyTasks.push(validateTask(task, idx, { requireSubtitle: true }));
+    } catch (err) {
+      if (!allowPartial) throw err;
+    }
+  });
+
+  if (dailyTasks.length === 0) throw new Error('dailyTasks 无有效条目');
+  return { dailyTasks: dailyTasks.slice(0, 40) };
 }
 
 export function validatePersonalStatementResponse(data) {

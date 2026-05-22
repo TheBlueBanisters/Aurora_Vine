@@ -1,0 +1,4 @@
+-- 社区帖子种子数据请使用 UTF-8 安全的 Python 脚本导入（Windows 下勿直接用 PowerShell 管道）：
+--   python data/fix-community-posts.py
+--
+-- 该脚本会删除 id 1–3 的旧帖（若存在）并重新写入三条 wiND 的示例帖子。

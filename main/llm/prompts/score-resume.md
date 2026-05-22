@@ -10,8 +10,9 @@ Rules:
 - llmScore must be 0-100, reflecting resume quality, project depth, leadership, research/internship evidence, and alignment with graduate applications.
 - summary.zh and summary.en must convey the same meaning in Chinese and English respectively.
 - Be realistic and constructive.
+- Use `standardizedTests` and `backgroundNarrative` together with the resume for evaluation.
 
-Applicant profile:
+Structured applicant profile (includes standardized tests & background narrative):
 {{profileJson}}
 
 Resume text:

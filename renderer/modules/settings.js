@@ -25,32 +25,33 @@ function updateProfileTipText(profileExpanded = false) {
 }
 
 export function updateSettingsCertifyState() {
+  const certifyItem = document.getElementById('settings-certify-item')
   const certifyBody = document.getElementById('settings-certify-body')
   const certifyGuestHint = document.getElementById('settings-certify-guest-hint')
-  const certifyStatus = document.getElementById('settings-certify-status')
   const codeInput = document.getElementById('settings-certify-code')
   const certifyTrigger = document.getElementById('settings-certify-trigger')
-  if (!certifyBody || !certifyGuestHint || !certifyStatus) return
+  if (!certifyItem || !certifyBody || !certifyGuestHint) return
 
   if (!isAccountMode()) {
+    certifyItem.hidden = false
     certifyGuestHint.hidden = false
     certifyBody.hidden = true
-    certifyStatus.textContent = '-'
     if (certifyTrigger) certifyTrigger.disabled = true
     if (codeInput) codeInput.value = ''
     return
   }
-  certifyGuestHint.hidden = true
-  if (certifyTrigger) certifyTrigger.disabled = false
+
   const isCertified = !!getAuthState().user?.is_certified
   if (isCertified) {
-    certifyBody.hidden = true
-    certifyStatus.textContent = t('settings.certified')
-  } else {
-    certifyBody.hidden = true
-    certifyStatus.textContent = t('settings.notCertified')
-    if (codeInput) codeInput.value = ''
+    certifyItem.hidden = true
+    return
   }
+
+  certifyItem.hidden = false
+  certifyGuestHint.hidden = true
+  certifyBody.hidden = true
+  if (certifyTrigger) certifyTrigger.disabled = false
+  if (codeInput) codeInput.value = ''
 }
 
 export function updateSettingsAvatarBadge() {
@@ -329,8 +330,7 @@ export function initSettingsPanel(refreshAuthBoundUI) {
   certifyTrigger?.addEventListener('click', () => {
     if (!certifyBody || certifyTrigger.disabled) return
     if (!isAccountMode()) return
-    const isCertified = !!getAuthState().user?.is_certified
-    if (isCertified) return
+    if (getAuthState().user?.is_certified) return
     certifyBody.hidden = !certifyBody.hidden
   })
 
@@ -346,6 +346,7 @@ export function initSettingsPanel(refreshAuthBoundUI) {
     applyAuthState(res)
     updateSettingsCertifyState()
     updateSettingsAvatarBadge()
+    if (certifyBody) certifyBody.hidden = true
     showToast(t('settings.certifySuccess'), 'success')
   })
 
@@ -361,6 +362,10 @@ export function initSettingsPanel(refreshAuthBoundUI) {
   apiSaveBtn?.addEventListener('click', async () => {
     if (!window.api?.settingsSetDeepseekApiKey) return
     const apiKey = apiInput?.value?.trim() || ''
+    if (!apiKey) {
+      showToast(t('settings.apiKeyEmpty'), 'warning')
+      return
+    }
     const res = await window.api.settingsSetDeepseekApiKey(apiKey)
     if (!res?.success) {
       showToast(res?.error || t('settings.apiKeySaveFail'), 'error')
@@ -369,6 +374,19 @@ export function initSettingsPanel(refreshAuthBoundUI) {
     if (apiInput) apiInput.value = ''
     await refreshApiKeyStatus()
     showToast(t('settings.apiKeySaved'), 'success')
+  })
+
+  const apiClearBtn = document.getElementById('settings-api-clear')
+  apiClearBtn?.addEventListener('click', async () => {
+    if (!window.api?.settingsSetDeepseekApiKey) return
+    const res = await window.api.settingsSetDeepseekApiKey('')
+    if (!res?.success) {
+      showToast(res?.error || t('settings.apiKeyClearFail'), 'error')
+      return
+    }
+    if (apiInput) apiInput.value = ''
+    await refreshApiKeyStatus()
+    showToast(t('settings.apiKeyCleared'), 'success')
   })
 
   document.getElementById('settings-clear-personal-data')?.addEventListener('click', async () => {

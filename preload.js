@@ -57,6 +57,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('studyPlan:delete', id),
   dailyCheckinAppendTasks: (dateKey, tasks) =>
     ipcRenderer.invoke('dailyCheckin:appendTasks', dateKey, tasks),
+  dailyCheckinImportPlan: (payload) =>
+    ipcRenderer.invoke('dailyCheckin:importPlan', payload),
   communityListPosts: (page = 1, pageSize = 10) =>
     ipcRenderer.invoke('community:listPosts', page, pageSize),
   communityGetPostDetail: (postId) =>

@@ -29,7 +29,7 @@ function applyThemeToWindow(win, theme) {
   if (win.setTitleBarOverlay) {
     win.setTitleBarOverlay(overlay);
   }
-  win.setBackgroundColor(isDark ? '#2d2d3a' : '#4a90d9');
+  win.setBackgroundColor(isDark ? '#2d2d3a' : '#76c9a8');
 }
 
 function createWindow() {
@@ -49,7 +49,7 @@ function createWindow() {
       symbolColor: '#4a4a5a',
       height: 38
     },
-    backgroundColor: '#4a90d9',
+    backgroundColor: '#76c9a8',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

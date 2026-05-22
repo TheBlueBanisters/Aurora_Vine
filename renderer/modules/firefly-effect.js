@@ -22,7 +22,7 @@ const STATIC_FIREFLY_HOSTS = [
   ['.nav-item', 'dark-active', FIREFLY_PARTICLE_COUNT],
   ['.planning-intro-box', 'dark-hover', FIREFLY_PARTICLE_COUNT],
   ['.score-card', 'dark', FIREFLY_PARTICLE_COUNT],
-  ['.my-profile-info-card', 'dark', FIREFLY_PARTICLE_COUNT],
+  ['.my-profile-info-card', 'dark', 4],
   ['.my-profile-chart-card', 'dark', FIREFLY_PARTICLE_COUNT],
   ['.my-profile-statement-card', 'dark', FIREFLY_PARTICLE_COUNT]
 ]
