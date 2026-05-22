@@ -1,4 +1,6 @@
 import { t } from './i18n.js'
+import { normalizeGpaTopPercent } from './gpa-percent.js'
+import { normalizeGpaTopPercent } from './gpa-percent.js'
 import {
   setSchoolPlanningView,
   syncSchoolPlanningIdentityState,
@@ -24,7 +26,8 @@ export function populateSchoolPlanningForm(profile) {
   setValue('sp-school-name', profile.schoolName)
   setValue('sp-major', profile.major)
   setValue('sp-gpa', profile.gpa)
-  setValue('sp-gpa-percentile', profile.gpaPercentile)
+  const topPct = normalizeGpaTopPercent(profile.gpaPercentile)
+  setValue('sp-gpa-percentile', topPct !== undefined ? String(topPct) : profile.gpaPercentile)
 
   const scaleRadio = document.querySelector(`input[name="sp-gpa-scale"][value="${profile.gpaScale}"]`)
   if (scaleRadio) scaleRadio.checked = true
@@ -191,8 +194,8 @@ export function initSchoolPlanningForm() {
     else if (gpaScale === '4' && (gpaValue < 0 || gpaValue > 4)) { setFieldError('gpa', t('planning.err.gpa4Range')); errors.push('gpa') }
     else if (gpaScale === '5' && (gpaValue < 0 || gpaValue > 5)) { setFieldError('gpa', t('planning.err.gpa5Range')); errors.push('gpa') }
     if (!gpaScale) { setFieldError('gpa', t('planning.err.gpaScale')); if (!errors.includes('gpa')) errors.push('gpa') }
-    const pct = parseFloat(gpaPercentile)
-    if (!gpaPercentile || isNaN(pct) || pct < 0 || pct > 100) { setFieldError('gpaPercentile', t('planning.err.gpaPercentile')); errors.push('gpaPercentile') }
+    const topPct = normalizeGpaTopPercent(gpaPercentile)
+    if (topPct === undefined) { setFieldError('gpaPercentile', t('planning.err.gpaPercentile')); errors.push('gpaPercentile') }
 
     if (!ieltsNone?.checked && (!ieltsSelect?.value || ieltsSelect.disabled)) { setFieldError('ielts', t('planning.err.ielts')); errors.push('ielts') }
     if (!toeflNone?.checked && (!toeflSelect?.value || toeflSelect.disabled)) { setFieldError('toefl', t('planning.err.toefl')); errors.push('toefl') }
@@ -213,7 +216,11 @@ export function initSchoolPlanningForm() {
       major: document.getElementById('sp-major')?.value?.trim() || '',
       gpa: document.getElementById('sp-gpa')?.value?.trim() || '',
       gpaScale: gpaScale || '',
-      gpaPercentile: document.getElementById('sp-gpa-percentile')?.value?.trim() || '',
+      gpaPercentile: (() => {
+        const raw = document.getElementById('sp-gpa-percentile')?.value?.trim() || ''
+        const top = normalizeGpaTopPercent(raw)
+        return top !== undefined ? String(top) : ''
+      })(),
       ielts: ieltsNone?.checked ? null : (ieltsSelect?.value || null),
       toefl: toeflNone?.checked ? null : (toeflSelect?.value || null),
       gre: greNone?.checked ? null : (greSelect?.value || null),

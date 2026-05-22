@@ -1,0 +1,6 @@
+node_modules/
+out/
+.cursor/
+
+# Excel 打开时产生的临时锁文件（无法被 git 读取）
+~$*.xlsx

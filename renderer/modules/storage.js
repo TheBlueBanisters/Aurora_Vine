@@ -1,3 +1,4 @@
+import { normalizeGpaTopPercent } from './gpa-percent.js'
 import {
   TARGET_SCHOOLS_KEY,
   LEGACY_SCHOOL_PLANNING_PROFILE_KEY,
@@ -34,11 +35,20 @@ export function getGuestSchoolPlanningProfile() {
   return legacyProfile
 }
 
+function normalizeProfilePercentile(profile) {
+  if (!profile || profile.gpaPercentile == null || profile.gpaPercentile === '') return profile
+  const top = normalizeGpaTopPercent(profile.gpaPercentile)
+  if (top === undefined) return profile
+  const canonical = String(top)
+  if (String(profile.gpaPercentile) === canonical) return profile
+  return { ...profile, gpaPercentile: canonical }
+}
+
 export function getSchoolPlanningProfile(accountId = getCurrentAccountId()) {
-  if (accountId) {
-    return readJsonStorage(getSchoolPlanningStorageKey(accountId))
-  }
-  return getGuestSchoolPlanningProfile()
+  const profile = accountId
+    ? readJsonStorage(getSchoolPlanningStorageKey(accountId))
+    : getGuestSchoolPlanningProfile()
+  return normalizeProfilePercentile(profile)
 }
 
 export function setSchoolPlanningProfile(data, accountId = getCurrentAccountId()) {

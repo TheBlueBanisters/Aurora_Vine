@@ -1,3 +1,5 @@
+import { normalizeGpaTopPercent } from '../utils/gpa-percent.js';
+
 const TIER_LABELS = {
   '985': { zh: '985 工程院校', en: '985 Project university' },
   '211': { zh: '211 工程院校', en: '211 Project university' },
@@ -73,24 +75,26 @@ function buildExperienceCounts(profile) {
 function buildGpaBlock(profile) {
   const gpa = parseOptionalFloat(profile.gpa);
   const scale = profile.gpaScale === '5' ? 5 : 4;
-  const percentile = parseOptionalFloat(profile.gpaPercentile);
+  const topPercent = normalizeGpaTopPercent(profile.gpaPercentile);
 
   if (gpa == null) {
     return {
       value: null,
       scale,
-      percentile: percentile ?? null,
+      topPercent,
+      percentile: topPercent,
       display: { zh: 'GPA：未填写', en: 'GPA: not provided' }
     };
   }
 
-  const pctText = percentile != null ? `，绩点百分位约 ${percentile}%` : '';
-  const pctTextEn = percentile != null ? `, GPA percentile ~${percentile}%` : '';
+  const pctText = topPercent != null ? `，年级排名前 ${topPercent}%` : '';
+  const pctTextEn = topPercent != null ? `, top ${topPercent}% of class` : '';
 
   return {
     value: gpa,
     scale,
-    percentile: percentile ?? null,
+    topPercent,
+    percentile: topPercent,
     display: {
       zh: `GPA ${gpa}/${scale}${pctText}`,
       en: `GPA ${gpa}/${scale}${pctTextEn}`

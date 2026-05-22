@@ -1,3 +1,5 @@
+import { normalizeGpaTopPercent, topPercentToRankStrength } from './gpa-percent.js'
+
 const SCHOOL_LEVEL_MAP = {
   '985': 100,
   '211': 85,
@@ -32,9 +34,11 @@ function calcGpa(input) {
 
   if (input.percentile === undefined) return gpaSat
 
-  const rank = input.percentile
+  const rankStrength = topPercentToRankStrength(input.percentile)
+  if (rankStrength === undefined) return gpaSat
+
   const deficiency = Math.max(0, 80 - gpaNorm)
-  const advantage = Math.max(0, rank - 70)
+  const advantage = Math.max(0, rankStrength - 70)
   const rawBoost = 0.5 * Math.min(deficiency, advantage)
   const dampedBoost = rawBoost * (1 - gpaNorm / 100)
 
@@ -133,8 +137,7 @@ export function profileToScoreInput(profile) {
   const gpaScale = profile.gpaScale === '5' ? 5 : 4
   const gpa = parseFloat(profile.gpa) || 0
 
-  const pct = parseFloat(profile.gpaPercentile)
-  const percentile = (!isNaN(pct) && pct >= 0 && pct <= 100) ? pct : undefined
+  const percentile = normalizeGpaTopPercent(profile.gpaPercentile)
 
   const ieltsRaw = parseFloat(profile.ielts)
   const ielts = (!isNaN(ieltsRaw) && ieltsRaw >= 4) ? ieltsRaw : undefined

@@ -1,0 +1,177 @@
+/* ============================================
+   萤火虫粒子效果（夜间为主，Logo 全时段）
+   ============================================ */
+
+.firefly-host {
+  position: relative;
+  isolation: isolate;
+}
+
+.firefly-layer {
+  display: none;
+  position: absolute;
+  inset: -6px;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.firefly-host--always .firefly-layer {
+  display: block;
+}
+
+[data-theme="dark"] .firefly-host--dark .firefly-layer,
+[data-theme="dark"] .firefly-host--dark-active.active .firefly-layer,
+[data-theme="dark"] .firefly-host--dark-hover:hover .firefly-layer,
+[data-theme="dark"] .firefly-host--dark-active-hover.is-active .firefly-layer,
+[data-theme="dark"] .firefly-host--dark-active-hover:hover .firefly-layer {
+  display: block;
+}
+
+.firefly-layer i {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff3bf;
+  box-shadow:
+    0 0 5px 1px rgba(255, 236, 179, 0.95),
+    0 0 12px 3px rgba(249, 226, 175, 0.45);
+  opacity: 0;
+  animation: firefly-float 5.2s ease-in-out infinite;
+}
+
+.firefly-host--always .firefly-layer i {
+  background: #ffe8a3;
+  box-shadow:
+    0 0 6px 2px rgba(255, 236, 179, 0.9),
+    0 0 14px 4px rgba(249, 226, 175, 0.5);
+}
+
+.firefly-layer i:nth-child(1) { top: 10%; left: 14%; animation-delay: 0s; }
+.firefly-layer i:nth-child(2) { top: 22%; left: 78%; animation-delay: 0.6s; }
+.firefly-layer i:nth-child(3) { top: 68%; left: 18%; animation-delay: 1.2s; }
+.firefly-layer i:nth-child(4) { top: 58%; left: 72%; animation-delay: 1.8s; }
+.firefly-layer i:nth-child(5) { top: 38%; left: 48%; animation-delay: 0.9s; }
+.firefly-layer i:nth-child(6) { top: 14%; left: 52%; animation-delay: 2.4s; }
+.firefly-layer i:nth-child(7) { top: 82%; left: 44%; animation-delay: 3s; }
+.firefly-layer i:nth-child(8) { top: 46%; left: 8%;  animation-delay: 3.6s; }
+
+@keyframes firefly-float {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.55);
+  }
+  10% {
+    opacity: 0.72;
+    transform: translate(2px, -3px) scale(1);
+  }
+  32% {
+    opacity: 0.38;
+    transform: translate(-3px, 2px) scale(0.82);
+  }
+  55% {
+    opacity: 0.78;
+    transform: translate(2px, 3px) scale(1.02);
+  }
+  78% {
+    opacity: 0.28;
+    transform: translate(-2px, -2px) scale(0.72);
+  }
+}
+
+/* 夜间：选中 / 悬停时的暖色光晕 */
+[data-theme="dark"] .firefly-host--dark,
+[data-theme="dark"] .firefly-host--dark-active.active,
+[data-theme="dark"] .firefly-host--dark-hover:hover,
+[data-theme="dark"] .firefly-host--dark-active-hover.is-active,
+[data-theme="dark"] .firefly-host--dark-active-hover:hover {
+  overflow: visible;
+}
+
+[data-theme="dark"] .nav-item.active.firefly-host {
+  background: color-mix(in srgb, #f9e2af 14%, var(--sidebar-active-bg));
+  color: #fff3bf;
+  box-shadow:
+    inset 0 0 18px rgba(249, 226, 175, 0.1),
+    0 0 16px rgba(249, 226, 175, 0.12);
+}
+
+[data-theme="dark"] .nav-item.active.firefly-host::before {
+  background: #ffe8a3;
+}
+
+.sidebar-logo-wrap.firefly-host .firefly-layer {
+  inset: 52px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  z-index: 0;
+}
+
+.sidebar-logo-wrap.firefly-host > .sidebar-logo {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-logo-wrap.firefly-host > .sidebar-logo-hi {
+  z-index: 2;
+}
+
+[data-theme="dark"] .score-card.firefly-host,
+[data-theme="dark"] .my-profile-chart-card.firefly-host,
+[data-theme="dark"] .my-profile-statement-card.firefly-host {
+  border-color: color-mix(in srgb, #f9e2af 28%, var(--card-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #f9e2af 12%, transparent),
+    0 0 20px rgba(249, 226, 175, 0.1),
+    inset 0 0 22px rgba(249, 226, 175, 0.04);
+}
+
+/* 我的背景 · 基本信息：仅外框少量光晕，内部字段无荧光 */
+[data-theme="dark"] .my-profile-info-card.firefly-host {
+  overflow: hidden;
+  border-color: color-mix(in srgb, #f9e2af 24%, var(--card-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #f9e2af 10%, transparent),
+    0 0 14px rgba(249, 226, 175, 0.08);
+}
+
+[data-theme="dark"] .my-profile-info-card .my-profile-info-item {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+[data-theme="dark"] .school-card.firefly-host:hover,
+[data-theme="dark"] .study-planning-tier-row.firefly-host:hover,
+[data-theme="dark"] .study-planning-intended-row.firefly-host:hover,
+[data-theme="dark"] .planning-intro-box.firefly-host:hover {
+  border-color: color-mix(in srgb, #f9e2af 38%, var(--card-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #f9e2af 16%, transparent),
+    0 0 18px rgba(249, 226, 175, 0.14),
+    inset 0 0 20px rgba(249, 226, 175, 0.04);
+}
+
+[data-theme="dark"] .resource-category-chip.firefly-host.is-active,
+[data-theme="dark"] .resource-category-chip.firefly-host:hover {
+  border-color: color-mix(in srgb, #f9e2af 48%, var(--accent));
+  background: color-mix(in srgb, #f9e2af 10%, var(--accent-soft));
+  color: #ffe8a3;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #f9e2af 22%, transparent),
+    0 0 22px rgba(249, 226, 175, 0.16),
+    inset 0 0 24px rgba(249, 226, 175, 0.05);
+}
+
+/* 留学规划大纲：萤火虫与光晕限制在容器内，避免横向滚动条 */
+[data-theme="dark"] .study-planning-outline-scroll .firefly-host--dark-hover,
+[data-theme="dark"] .study-planning-outline-scroll .firefly-host--dark-hover:hover {
+  overflow: hidden;
+}
+
+.study-planning-outline-scroll .firefly-host .firefly-layer {
+  inset: 0;
+  overflow: hidden;
+}

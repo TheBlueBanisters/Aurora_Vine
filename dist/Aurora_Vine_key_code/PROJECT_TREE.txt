@@ -1,0 +1,138 @@
+Aurora_Vine — 完整项目树（供其他 AI 对照）
+图例: [INCLUDED] 已打入压缩包 | [OMITTED] 未包含 | [PARTIAL] 仅部分文件
+说明: 层级与仓库一致；未上传的文件仍会在此列出，便于理解全项目范围。
+Generated: 2026-05-22 18:31:45
+
+backup/  [OMITTED] legacy backup (.jsx2)
+
+data/  [INCLUDED]
+  fix-community-posts.py  [INCLUDED]
+  init_db.js  [INCLUDED]
+  school_item.db  [OMITTED]
+  school_item.sql  [INCLUDED]
+  seed-community-posts.sql  [INCLUDED]
+
+image/  [OMITTED] app illustrations (.pngx10, .jpgx8)
+    board.png  [OMITTED]
+    hi.png  [OMITTED]
+    icon.jpg  [OMITTED]
+    icon.png  [OMITTED]
+    lecture.png  [OMITTED]
+    logo.jpg  [OMITTED]
+    logo.png  [OMITTED]
+    logo_n.png  [OMITTED]
+    picnic.png  [OMITTED]
+    plan.png  [OMITTED]
+    planting.png  [OMITTED]
+    welcome.png  [OMITTED]
+
+main/  [INCLUDED]
+  ipc/
+    application-cases.js  [INCLUDED]
+    auth.js  [INCLUDED]
+    avatar.js  [INCLUDED]
+    community.js  [INCLUDED]
+    daily-checkin.js  [INCLUDED]
+    llm.js  [INCLUDED]
+    resume.js  [INCLUDED]
+    schools.js  [INCLUDED]
+    study-planning.js  [INCLUDED]
+  llm/
+    application-timeline.js  [INCLUDED]
+    deepseek-client.js  [INCLUDED]
+    i18n-content.js  [INCLUDED]
+    plan-schema.js  [INCLUDED]
+    profile-context.js  [INCLUDED]
+    prompt-loader.js  [INCLUDED]
+    prompts/
+      personal-statement.md  [INCLUDED]
+      plan-daily-tasks.md  [INCLUDED]
+      plan-outline.md  [INCLUDED]
+      plan-schedule.md  [INCLUDED]
+      score-resume.md  [INCLUDED]
+    school-matcher.js  [INCLUDED]
+  utils/
+    app-config.js  [INCLUDED]
+    crypto.js  [INCLUDED]
+    db.js  [INCLUDED]
+    resume-store.js  [INCLUDED]
+    resume-text.js  [INCLUDED]
+    security.js  [INCLUDED]
+
+major/  [OMITTED] programs xlsx for init_db (.xlsxx1)
+    院校专业整理.xlsx  [OMITTED]
+
+personalCase/  [OMITTED] cases csv for init_db (.csvx1)
+    个人案例整理.csv  [OMITTED]
+
+renderer/  [INCLUDED]
+  app.js  [INCLUDED]
+  index.html  [INCLUDED]
+  modules/
+    application-cases.js  [INCLUDED]
+    auth.js  [INCLUDED]
+    case-display.js  [INCLUDED]
+    community.js  [INCLUDED]
+    confirm-dialog.js  [INCLUDED]
+    custom-select.js  [INCLUDED]
+    daily-checkin.js  [INCLUDED]
+    daily-task-distributor.js  [INCLUDED]
+    favorite-star.js  [INCLUDED]
+    firefly-effect.js  [INCLUDED]
+    guide.js  [INCLUDED]
+    i18n.js  [INCLUDED]
+    llm-planning-service.js  [INCLUDED]
+    loading.js  [INCLUDED]
+    localized-content.js  [INCLUDED]
+    personal-data.js  [INCLUDED]
+    planning.js  [INCLUDED]
+    profile.js  [INCLUDED]
+    resource-center.js  [INCLUDED]
+    resource-content.js  [INCLUDED]
+    resource-content/
+      gre-math.js  [INCLUDED]
+      gre-vocab.js  [INCLUDED]
+      gre-vocab-2.js  [INCLUDED]
+    resource-content-renderer.js  [INCLUDED]
+    resource-placeholder-extra.js  [INCLUDED]
+    schools.js  [INCLUDED]
+    scoring.js  [INCLUDED]
+    settings.js  [INCLUDED]
+    state.js  [INCLUDED]
+    storage.js  [INCLUDED]
+    study-planning.js  [INCLUDED]
+    study-planning-parser.js  [INCLUDED]
+    theme.js  [INCLUDED]
+    utils.js  [INCLUDED]
+  style.css  [INCLUDED]
+  styles/
+    custom-select.css  [INCLUDED]
+    firefly-effect.css  [INCLUDED]
+
+school/  [PARTIAL] 200 dirs No.* ; per school: intro.json + images
+  No.1/
+    intro.json  [INCLUDED] sample only
+    *.jpg, *.png, *.PNG  [OMITTED] media (~5-8 per school)
+  No.2/ ... No.200/  [OMITTED] same layout, 199 dirs not packed
+  README_OMITTED_ASSETS.md  [INCLUDED]
+
+.gitignore  [INCLUDED]
+.npmrc  [INCLUDED]
+backup.sh  [INCLUDED]
+deepseek.py  [INCLUDED]
+electron.vite.config.js  [INCLUDED]
+follow.sh  [INCLUDED]
+main.js  [INCLUDED]
+package.json  [INCLUDED]
+package-lock.json  [OMITTED]
+preload.js  [INCLUDED]
+proposal.md  [INCLUDED]
+README.md  [INCLUDED]
+功能汇总.md  [INCLUDED]
+软件实作要求.pdf  [OMITTED]
+node_modules/  [OMITTED] npm dependencies (not listed)
+out/  [OMITTED] electron-vite build output
+dist/  [OMITTED] local pack output only
+scripts/  [OMITTED] pack-key-code.ps1 tooling
+
+Pack stats: 83 files copied into this zip

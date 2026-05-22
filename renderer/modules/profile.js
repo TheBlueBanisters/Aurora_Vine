@@ -5,6 +5,7 @@ import { isAccountMode, getCurrentUserDisplayName } from './state.js'
 import { getSchoolPlanningProfile } from './storage.js'
 import { getTheme } from './theme.js'
 import { computeStudentScore, profileToScoreInput } from './scoring.js'
+import { normalizeGpaTopPercent, formatGpaTopPercentDisplay, topPercentToRankStrength } from './gpa-percent.js'
 import { pickLocalized } from './localized-content.js'
 
 let myProfileChartInstance = null
@@ -57,7 +58,7 @@ export function loadMyProfile() {
     { label: t('profile.school'), value: profile.schoolName },
     { label: t('profile.major'), value: profile.major },
     { label: t('profile.gpa'), value: profile.gpa ? `${profile.gpa} (${profile.gpaScale === '4' ? t('planning.scale4') : t('planning.scale5')})` : '-' },
-    { label: t('profile.gpaPercentile'), value: profile.gpaPercentile ? `${profile.gpaPercentile}%` : '-' },
+    { label: t('profile.gpaPercentile'), value: formatGpaTopPercentDisplay(profile.gpaPercentile) || '-' },
     { label: t('profile.ielts'), value: profile.ielts != null ? profile.ielts : t('profile.noData') },
     { label: t('profile.toefl'), value: profile.toefl != null ? profile.toefl : t('profile.noData') },
     { label: 'GRE', value: profile.gre != null ? `${profile.gre} (${t('profile.greWriting')} ${profile.greWriting || '-'})` : t('profile.noData') },
@@ -71,13 +72,12 @@ export function loadMyProfile() {
   const chartData = []
   const labels = []
   const gpaInverted = []
-  if (profile.gpaPercentile != null && profile.gpaPercentile !== '') {
-    const pct = parseFloat(profile.gpaPercentile)
-    if (!isNaN(pct) && pct >= 0 && pct <= 100) {
-      chartData.push([labels.length, 0, Math.round((100 - pct) * 100) / 100])
-      gpaInverted.push(labels.length)
-      labels.push('GPA')
-    }
+  const gpaTopPct = normalizeGpaTopPercent(profile.gpaPercentile)
+  if (gpaTopPct !== undefined) {
+    const strength = topPercentToRankStrength(gpaTopPct)
+    chartData.push([labels.length, 0, Math.round(strength * 100) / 100])
+    gpaInverted.push(labels.length)
+    labels.push('GPA')
   }
   if (profile.ielts != null && profile.ielts !== '') {
     const score = parseFloat(profile.ielts)
@@ -152,8 +152,13 @@ export function loadMyProfile() {
             const idx = params.dataIndex
             const name = (labels[idx] || '').replace(/\n/g, ' ')
             let rawVal = Number(chartData[idx][2])
-            if (gpaInverted.includes(idx)) rawVal = 100 - rawVal
-            const pct = isNaN(rawVal) ? String(chartData[idx][2]) : rawVal.toFixed(2)
+            if (gpaInverted.includes(idx)) {
+              const top = normalizeGpaTopPercent(profile.gpaPercentile)
+              return top !== undefined
+                ? `${name}: ${t('profile.gpaTopTooltip', top.toFixed(1))}`
+                : `${name}: —`
+            }
+            const pct = isNaN(rawVal) ? String(chartData[idx][2]) : rawVal.toFixed(1)
             return `${name}: ${pct}%`
           },
         },

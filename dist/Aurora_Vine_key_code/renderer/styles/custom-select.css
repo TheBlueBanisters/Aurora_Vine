@@ -1,0 +1,144 @@
+/* 自定义下拉框：替代原生 select，支持主题色条目高亮 */
+
+.custom-select {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+}
+
+.custom-select-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--content-text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.custom-select-trigger:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.custom-select.is-open .custom-select-trigger,
+.custom-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
+}
+
+.custom-select.is-placeholder .custom-select-label {
+  color: var(--content-text-secondary);
+}
+
+.custom-select.is-disabled .custom-select-trigger {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.custom-select-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-chevron {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--content-text-secondary);
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.custom-select.is-open .custom-select-chevron {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+.custom-select-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 120;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--content-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow), 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: none;
+}
+
+.custom-select.is-open .custom-select-list {
+  display: block;
+}
+
+.custom-select-option {
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--content-text);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.custom-select-option.is-selected {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.custom-select-option:hover:not(.is-disabled),
+.custom-select-option.is-selected:hover:not(.is-disabled) {
+  background: var(--accent);
+  color: var(--btn-primary-text);
+}
+
+.custom-select-option.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.form-field.error .custom-select-trigger {
+  border-color: var(--error-color);
+}
+
+.form-gre-group .custom-select {
+  max-width: 140px;
+}
+
+.form-gre-group .custom-select:last-of-type {
+  max-width: 120px;
+}
+
+.form-resume-counts-row .custom-select {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
