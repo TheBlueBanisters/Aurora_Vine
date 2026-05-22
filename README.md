@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="image/logo.png" alt="Aurora Vine logo" width="120">
+  <img src="image/logo.png" alt="Aurora Vine logo (light)" width="72">
+  &nbsp;&nbsp;
+  <img src="image/logo_n.png" alt="Aurora Vine logo (dark)" width="72">
 </p>
 
 <h1 align="center">Aurora Vine</h1>
@@ -7,10 +9,6 @@
 <p align="center">
   <strong>A clearer path to studying abroad</strong><br>
   <em>极光藤 · 让留学规划更清晰</em>
-</p>
-
-<p align="center">
-  <img src="image/welcome.png" alt="Welcome illustration" width="420">
 </p>
 
 <p align="center">
@@ -48,40 +46,12 @@ Built with vanilla **HTML / CSS / JavaScript** (ES modules in `renderer/modules/
 
 ## ✨ Highlights
 
-<table>
-  <tr>
-    <td align="center" width="25%">
-      <img src="image/plan.png" alt="School planning" width="80"><br>
-      <strong>🎯 School Planning</strong><br>
-      Profile form, scoring, AI school tiers
-    </td>
-    <td align="center" width="25%">
-      <img src="image/board.png" alt="Study planning" width="80"><br>
-      <strong>📋 Study Planning</strong><br>
-      AI outline, smart schedule, custom plans
-    </td>
-    <td align="center" width="25%">
-      <img src="image/planting.png" alt="AI loading" width="80"><br>
-      <strong>🤖 AI Assistant</strong><br>
-      Resume review, PS draft, daily tasks
-    </td>
-    <td align="center" width="25%">
-      <img src="image/picnic.png" alt="Community" width="80"><br>
-      <strong>💬 Community</strong><br>
-      Posts, replies, peer discussion
-    </td>
-  </tr>
-</table>
-
-<p align="center">
-  <img src="image/intro/1.jpg" alt="Intro 1" width="15%">
-  <img src="image/intro/2.jpg" alt="Intro 2" width="15%">
-  <img src="image/intro/3.jpg" alt="Intro 3" width="15%">
-  <img src="image/intro/4.jpg" alt="Intro 4" width="15%">
-  <img src="image/intro/5.jpg" alt="Intro 5" width="15%">
-  <img src="image/intro/6.jpg" alt="Intro 6" width="15%">
-</p>
-<p align="center"><em>🖼️ In-app intro carousel — sample screens from <code>image/intro/</code></em></p>
+- **🎯 School Planning** — Profile form, competitiveness scoring, AI school tiers
+- **📋 Study Planning** — AI outline, smart schedule, custom text plans
+- **🤖 AI Assistant** — Resume review, personal statement draft, daily task generation
+- **💬 Community** — Posts, replies, and peer discussion
+- **🏫 University Database** — ~200 schools with search, filters, and program lists
+- **📂 Application Cases** — Filterable real-case library linked to school pages
 
 ---
 
@@ -103,12 +73,6 @@ Built with vanilla **HTML / CSS / JavaScript** (ES modules in `renderer/modules/
 | **⚙️ Settings** | Language, light/dark theme, profile, avatar, DeepSeek API key, invite-code verification, clear personal data |
 | **📖 Usage Guide** | First-run tour and feature walkthrough |
 
-<p align="center">
-  <img src="image/lecture.png" alt="Profile & resources" width="200">
-  &nbsp;&nbsp;
-  <img src="image/hi.png" alt="Sidebar mascot" width="120">
-</p>
-
 ### UX polish
 
 - 🪟 Frameless window with custom title bar (draggable)
@@ -125,20 +89,20 @@ Configure a **DeepSeek API key** under **Settings → API Key**. Keys are stored
 
 ### Flow
 
-```
-School Planning submit
-  ├─ [optional] Resume upload → text extraction → LLM resume score
-  ├─ Local competitiveness score (GPA / language / background / school tier [+ resume])
-  ├─ LLM planning outline (entries + reach / match / safety tiers)
-  └─ [optional] LLM personal statement draft → My Profile
+**School Planning submit**
 
-Study Planning → Regenerate smart schedule
-  ├─ LLM phase schedule (plan-schedule)
-  ├─ LLM daily tasks (plan-daily-tasks, with retries)
-  ├─ Fallback: expand schedule milestones to per-day tasks
-  ├─ Gap fill: assign nearest phase task to uncovered dates
-  └─ Bulk import to daily_checkin (single DB transaction)
-```
+1. *(Optional)* Upload resume → extract text → LLM resume score
+2. Compute local competitiveness score (GPA, language, background, school tier, and resume when available)
+3. LLM generates planning outline with reach / match / safety tiers
+4. *(Optional)* LLM generates personal statement draft → saved to **My Profile**
+
+**Study Planning → Regenerate smart schedule**
+
+1. LLM generates phase-level schedule (`plan-schedule`)
+2. LLM generates daily check-in tasks (`plan-daily-tasks`, with retries)
+3. Fallback expands schedule milestones into per-day tasks
+4. Gap fill assigns the nearest phase task to uncovered dates in the planning window
+5. Bulk import into `daily_checkin` via a single database transaction
 
 ### Without a resume
 
@@ -332,26 +296,15 @@ Aurora_Vine/
 
 ## 🏗 Architecture
 
-```
-┌──────────────────────────────────────────────┐
-│  Renderer  (renderer/)                       │
-│  HTML + CSS + ES Modules                     │
-│  window.api  ←── preload ──→  IPC            │
-└────────────────────┬─────────────────────────┘
-                     │
-┌────────────────────▼─────────────────────────┐
-│  Main Process  (main.js + main/ipc/)         │
-│  Window · protocols · SQLite · LLM · files   │
-└────────────────────┬─────────────────────────┘
-                     │
-      ┌──────────────┼──────────────┐
-      ▼              ▼              ▼
- school_item.db   userData/      school/
-                  config.json    image/
-                  resumes/
-```
+The app follows a standard Electron split:
 
-**Security:** `contextIsolation: true`, no Node in renderer; privileged ops via IPC; `school://` and `avatar://` protocols read whitelisted paths only.
+- **Renderer** (`renderer/`) — HTML, CSS, and ES modules; no Node integration
+- **Preload** (`preload.js`) — exposes `window.api` through `contextBridge`
+- **Main process** (`main.js`, `main/ipc/`) — window management, SQLite, LLM calls, file I/O, custom protocols
+
+Data flows from the UI through IPC handlers into `data/school_item.db` (shared app data) and the Electron `userData` directory (API keys, resumes, avatars). University assets are read from `school/` via the `school://` protocol.
+
+**Security:** `contextIsolation` is enabled; privileged operations stay in the main process; `school://` and `avatar://` only serve whitelisted paths.
 
 ---
 
@@ -412,8 +365,13 @@ Custom protocols: `school://No.{rank}/{file}` · `avatar://account/{id}`
 
 ## 🎨 Theme & i18n
 
+<p align="center">
+  <img src="image/icon.png" alt="App icon" width="40">
+</p>
+
 | | Light | Dark |
-|---|-------|------|
+| --- | --- | --- |
+| Logo | `image/logo.png` | `image/logo_n.png` |
 | Sidebar | Mint green `#76c9a8` | Catppuccin-style `#2d2d3a` |
 | Accent | `#4db882` | `#ffe066` (buttons) |
 | Cases page | Original blue accent (isolated CSS vars) | Same blue tone |
@@ -469,8 +427,6 @@ Please refer to the license terms declared in this repository.
 ---
 
 <p align="center">
-  <img src="image/logo_n.png" alt="Aurora Vine" width="64">
-  <br><br>
   <strong>Aurora Vine</strong> · 极光藤<br>
   <em>A clearer path to studying abroad 🌿</em>
 </p>
