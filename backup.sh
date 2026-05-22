@@ -2,7 +2,7 @@
 set -e
 
 # ===== 用户手动控制区（只改这里） =====
-TAG_NAME="更新·一下README"
+TAG_NAME="更新·一下README(EN)"
 REMOTE_NAME="origin"
 BRANCH_NAME="main"
 REMOTE_URL="https://github.com/TheBlueBanisters/Aurora_Vine.git"

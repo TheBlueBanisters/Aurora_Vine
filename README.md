@@ -1,151 +1,211 @@
-# Aurora Vine · 极光藤
-
 <p align="center">
-  <strong>让留学规划更清晰 · A Clearer Path to Studying Abroad</strong>
+  <img src="image/logo.png" alt="Aurora Vine logo" width="120">
 </p>
 
-Aurora Vine 是一款面向留学申请者的 **Electron 桌面应用**。它将背景整理、院校探索、案例参考、AI 辅助规划、每日打卡与社区交流整合在同一界面中，帮助申请者把长期目标拆解为可执行步骤。
+<h1 align="center">Aurora Vine</h1>
 
-渲染层采用原生 **HTML / CSS / JavaScript**，按功能拆分为 `renderer/modules/` 下的 ES 模块；主进程通过 `main.js` 启动，业务 IPC 集中在 `main/ipc/`；LLM 相关逻辑位于 `main/llm/`。
+<p align="center">
+  <strong>A clearer path to studying abroad</strong><br>
+  <em>极光藤 · 让留学规划更清晰</em>
+</p>
 
----
+<p align="center">
+  <img src="image/welcome.png" alt="Welcome illustration" width="420">
+</p>
 
-## 目录
-
-- [功能概览](#功能概览)
-- [AI 与 LLM 能力](#ai-与-llm-能力)
-- [账户与权限](#账户与权限)
-- [技术栈](#技术栈)
-- [环境要求](#环境要求)
-- [快速开始](#快速开始)
-- [数据准备](#数据准备)
-- [项目结构](#项目结构)
-- [架构说明](#架构说明)
-- [数据与存储](#数据与存储)
-- [IPC 接口一览](#ipc-接口一览)
-- [主题与国际化](#主题与国际化)
-- [开发说明](#开发说明)
-- [备份与协作](#备份与协作)
-- [许可证](#许可证)
+<p align="center">
+  🌿 Electron desktop app · 🎓 ~200 universities · 🤖 DeepSeek-powered planning · 📅 Daily check-ins
+</p>
 
 ---
 
-## 功能概览
+**Aurora Vine** is an Electron desktop application for study-abroad applicants. It brings background profiling, university exploration, real application cases, AI-assisted planning, daily task tracking, and community discussion into one calm, focused workspace.
 
-### 核心入口
-
-| 模块 | 说明 |
-|------|------|
-| **定校规划** | 收集本科背景、GPA、语言与 GRE 标化、科研/实习/论文数量；可选上传简历（PDF/DOC/DOCX）。提交后计算综合竞争力评分，并在配置 API Key 后调用 LLM 生成规划大纲与院校梯度建议 |
-| **我的背景** | 展示已填写的背景信息；ECharts 可视化标化成绩；展示 LLM 生成的个人陈述草稿（需 API Key）；支持重新填写 |
-| **目标院校** | 管理收藏院校，按 QS 排名排序，可跳转详情 |
-| **留学规划** | **规划大纲**（LLM 生成 SWOT 式分析 + 冲/稳/保院校推荐）；**智能留学规划**（阶段日程 + 导入每日打卡）；**自定义规划**（结构化文本解析写入 SQLite）；展示推荐院校梯度与意向院校 |
-| **每日打卡** | 月历视图 + 当日任务（最多 9 条）；支持完成状态与颜色标记；可接收智能规划批量导入 |
-| **院校数据库** | 分页浏览约 200 所院校；关键词搜索；地区筛选（英美新港欧等）；详情侧栏含简介、官网、地址、轮播图、专业列表、相关申请案例 |
-| **申请案例** | 分页列表与多维筛选（本科层级、GPA、语言、软背景、排序等）；侧栏详情；与院校详情联动 |
-| **资源中心** | 分类浏览 GRE / 雅思 / 托福 / 文书 / 简历等素材；部分条目含富文本正文（含 KaTeX 公式渲染） |
-| **社区留言** | 发帖、回复、嵌套评论；可删除自己的帖子与回复 |
-| **设置** | 中/英语言、亮/暗主题、个人信息、头像、DeepSeek API Key、邀请码认证、清空个人资料 |
-| **使用指南** | 首次进入引导与功能说明 |
-
-### 通用体验
-
-- 无边框窗口 + 自定义标题栏（支持拖拽）
-- 亮色主题（薄荷绿强调）与暗色主题（荧光黄按钮强调）
-- 中英文界面切换（`renderer/modules/i18n.js`）
-- 夜间模式「萤火虫」粒子装饰（Logo、导航、部分卡片）
-- Toast 通知（NotifyX）、确认对话框、LLM 等待进度遮罩
+Built with vanilla **HTML / CSS / JavaScript** (ES modules in `renderer/modules/`), a modular **main process** (`main.js`, `main/ipc/`), and an optional **LLM pipeline** (`main/llm/`) powered by the DeepSeek API.
 
 ---
 
-## AI 与 LLM 能力
+## 📑 Table of Contents
 
-应用通过 **DeepSeek API**（OpenAI 兼容接口）提供智能规划，API Key 在「设置 → API Key」中配置，保存在用户目录 `config.json`，不会写入仓库。
+- [✨ Highlights](#-highlights)
+- [🧭 Features](#-features)
+- [🤖 AI & LLM Pipeline](#-ai--llm-pipeline)
+- [👤 Accounts & Access](#-accounts--access)
+- [🛠 Tech Stack](#-tech-stack)
+- [⚙️ Requirements](#️-requirements)
+- [🚀 Quick Start](#-quick-start)
+- [📦 Data Preparation](#-data-preparation)
+- [🗂 Project Structure](#-project-structure)
+- [🏗 Architecture](#-architecture)
+- [💾 Data & Storage](#-data--storage)
+- [🔌 IPC API Reference](#-ipc-api-reference)
+- [🎨 Theme & i18n](#-theme--i18n)
+- [🧑‍💻 Development](#-development)
+- [☁️ Backup & Git](#️-backup--git)
+- [📄 License](#-license)
 
-### 工作流程
+---
+
+## ✨ Highlights
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="image/plan.png" alt="School planning" width="80"><br>
+      <strong>🎯 School Planning</strong><br>
+      Profile form, scoring, AI school tiers
+    </td>
+    <td align="center" width="25%">
+      <img src="image/board.png" alt="Study planning" width="80"><br>
+      <strong>📋 Study Planning</strong><br>
+      AI outline, smart schedule, custom plans
+    </td>
+    <td align="center" width="25%">
+      <img src="image/planting.png" alt="AI loading" width="80"><br>
+      <strong>🤖 AI Assistant</strong><br>
+      Resume review, PS draft, daily tasks
+    </td>
+    <td align="center" width="25%">
+      <img src="image/picnic.png" alt="Community" width="80"><br>
+      <strong>💬 Community</strong><br>
+      Posts, replies, peer discussion
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="image/intro/1.jpg" alt="Intro 1" width="15%">
+  <img src="image/intro/2.jpg" alt="Intro 2" width="15%">
+  <img src="image/intro/3.jpg" alt="Intro 3" width="15%">
+  <img src="image/intro/4.jpg" alt="Intro 4" width="15%">
+  <img src="image/intro/5.jpg" alt="Intro 5" width="15%">
+  <img src="image/intro/6.jpg" alt="Intro 6" width="15%">
+</p>
+<p align="center"><em>🖼️ In-app intro carousel — sample screens from <code>image/intro/</code></em></p>
+
+---
+
+## 🧭 Features
+
+### Core modules
+
+| Module | Description |
+|--------|-------------|
+| **📝 School Planning** | Collect undergrad background, GPA, IELTS/TOEFL/GRE, research/internship/paper counts; optional resume upload (PDF/DOC/DOCX). Computes a competitiveness score and, with an API key, generates an AI planning outline + reach/match/safety school tiers |
+| **📊 My Profile** | Displays saved background data; ECharts visualization of test scores; shows LLM-generated personal statement draft; supports re-editing |
+| **⭐ Target Universities** | Manage favorited schools, sorted by QS ranking, with quick access to detail pages |
+| **📅 Study Planning** | **AI outline** (SWOT-style sections + school recommendations); **Smart schedule** (phase-level plan → daily check-in import); **Custom plan** (parse structured text into SQLite); tier & intended-school panels |
+| **✅ Daily Check-in** | Calendar + up to **9 tasks per day**; completion state & color tags; bulk import from smart planning |
+| **🏫 University Database** | Browse ~200 schools with search & region filters; detail sidebar with intro, website, address, image carousel, programs, related cases |
+| **📂 Application Cases** | Paginated case library with rich filters (tier, GPA, language, soft background, sorting); slide-out detail; linked from school pages |
+| **📚 Resource Center** | GRE / IELTS / TOEFL / SOP / resume templates and guides; rich content with **KaTeX** math rendering |
+| **💬 Community** | Create posts & nested replies; delete your own content |
+| **⚙️ Settings** | Language, light/dark theme, profile, avatar, DeepSeek API key, invite-code verification, clear personal data |
+| **📖 Usage Guide** | First-run tour and feature walkthrough |
+
+<p align="center">
+  <img src="image/lecture.png" alt="Profile & resources" width="200">
+  &nbsp;&nbsp;
+  <img src="image/hi.png" alt="Sidebar mascot" width="120">
+</p>
+
+### UX polish
+
+- 🪟 Frameless window with custom title bar (draggable)
+- 🌞 Light theme — mint-green accents · 🌙 Dark theme — warm yellow accents on buttons
+- 🌐 Chinese / English UI toggle
+- ✨ Firefly particle effects in dark mode (logo, nav, selected cards)
+- 🔔 Toast notifications, confirm dialogs, AI loading overlay with progress bar
+
+---
+
+## 🤖 AI & LLM Pipeline
+
+Configure a **DeepSeek API key** under **Settings → API Key**. Keys are stored in the user `config.json` file — never committed to the repo.
+
+### Flow
 
 ```
-定校规划提交
-  ├─ [可选] 简历上传 → 文本提取 → LLM 简历评分 (llmScore + summary)
-  ├─ 本地综合评分 (GPA / 语言 / 背景 / 院校层次 [+ 简历分])
-  ├─ LLM 生成规划大纲 (entries + schoolTiers 冲/稳/保)
-  └─ [可选] LLM 生成个人陈述草稿 → 写入「我的背景」
+School Planning submit
+  ├─ [optional] Resume upload → text extraction → LLM resume score
+  ├─ Local competitiveness score (GPA / language / background / school tier [+ resume])
+  ├─ LLM planning outline (entries + reach / match / safety tiers)
+  └─ [optional] LLM personal statement draft → My Profile
 
-留学规划 → 重新生成智能日程
-  ├─ LLM 生成阶段日程 (plan-schedule)
-  ├─ LLM 生成每日打卡任务 (plan-daily-tasks，带重试)
-  ├─ 日程兜底：将阶段任务按天展开
-  ├─ 空档补全：规划窗口内无任务的日期用最近阶段任务填充
-  └─ 批量导入 daily_checkin (dailyCheckin:importPlan，单次事务)
+Study Planning → Regenerate smart schedule
+  ├─ LLM phase schedule (plan-schedule)
+  ├─ LLM daily tasks (plan-daily-tasks, with retries)
+  ├─ Fallback: expand schedule milestones to per-day tasks
+  ├─ Gap fill: assign nearest phase task to uncovered dates
+  └─ Bulk import to daily_checkin (single DB transaction)
 ```
 
-### 无简历时的输入整理
+### Without a resume
 
-未上传简历时，主进程 `main/llm/profile-context.js` 会将表单中的标化信息整理为结构化 LLM 上下文，包括：
+When no resume is uploaded, `main/llm/profile-context.js` builds structured LLM input from the form:
 
-- `academic`：院校层次、GPA、百分位等
-- `standardizedTests`：雅思/托福/GRE 及「未考/已考」状态
-- `experience`：科研、实习、论文计数
-- `backgroundNarrative`：中英文叙事摘要
-- `guidanceForModel`：提示模型勿臆造简历细节
+- `academic` — school tier, GPA, percentile
+- `standardizedTests` — IELTS / TOEFL / GRE with taken / not-taken status
+- `experience` — research, internship, paper counts
+- `backgroundNarrative` — bilingual summary for the model
 
-### Prompt 模板
+### Prompt templates
 
-位于 `main/llm/prompts/`：
+Located in `main/llm/prompts/`:
 
-| 文件 | 用途 |
-|------|------|
-| `score-resume.md` | 简历质量评分 |
-| `plan-outline.md` | 规划大纲 + 院校梯度 |
-| `plan-schedule.md` | 阶段级智能日程 |
-| `plan-daily-tasks.md` | 每日可执行任务 |
-| `personal-statement.md` | 个人陈述草稿 |
+| File | Purpose |
+|------|---------|
+| `score-resume.md` | Resume quality scoring |
+| `plan-outline.md` | Planning outline + school tiers |
+| `plan-schedule.md` | Phase-level smart schedule |
+| `plan-daily-tasks.md` | Executable daily check-in tasks |
+| `personal-statement.md` | Personal statement draft |
 
-### 简历解析
+### Resume parsing
 
-- 支持 PDF（`pdf-parse`）、DOC/DOCX（`mammoth` / `word-extractor`）
-- 文件以 MD5 去重，文本缓存于 userData
-- 图片格式简历会存档但暂不支持 OCR
-
----
-
-## 账户与权限
-
-| 模式 | 说明 |
-|------|------|
-| **注册用户** | 邮箱 + 密码；数据与 SQLite 业务表关联 |
-| **游客模式** | 无需登录即可浏览与填写；定校规划等使用独立 localStorage 键 |
-| **认证用户** | 登录后输入邀请码通过 `auth:certify` 认证（邀请码配置于 `main/ipc/auth.js`） |
-
-- 头像：JPEG / PNG / WebP，≤ 512KB，经 `avatar://` 协议加载
-- 游客与账号的定校规划、收藏院校、主题等通过 `renderer/modules/storage.js` 分键存储
+- **PDF** — `pdf-parse` · **DOC/DOCX** — `mammoth` / `word-extractor`
+- Files deduplicated by MD5; text cached under userData
+- Image-only resumes are stored but OCR is not supported yet
 
 ---
 
-## 技术栈
+## 👤 Accounts & Access
 
-| 类型 | 技术 |
-|------|------|
-| 桌面壳 | Electron 33 |
-| 构建 | electron-vite 3.x |
-| 数据库 | better-sqlite3（`data/school_item.db`） |
+| Mode | Description |
+|------|-------------|
+| **Registered user** | Email + password; data tied to SQLite session |
+| **Guest** | Browse and fill forms without login; separate localStorage keys |
+| **Verified user** | Invite-code certification after login (code configured in `main/ipc/auth.js`) |
+
+- 🖼️ Avatars: JPEG / PNG / WebP, max 512 KB, served via `avatar://` protocol
+- 🔐 Guest vs account data isolated in `renderer/modules/storage.js`
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Desktop | Electron 33 |
+| Build | electron-vite 3.x |
+| Database | better-sqlite3 (`data/school_item.db`) |
 | LLM | OpenAI SDK → DeepSeek API |
-| 图表 | ECharts 5.x、echarts-gl |
-| 公式 | KaTeX（资源中心 GRE 等内容） |
-| 文档解析 | pdf-parse、mammoth、word-extractor |
-| 表格导入 | xlsx（`data/init_db.js`） |
-| 通知 | NotifyX |
-| 前端 | 原生 HTML / CSS / ES Modules（无 React / Vue） |
+| Charts | ECharts 5.x, echarts-gl |
+| Math | KaTeX (resource center) |
+| Documents | pdf-parse, mammoth, word-extractor |
+| Data import | xlsx (`data/init_db.js`) |
+| Notifications | NotifyX |
+| Frontend | Native HTML / CSS / ES Modules |
 
 ---
 
-## 环境要求
+## ⚙️ Requirements
 
 - **Node.js** 18+
 - **npm** 9+
-- **Windows / macOS / Linux**（开发环境已在 Windows 上验证）
+- **Windows / macOS / Linux**
 
-依赖含 **better-sqlite3** 原生模块：`npm install` 后通过 `postinstall` 执行 `electron-rebuild`。若启动报原生模块错误，可手动执行：
+`better-sqlite3` is a native addon. After `npm install`, `postinstall` runs `electron-rebuild`. If the app fails to start:
 
 ```bash
 npm run prestart
@@ -153,9 +213,9 @@ npm run prestart
 
 ---
 
-## 快速开始
+## 🚀 Quick Start
 
-### 1. 克隆与安装
+### 1️⃣ Clone & install
 
 ```bash
 git clone https://github.com/TheBlueBanisters/Aurora_Vine.git
@@ -163,293 +223,254 @@ cd Aurora_Vine
 npm install
 ```
 
-### 2. 初始化数据库（首次必做）
+### 2️⃣ Initialize the database (required on first run)
 
 ```bash
 node data/init_db.js
 ```
 
-脚本会 **删除已有的** `data/school_item.db` 并重建，包括：
+This **deletes and recreates** `data/school_item.db`, importing:
 
-- 从 `school/No.{QS排名}/` 导入院校与素材索引
-- 从 `major/*.xlsx`（可选）导入专业表 `school_programs`
-- 从 `personalCase/*.csv`（可选）导入申请案例
+- 🏫 Schools from `school/No.{QS_rank}/`
+- 📘 Programs from `major/*.xlsx` (optional)
+- 📋 Application cases from `personalCase/*.csv` (optional)
 
-> **警告**：重建数据库会清空账户、打卡、社区、留学规划等运行期数据。重要数据请先备份 `data/school_item.db`。
+> ⚠️ **Warning:** Rebuilding the DB wipes runtime data (accounts, check-ins, community, study plans). Back up `data/school_item.db` first if needed.
 
-当前仓库 `school/` 下约有 **200** 个院校目录，具体条数以脚本日志为准。
-
-### 3. 开发模式
+### 3️⃣ Development
 
 ```bash
 npm run dev
 ```
 
-- 渲染进程由 Vite 提供 HMR（`http://127.0.0.1:5173`）
-- 开发中间件映射 `/image` → 项目根目录 `image/`
-- 修改 `main.js`、`preload.js` 或 `main/ipc/` 后需重启 Electron
+- Renderer HMR at `http://127.0.0.1:5173`
+- Dev server maps `/image` → project `image/` folder
+- Restart Electron after changing `main.js`, `preload.js`, or `main/ipc/`
 
-### 4. 生产构建
+### 4️⃣ Production build
 
 ```bash
 npm run build
 npm start
 ```
 
-构建产物位于 `out/`（`main`、`preload`、`renderer`）。`package.json` 的 `"main"` 指向 `out/main/main.js`。
+Output goes to `out/`; entry point is `out/main/main.js`.
 
-### 5. 配置 LLM（可选）
+### 5️⃣ Enable AI (optional)
 
-1. 启动应用 → **设置**
-2. 展开 **API Key**，填入 DeepSeek API Key 并保存
-3. 在 **定校规划** 填写背景并提交，即可生成 AI 大纲
-4. 在 **留学规划** 点击「重新生成智能日程」，生成阶段计划并导入 **每日打卡**
+1. Launch the app → **Settings**
+2. Expand **API Key**, enter your DeepSeek key, click **Save**
+3. Fill **School Planning** and submit → AI outline is generated
+4. Open **Study Planning** → **Regenerate smart schedule** → tasks flow into **Daily Check-in**
 
 ---
 
-## 数据准备
+## 📦 Data Preparation
 
-### 1. 院校目录 `school/`（必填）
+### 🏫 `school/` (required)
 
-每个院校一个子文件夹，命名 **`No.{QS排名}`**（如 `No.2`、`No.163`）。
+One folder per university: **`No.{QS_ranking}`** (e.g. `No.2`, `No.163`).
 
-**必备：**
+**Required:**
 
-- **`intro.json`**：含 `intro.zh` / `intro.en`（字符串数组）、`contact`（官网）、`address.zh` / `address.en`
-- **校徽 PNG**：目录内至少一个非纯数字文件名的 `.png`（如 `帝国理工学院.png`）
+- `intro.json` — `intro.zh` / `intro.en`, `contact`, `address.zh` / `address.en`
+- Logo PNG — at least one non-numeric `.png` filename
 
-**可选：**
+**Optional:**
 
-- `1.jpg` ~ `5.jpg` 等轮播图（详情页展示）
+- `1.jpg` … `5.jpg` for the detail-page carousel
 
-### 2. 专业表 `major/`（可选）
+### 📘 `major/` (optional)
 
-- 放置 **一个** `.xlsx`（忽略 `~$*.xlsx`），读取第一张工作表，首行为表头
-- 必须能匹配：中文校名、英文校名、中/英专业名（别名见 `data/init_db.js` 中 `PROGRAM_COLUMN_ALIASES`）
-- 可选列：学费、语言要求、学制、培养方案、专业难度系数等
-- 每行校名须能唯一定位到已导入院校，否则脚本报错终止
+- Single `.xlsx` workbook (first sheet, header row)
+- Must map: CN/EN school name, CN/EN program name (aliases in `data/init_db.js`)
+- Optional columns: tuition, language requirements, duration, curriculum, difficulty
 
-### 3. 申请案例 `personalCase/`（可选）
+### 📋 `personalCase/` (optional)
 
-- 放置 **一个** `.csv`，脚本按 **GB18030** 解码（兼容 Excel 中文 Windows 导出）
-- 主要列：`案例序号`、`本科层次`、`绩点分制`、`绩点`、`绩点排名百分比`、`雅思成绩`、`托福成绩`、`GRE`、`GRE写作`、`实习数量`、`科研数量`、`论文数量`
-- Offer 列表由脚本结合院校与专业数据自动分配
+- Single `.csv`, decoded as **GB18030** (Excel CN Windows export)
+- Key columns: case ID, undergrad tier, GPA scale/score, percentiles, IELTS/TOEFL/GRE, internship/research/paper counts
+- Offers are auto-assigned from school + program data
 
-### 4. 社区示例帖（可选）
+### 💬 Community seed (optional)
 
 ```bash
 python data/fix-community-posts.py
 ```
 
-用于插入 UTF-8 编码的示例社区帖子（避免 Windows 下 SQL 管道乱码）。
+Inserts UTF-8 sample posts (avoids encoding issues on Windows).
 
 ---
 
-## 项目结构
+## 🗂 Project Structure
 
 ```
 Aurora_Vine/
-├── main.js                      # Electron 主进程入口
-├── preload.js                   # contextBridge → window.api
-├── electron.vite.config.js      # main / preload / renderer 构建配置
-├── package.json
-│
+├── main.js                 # Electron main entry
+├── preload.js              # contextBridge → window.api
+├── electron.vite.config.js
 ├── main/
-│   ├── ipc/                     # IPC 处理器
-│   │   ├── auth.js              # 注册 / 登录 / 认证
-│   │   ├── avatar.js            # 头像与 avatar:// 协议
-│   │   ├── schools.js           # 院校 CRUD、搜索、school:// 协议
-│   │   ├── application-cases.js # 申请案例
-│   │   ├── daily-checkin.js     # 每日打卡（含 bulk import）
-│   │   ├── study-planning.js    # 留学规划 SQLite
-│   │   ├── community.js         # 社区
-│   │   ├── resume.js            # 简历上传与文本提取
-│   │   └── llm.js               # DeepSeek LLM 管道
-│   ├── llm/                     # Prompt、JSON 校验、院校匹配、Profile 上下文
-│   └── utils/                   # db、crypto、security、app-config、resume-text
-│
+│   ├── ipc/                # auth, schools, cases, check-in, study-plan, community, resume, llm
+│   ├── llm/                # prompts, schema validation, school matcher, profile context
+│   └── utils/              # db, security, app-config, resume-text
 ├── data/
-│   ├── init_db.js               # 重建 school_item.db
-│   ├── school_item.db           # 运行期数据库（git 通常忽略）
-│   ├── fix-community-posts.py   # 社区帖 UTF-8 种子脚本
-│   └── seed-community-posts.sql
-│
-├── school/                      # 院校素材（No.{rank}/）
-├── major/                       # 专业 xlsx（可选）
-├── personalCase/                # 案例 csv（可选）
-├── image/                       # 应用静态图、启动页等
-│
+│   ├── init_db.js          # rebuild school_item.db
+│   └── fix-community-posts.py
+├── school/                 # university assets
+├── major/                  # program spreadsheets
+├── personalCase/           # case CSVs
+├── image/                  # app illustrations & branding
 ├── renderer/
-│   ├── index.html               # 单页应用骨架
-│   ├── style.css                # 全局样式
-│   ├── styles/                  # 组件级样式（如 custom-select、firefly）
-│   ├── app.js                   # 入口：导航、模块初始化
-│   └── modules/
-│       ├── auth.js / settings.js / theme.js / i18n.js
-│       ├── planning.js / scoring.js / profile.js
-│       ├── llm-planning-service.js    # LLM 提交流水线
-│       ├── daily-task-distributor.js  # 打卡任务合并与导入
-│       ├── study-planning.js / study-planning-parser.js
-│       ├── schools.js / application-cases.js
-│       ├── daily-checkin.js / community.js
-│       ├── resource-center.js / resource-content*.js
-│       └── ...
-│
-├── out/                         # npm run build 输出
-├── backup.sh                    # Git 备份推送脚本
-└── README.md
+│   ├── index.html
+│   ├── style.css
+│   ├── app.js
+│   └── modules/            # feature modules (planning, schools, llm-planning-service, …)
+└── out/                    # build output
 ```
 
 ---
 
-## 架构说明
+## 🏗 Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  Renderer (renderer/)                                   │
-│  HTML + CSS + ES Modules                                │
-│  window.api.*  ←── contextBridge ──→  preload.js       │
-└───────────────────────────┬─────────────────────────────┘
-                            │ IPC invoke/handle
-┌───────────────────────────▼─────────────────────────────┐
-│  Main Process (main.js + main/ipc/)                     │
-│  BrowserWindow · protocol · SQLite · LLM · 文件 IO      │
-└───────────────────────────┬─────────────────────────────┘
-                            │
-         ┌──────────────────┼──────────────────┐
-         ▼                  ▼                  ▼
-  data/school_item.db   userData/          school/
-  (业务 + 院校数据)      config.json         静态素材
-                        resumes/           major/
-                        avatars/
+┌──────────────────────────────────────────────┐
+│  Renderer  (renderer/)                       │
+│  HTML + CSS + ES Modules                     │
+│  window.api  ←── preload ──→  IPC            │
+└────────────────────┬─────────────────────────┘
+                     │
+┌────────────────────▼─────────────────────────┐
+│  Main Process  (main.js + main/ipc/)         │
+│  Window · protocols · SQLite · LLM · files   │
+└────────────────────┬─────────────────────────┘
+                     │
+      ┌──────────────┼──────────────┐
+      ▼              ▼              ▼
+ school_item.db   userData/      school/
+                  config.json    image/
+                  resumes/
 ```
 
-**安全模型：**
-
-- `contextIsolation: true`，渲染进程禁用 Node 集成
-- 所有特权操作经 IPC；输入在主进程侧校验（`main/utils/security.js`）
-- 自定义协议 `school://`、`avatar://` 仅读取白名单路径
+**Security:** `contextIsolation: true`, no Node in renderer; privileged ops via IPC; `school://` and `avatar://` protocols read whitelisted paths only.
 
 ---
 
-## 数据与存储
+## 💾 Data & Storage
 
-### SQLite：`data/school_item.db`
+### SQLite — `data/school_item.db`
 
-| 类别 | 表 | 说明 |
-|------|-----|------|
-| 院校 | `schools`、`school_programs` | `init_db.js` 导入 |
-| 案例 | `application_cases`、`application_case_offers` | `init_db.js` 导入 |
-| 账户 | `accounts`、`app_session` | 启动时自动建表 |
-| 打卡 | `daily_checkin` | 含 `completed`、`sort_order`，每日最多 9 条 |
-| 规划 | `study_plan` | 标题、描述 JSON、任务 JSON、颜色、`source` / `kind` |
-| 社区 | `community_posts`、`community_replies` | 帖子与嵌套回复 |
+| Category | Tables |
+|----------|--------|
+| Universities | `schools`, `school_programs` |
+| Cases | `application_cases`, `application_case_offers` |
+| Accounts | `accounts`, `app_session` |
+| Check-in | `daily_checkin` |
+| Plans | `study_plan` |
+| Community | `community_posts`, `community_replies` |
 
-### localStorage（按账号 / 游客隔离）
+### localStorage (per account / guest)
 
-| 键 | 内容 |
-|----|------|
-| `schoolPlanningProfile[:guest]` | 定校规划表单与 LLM 结果 |
-| `targetSchools[:guest]` | 收藏院校 ID 列表 |
-| `profileInfo[:guest]` | 设置页个人信息 |
+| Key | Content |
+|-----|---------|
+| `schoolPlanningProfile[:guest]` | Planning form + LLM results |
+| `targetSchools[:guest]` | Favorited school IDs |
+| `profileInfo[:guest]` | Settings profile fields |
 | `theme` | `light` / `dark` |
 | `lang` | `zh` / `en` |
 
-### userData 目录
+### userData
 
-| 路径 | 内容 |
-|------|------|
-| `config.json` | DeepSeek API Key（masked 展示） |
-| `resumes/{md5}.*` | 上传的简历原文件 |
-| `resumes/{md5}.txt` | 提取的纯文本 |
-| `avatars/{accountId}.*` | 用户头像 |
-
----
-
-## IPC 接口一览
-
-渲染进程通过 `preload.js` 暴露的 `window.api` 与主进程通信：
-
-| 分组 | 方法 | 说明 |
-|------|------|------|
-| 主题 | `themeApply` | 同步窗口标题栏与背景 |
-| 认证 | `authGetCurrentUser`、`authLogin`、`authRegister`、`authLogout`、`authEnterGuest`、`authCertify`、`authUpdateNickname`、`authUploadAvatar` | 账户体系 |
-| 头像 | `avatarGetDataUrl` | 读取头像 Data URL |
-| 院校 | `schoolsList`、`schoolsSearch`、`schoolsGetById`、`schoolsGetByIds`、`schoolsGetProgramsBySchoolId`、`schoolsGetIntro`、`schoolsGetAssetPath`、`schoolsGetAssetDataUrl` | 列表 / 搜索 / 详情 / 素材 |
-| 案例 | `applicationCasesList`、`applicationCasesGetDetail`、`applicationCasesListBySchoolId` | 申请案例 |
-| 打卡 | `dailyCheckinGetByDate`、`dailyCheckinListByMonth`、`dailyCheckinSaveByDate`、`dailyCheckinAppendTasks`、`dailyCheckinImportPlan`、`dailyCheckinClearAll` | 每日打卡 |
-| 规划 | `studyPlanSave`、`studyPlanList`、`studyPlanDelete`、`studyPlanClearBySource`、`studyPlanClearBySourceAndKind`、`studyPlanClearAll` | 留学规划 SQLite |
-| 社区 | `communityListPosts`、`communityGetPostDetail`、`communityCreatePost`、`communityCreateReply`、`communityDeletePost`、`communityDeleteReply` | 社区 |
-| 简历 | `resumeUpload`、`resumeClearAll`、`resumeGetText` | 简历管理 |
-| 设置 | `settingsGetDeepseekApiKey`、`settingsSetDeepseekApiKey` | API Key |
-| LLM | `llmScoreResume`、`llmGenerateOutline`、`llmGenerateSchedule`、`llmGenerateDailyTasks`、`llmGeneratePersonalStatement` | AI 生成 |
+| Path | Content |
+|------|---------|
+| `config.json` | DeepSeek API key |
+| `resumes/` | Uploaded resumes + extracted text |
+| `avatars/` | User avatar files |
 
 ---
 
-## 主题与国际化
+## 🔌 IPC API Reference
 
-### 主题
+Exposed via `window.api` in `preload.js`:
 
-- **亮色**：侧边栏薄荷绿（`#76c9a8`），按钮与强调色 `#4db882`
-- **暗色**：Catppuccin 风格深色底，按钮与强调色荧光黄 `#ffe066`
-- **申请案例页**独立保留原蓝色强调（`--cases-accent-rgb`），与全局主题解耦
-- 切换入口：设置 → 夜间模式；状态写入 localStorage 并调用 `theme:apply`
+| Group | Methods |
+|-------|---------|
+| Theme | `themeApply` |
+| Auth | `authGetCurrentUser`, `authLogin`, `authRegister`, `authLogout`, `authEnterGuest`, `authCertify`, `authUpdateNickname`, `authUploadAvatar` |
+| Avatar | `avatarGetDataUrl` |
+| Schools | `schoolsList`, `schoolsSearch`, `schoolsGetById`, `schoolsGetByIds`, `schoolsGetProgramsBySchoolId`, `schoolsGetIntro`, `schoolsGetAssetPath`, `schoolsGetAssetDataUrl` |
+| Cases | `applicationCasesList`, `applicationCasesGetDetail`, `applicationCasesListBySchoolId` |
+| Check-in | `dailyCheckinGetByDate`, `dailyCheckinListByMonth`, `dailyCheckinSaveByDate`, `dailyCheckinAppendTasks`, `dailyCheckinImportPlan`, `dailyCheckinClearAll` |
+| Study plan | `studyPlanSave`, `studyPlanList`, `studyPlanDelete`, `studyPlanClearBySource`, `studyPlanClearBySourceAndKind`, `studyPlanClearAll` |
+| Community | `communityListPosts`, `communityGetPostDetail`, `communityCreatePost`, `communityCreateReply`, `communityDeletePost`, `communityDeleteReply` |
+| Resume | `resumeUpload`, `resumeClearAll`, `resumeGetText` |
+| Settings | `settingsGetDeepseekApiKey`, `settingsSetDeepseekApiKey` |
+| LLM | `llmScoreResume`, `llmGenerateOutline`, `llmGenerateSchedule`, `llmGenerateDailyTasks`, `llmGeneratePersonalStatement` |
 
-### 国际化
-
-- 文案集中在 `renderer/modules/i18n.js`
-- 页面元素通过 `data-i18n` / `data-i18n-placeholder` 绑定
-- LLM 输出要求中英文双语 JSON 字段 `{ zh, en }`
-
----
-
-## 开发说明
-
-### 常用命令
-
-| 命令 | 作用 |
-|------|------|
-| `npm run dev` | 开发模式（Vite + Electron） |
-| `npm run build` | 构建到 `out/` |
-| `npm start` | 运行构建后的应用 |
-| `node data/init_db.js` | 重建院校 / 案例数据库 |
-
-### 新增功能建议
-
-- 与现有板块弱相关的功能，优先封装为 `renderer/modules/` 下的独立文件（见 `.cursor/rules/encapsulation-rule.mdc`）
-- 新增 IPC 时在 `main/ipc/` 注册，并同步 `preload.js` 的 `window.api`
-- LLM 新能力：添加 `main/llm/prompts/*.md`，在 `plan-schema.js` 增加校验，于 `llm.js` 注册 handler
-
-### 常见问题
-
-| 现象 | 处理 |
-|------|------|
-| 院校列表为空 | 执行 `node data/init_db.js` |
-| better-sqlite3 报错 | 运行 `npm run prestart` 或重新 `npm install` |
-| LLM 提交失败 | 检查设置中 API Key；查看主进程控制台错误 |
-| 打卡导入不完整 | 在留学规划重新「生成智能日程」；系统会自动日程兜底 + 空档补全 |
-| 社区帖乱码 | 使用 `python data/fix-community-posts.py` 重新插入 |
+Custom protocols: `school://No.{rank}/{file}` · `avatar://account/{id}`
 
 ---
 
-## 备份与协作
+## 🎨 Theme & i18n
 
-仓库根目录提供 `backup.sh`，用于本地 Git 提交并推送到远程（默认 `origin` → GitHub）。使用前在脚本顶部修改 `TAG_NAME`、`BRANCH_NAME` 等变量。
+| | Light | Dark |
+|---|-------|------|
+| Sidebar | Mint green `#76c9a8` | Catppuccin-style `#2d2d3a` |
+| Accent | `#4db882` | `#ffe066` (buttons) |
+| Cases page | Original blue accent (isolated CSS vars) | Same blue tone |
+
+- 🌐 Strings in `renderer/modules/i18n.js`; LLM outputs use bilingual `{ zh, en }` JSON fields
+- 🔄 Toggle language in Settings; theme syncs to the native title bar via `theme:apply`
+
+---
+
+## 🧑‍💻 Development
+
+| Command | Action |
+|---------|--------|
+| `npm run dev` | Dev mode (Vite HMR + Electron) |
+| `npm run build` | Build to `out/` |
+| `npm start` | Run production build |
+| `node data/init_db.js` | Rebuild university / case database |
+
+### Adding features
+
+- Keep loosely coupled features in separate files under `renderer/modules/`
+- Register new IPC in `main/ipc/` and expose in `preload.js`
+- New LLM capabilities: add prompt in `main/llm/prompts/`, validation in `plan-schema.js`, handler in `llm.js`
+
+### FAQ
+
+| Issue | Fix |
+|-------|-----|
+| Empty school list | Run `node data/init_db.js` |
+| `better-sqlite3` error | `npm run prestart` or reinstall |
+| LLM submit fails | Check API key in Settings; inspect main-process logs |
+| Incomplete check-in import | Regenerate smart schedule (fallback + gap-fill runs automatically) |
+| Garbled community posts | Run `python data/fix-community-posts.py` |
+
+---
+
+## ☁️ Backup & Git
+
+Use `backup.sh` to commit and push to remote (default: `origin` on GitHub). Edit the config block at the top of the script before running:
 
 ```bash
 bash backup.sh
 ```
 
-`node_modules` 已由 `.gitignore` 排除，不会被纳入提交。
+`node_modules` is excluded via `.gitignore`.
 
 ---
 
-## 许可证
+## 📄 License
 
-请遵循本仓库声明的许可证条款。
+Please refer to the license terms declared in this repository.
 
 ---
 
 <p align="center">
-  <em>Aurora Vine · 极光藤 — 让留学规划更清晰</em>
+  <img src="image/logo_n.png" alt="Aurora Vine" width="64">
+  <br><br>
+  <strong>Aurora Vine</strong> · 极光藤<br>
+  <em>A clearer path to studying abroad 🌿</em>
 </p>
