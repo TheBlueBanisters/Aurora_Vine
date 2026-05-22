@@ -1,6 +1,7 @@
 import { escapeHtml, showToast } from './utils.js'
 import { t } from './i18n.js'
 import { pickLocalized } from './localized-content.js'
+import { translateCaseTag, translateOfferTier, translateUndergradTier } from './case-display.js'
 
 const APPLICATION_CASE_PAGE_SIZE = 12
 
@@ -59,7 +60,10 @@ function pickCaseProgramName(item) {
 }
 
 function pickCaseSchoolName(item) {
-  return item.primary_school_name_zh || t('cases.schoolPending')
+  return pickLocalized({
+    zh: item.primary_school_name_zh,
+    en: item.primary_school_name_en
+  }) || t('cases.schoolPending')
 }
 
 function pickOfferSchoolName(offer) {
@@ -84,7 +88,7 @@ function formatOfferLocation(offer) {
 
 function renderCaseTags(tags = []) {
   const safeTags = Array.isArray(tags) ? tags : []
-  return safeTags.map((tag) => `<span class="application-case-tag">${escapeHtml(tag)}</span>`).join('')
+  return safeTags.map((tag) => `<span class="application-case-tag">${escapeHtml(translateCaseTag(tag))}</span>`).join('')
 }
 
 function syncTierFilterState() {
@@ -200,17 +204,17 @@ export async function openApplicationCaseDetail(caseId) {
 
   if (!kickerEl || !titleEl || !subtitleEl || !overviewEl || !testsEl || !softEl || !offersEl) return
 
-  kickerEl.textContent = `${t('cases.kicker', caseItem.case_no, caseItem.undergrad_tier)} · ${t('cases.profileScore')} ${caseItem.profile_tier_score}`
+  kickerEl.textContent = `${t('cases.kicker', caseItem.case_no, translateUndergradTier(caseItem.undergrad_tier))} · ${t('cases.profileScore')} ${caseItem.profile_tier_score}`
   titleEl.textContent = pickCaseSchoolName(caseItem)
   subtitleEl.textContent = pickCaseProgramName(caseItem)
 
   overviewEl.innerHTML = [
-    buildDetailField(t('caseDetail.labelTier'), caseItem.undergrad_tier || '-'),
+    buildDetailField(t('caseDetail.labelTier'), translateUndergradTier(caseItem.undergrad_tier) || '-'),
     buildDetailField(t('caseDetail.labelGpa'), `${formatMaybeNumber(caseItem.gpa_value)} / ${escapeHtml(caseItem.gpa_scale || '-')}`),
     buildDetailField(t('caseDetail.labelGpaRank'), formatRankPercent(caseItem.gpa_rank_percent)),
     buildDetailField(t('caseDetail.labelPrimarySchool'), pickCaseSchoolName(caseItem)),
     buildDetailField(t('caseDetail.labelPrimaryProgram'), pickCaseProgramName(caseItem)),
-    buildDetailField(t('caseDetail.labelTags'), (caseItem.tags || []).join(' · ') || '-')
+    buildDetailField(t('caseDetail.labelTags'), (caseItem.tags || []).map(translateCaseTag).join(' · ') || '-')
   ].join('')
 
   testsEl.innerHTML = [
@@ -236,7 +240,7 @@ export async function openApplicationCaseDetail(caseId) {
           </div>
           <div class="application-case-offer-badges">
             <span class="application-case-offer-badge">${escapeHtml(t('cases.qsRank', offer.ranking_qs || '-'))}</span>
-            <span class="application-case-offer-badge">${escapeHtml(offer.offer_tier || t('caseDetail.offerTierMatch'))}</span>
+            <span class="application-case-offer-badge">${escapeHtml(translateOfferTier(offer.offer_tier))}</span>
             ${offer.is_primary_offer ? `<span class="application-case-offer-badge is-primary">${t('caseDetail.primaryBadge')}</span>` : ''}
           </div>
         </div>
@@ -252,7 +256,7 @@ function renderCaseCard(item) {
     <article class="application-case-card" data-case-id="${item.id}">
       <div class="application-case-card-top">
         <div>
-          <p class="application-case-card-kicker">${escapeHtml(t('cases.kicker', item.case_no || '-', item.undergrad_tier || '-'))}</p>
+          <p class="application-case-card-kicker">${escapeHtml(t('cases.kicker', item.case_no || '-', translateUndergradTier(item.undergrad_tier) || '-'))}</p>
           <h3 class="application-case-card-title">${escapeHtml(pickCaseSchoolName(item))}</h3>
           <p class="application-case-card-subtitle">${escapeHtml(pickCaseProgramName(item))}</p>
         </div>
@@ -265,7 +269,7 @@ function renderCaseCard(item) {
       <div class="application-case-card-grid">
         <div class="application-case-card-metric">
           <span class="application-case-card-metric-label">${t('cases.labelUndergrad')}</span>
-          <span class="application-case-card-metric-value">${escapeHtml(item.undergrad_tier || '-')}</span>
+          <span class="application-case-card-metric-value">${escapeHtml(translateUndergradTier(item.undergrad_tier) || '-')}</span>
         </div>
         <div class="application-case-card-metric">
           <span class="application-case-card-metric-label">${t('cases.labelGpa')}</span>

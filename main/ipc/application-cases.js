@@ -33,12 +33,14 @@ function buildCaseFilter(filters = {}) {
     where.push(`
       (
         c.primary_school_name_zh LIKE ?
+        OR primary_offer.school_name_en LIKE ?
         OR c.primary_program_name_cn LIKE ?
+        OR c.primary_program_name_en LIKE ?
         OR c.undergrad_tier LIKE ?
         OR c.tags_json LIKE ?
       )
     `);
-    params.push(likePattern, likePattern, likePattern, likePattern);
+    params.push(likePattern, likePattern, likePattern, likePattern, likePattern, likePattern);
   }
 
   const undergradTier = String(filters?.undergradTier ?? 'all').trim();
@@ -135,6 +137,7 @@ export function registerApplicationCasesIpc() {
           c.tags_json,
           c.primary_school_id,
           c.primary_school_name_zh,
+          primary_offer.school_name_en AS primary_school_name_en,
           c.primary_program_name_cn,
           c.primary_program_name_en,
           primary_offer.ranking_qs AS primary_ranking_qs,
@@ -170,6 +173,7 @@ export function registerApplicationCasesIpc() {
       const caseRow = db.prepare(`
         SELECT
           c.*,
+          primary_offer.school_name_en AS primary_school_name_en,
           primary_offer.ranking_qs AS primary_ranking_qs
         FROM application_cases c
         LEFT JOIN application_case_offers primary_offer

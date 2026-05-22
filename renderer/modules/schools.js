@@ -6,6 +6,7 @@ import { getFavoriteStarMarkup, bindFavoriteStar } from './favorite-star.js'
 import { getTheme } from './theme.js'
 import { openApplicationCaseDetail } from './application-cases.js'
 import { decorateFireflyHost } from './firefly-effect.js'
+import { translateCaseTag, translateOfferTier, translateUndergradTier } from './case-display.js'
 
 let explorerPage = 1
 let explorerTotal = 0
@@ -245,7 +246,7 @@ function renderRelatedCases(items = [], error = '') {
       <article class="school-related-case-card" data-case-id="${item.id}">
         <div class="school-related-case-top">
           <div>
-            <p class="school-related-case-kicker">${escapeHtml(t('schoolDetail.caseKicker', item.case_no || '-', item.undergrad_tier || '-'))}</p>
+            <p class="school-related-case-kicker">${escapeHtml(t('schoolDetail.caseKicker', item.case_no || '-', translateUndergradTier(item.undergrad_tier) || '-'))}</p>
             <div class="school-related-case-program">
               <span class="school-related-case-program-label">${t('schoolDetail.admittedProgram')}</span>
               <div class="school-related-case-program-body">
@@ -266,9 +267,9 @@ function renderRelatedCases(items = [], error = '') {
           <span>GPA ${escapeHtml(String(item.gpa_value || '-'))}</span>
           <span>${escapeHtml(language)}</span>
           <span>${escapeHtml(gre)}</span>
-          <span>${escapeHtml(item.offer_tier || t('schoolDetail.offerTierMatch'))}</span>
+          <span>${escapeHtml(translateOfferTier(item.offer_tier, t('schoolDetail.offerTierMatch')))}</span>
         </div>
-        ${tags.length ? `<div class="school-related-case-tags">${tags.map((tag) => `<span class="school-related-case-tag">${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
+        ${tags.length ? `<div class="school-related-case-tags">${tags.map((tag) => `<span class="school-related-case-tag">${escapeHtml(translateCaseTag(tag))}</span>`).join('')}</div>` : ''}
       </article>`
   }).join('')
 

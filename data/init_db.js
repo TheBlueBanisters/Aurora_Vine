@@ -98,6 +98,7 @@ CREATE INDEX idx_application_case_offers_school_id ON application_case_offers(sc
 const schoolDir = path.join(__dirname, '..', 'school');
 const majorDir = path.join(__dirname, '..', 'major');
 const personalCaseDir = path.join(__dirname, '..', 'personalCase');
+const TARGET_APPLICATION_CASE_COUNT = 200;
 
 const COUNTRY_ZH_LIST = [
   '中国香港', '中国澳门', '中国台湾',
@@ -735,6 +736,97 @@ function computeProfileTierScore(row) {
   return Number(score.toFixed(2));
 }
 
+function clampNumber(value, min, max) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return min;
+  return Math.max(min, Math.min(max, num));
+}
+
+function roundTo(value, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round(Number(value) * factor) / factor;
+}
+
+function buildApplicationCaseProfile(row) {
+  const caseNo = Number(row['案例序号'] || 0);
+  const ieltsScore = pickFirstPositive(row['雅思成绩']);
+  const toeflScore = pickFirstPositive(row['托福成绩']);
+  const greScore = pickFirstPositive(row.GRE);
+  const greWritingScore = pickFirstPositive(row['GRE写作']);
+  return {
+    caseNo,
+    profileTierScore: computeProfileTierScore(row),
+    undergradTier: String(row['本科层次'] || '').trim() || '其他',
+    gpaScale: String(row['绩点分制'] || '').trim() || '5分制',
+    gpaValue: Number(row['绩点'] || 0),
+    gpaRankPercent: parsePercentNumber(row['绩点排名百分比']),
+    ieltsScore: ieltsScore || null,
+    toeflScore: toeflScore || null,
+    greScore: greScore || null,
+    greWritingScore: greWritingScore || null,
+    internshipCount: Number(row['实习数量'] || 0),
+    researchCount: Number(row['科研数量'] || 0),
+    paperCount: Number(row['论文数量'] || 0),
+    tags: buildCaseTags(row),
+    rawJson: JSON.stringify(row)
+  };
+}
+
+function createVariantCaseRow(sourceRow, variantIndex, caseNo) {
+  const row = { ...sourceRow };
+  const gpaScale = getGpaScaleNumber(row['绩点分制']);
+  const gpaDelta = [-0.08, 0.06, 0.11, -0.04, 0.03][variantIndex % 5];
+  const rankDelta = [4, -3, 6, -5, 2][variantIndex % 5];
+  const ieltsDelta = [-0.5, 0, 0.5, 0, 0.5][variantIndex % 5];
+  const toeflDelta = [-3, 2, 4, -2, 3][variantIndex % 5];
+  const greDelta = [-4, 3, 5, -2, 4][variantIndex % 5];
+  const writingDelta = [-0.5, 0, 0.5, 0, 0.5][variantIndex % 5];
+  const softDelta = [-1, 0, 1, 0, 1][variantIndex % 5];
+
+  row['案例序号'] = String(caseNo);
+  row['绩点'] = String(roundTo(clampNumber(Number(row['绩点'] || 0) + gpaDelta, 0, gpaScale), 2));
+
+  const rankPercent = parsePercentNumber(row['绩点排名百分比']);
+  if (Number.isFinite(rankPercent)) {
+    row['绩点排名百分比'] = String(roundTo(clampNumber(rankPercent + rankDelta, 1, 80), 1));
+  }
+
+  const ielts = Number(row['雅思成绩'] || 0);
+  if (ielts > 0) row['雅思成绩'] = String(roundTo(clampNumber(ielts + ieltsDelta, 5, 8.5), 1));
+
+  const toefl = Number(row['托福成绩'] || 0);
+  if (toefl > 0) row['托福成绩'] = String(Math.round(clampNumber(toefl + toeflDelta, 70, 119)));
+
+  const gre = Number(row.GRE || 0);
+  if (gre > 0) row.GRE = String(Math.round(clampNumber(gre + greDelta, 295, 338)));
+
+  const greWriting = Number(row['GRE写作'] || 0);
+  if (greWriting > 0) row['GRE写作'] = String(roundTo(clampNumber(greWriting + writingDelta, 2.5, 5.5), 1));
+
+  row['实习数量'] = String(Math.round(clampNumber(Number(row['实习数量'] || 0) + softDelta, 0, 5)));
+  row['科研数量'] = String(Math.round(clampNumber(Number(row['科研数量'] || 0) - softDelta, 0, 5)));
+  row['论文数量'] = String(Math.round(clampNumber(Number(row['论文数量'] || 0) + (variantIndex % 3 === 0 ? 1 : 0), 0, 3)));
+  row['基础案例序号'] = sourceRow['案例序号'] || '';
+  row['模拟变体序号'] = String(variantIndex + 1);
+
+  return row;
+}
+
+function expandApplicationCaseRows(rows, targetCount = TARGET_APPLICATION_CASE_COUNT) {
+  if (!Array.isArray(rows) || rows.length >= targetCount) return rows;
+  const maxCaseNo = rows.reduce((max, row) => Math.max(max, Number(row['案例序号'] || 0)), 0);
+  const expandedRows = [...rows];
+  let variantIndex = 0;
+
+  while (expandedRows.length < targetCount) {
+    const sourceRow = rows[variantIndex % rows.length];
+    expandedRows.push(createVariantCaseRow(sourceRow, variantIndex, maxCaseNo + variantIndex + 1));
+    variantIndex++;
+  }
+
+  return expandedRows;
+}
+
 function buildOfferTier(targetRank, rankingQs) {
   if (rankingQs < targetRank - 8) return '冲刺';
   if (rankingQs > targetRank + 12) return '保底';
@@ -846,38 +938,8 @@ function importApplicationCases(records) {
   })).sort((a, b) => a.rank - b.rank);
   const schoolProgramsMap = buildSchoolProgramsMap();
 
-  const caseProfiles = rows.map((row) => {
-    const caseNo = Number(row['案例序号'] || 0);
-    const profileTierScore = computeProfileTierScore(row);
-    const gpaScale = String(row['绩点分制'] || '').trim() || '5分制';
-    const gpaValue = Number(row['绩点'] || 0);
-    const gpaRankPercent = parsePercentNumber(row['绩点排名百分比']);
-    const ieltsScore = pickFirstPositive(row['雅思成绩']);
-    const toeflScore = pickFirstPositive(row['托福成绩']);
-    const greScore = pickFirstPositive(row.GRE);
-    const greWritingScore = pickFirstPositive(row['GRE写作']);
-    const internshipCount = Number(row['实习数量'] || 0);
-    const researchCount = Number(row['科研数量'] || 0);
-    const paperCount = Number(row['论文数量'] || 0);
-    const tags = buildCaseTags(row);
-    return {
-      caseNo,
-      profileTierScore,
-      undergradTier: String(row['本科层次'] || '').trim() || '其他',
-      gpaScale,
-      gpaValue,
-      gpaRankPercent,
-      ieltsScore: ieltsScore || null,
-      toeflScore: toeflScore || null,
-      greScore: greScore || null,
-      greWritingScore: greWritingScore || null,
-      internshipCount,
-      researchCount,
-      paperCount,
-      tags,
-      rawJson: JSON.stringify(row)
-    };
-  }).sort((a, b) => {
+  const expandedRows = expandApplicationCaseRows(rows);
+  const caseProfiles = expandedRows.map(buildApplicationCaseProfile).sort((a, b) => {
     if (b.profileTierScore !== a.profileTierScore) return b.profileTierScore - a.profileTierScore;
     return a.caseNo - b.caseNo;
   });
@@ -973,7 +1035,7 @@ function importApplicationCases(records) {
   });
 
   insertAll(caseProfiles);
-  console.log(`Application cases imported from ${path.basename(csvPath)} (${insertedCases} cases, ${insertedOffers} offers inserted)`);
+  console.log(`Application cases imported from ${path.basename(csvPath)} (${rows.length} base rows expanded to ${insertedCases} cases, ${insertedOffers} offers inserted)`);
   return { cases: insertedCases, offers: insertedOffers };
 }
 
