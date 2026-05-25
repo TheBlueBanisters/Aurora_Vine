@@ -13,6 +13,7 @@ import { initDailyCheckinPage } from './modules/daily-checkin.js'
 import { initStudyPlanningPage, renderStudyPlanningPage } from './modules/study-planning.js'
 import { initResourceCenterPage, closeResourceDetail } from './modules/resource-center.js'
 import { initSchoolPlanningForm } from './modules/planning.js'
+import { canLeaveSchoolPlanningPage } from './modules/school-planning-guard.js'
 import { initApplicationCasesPage, initApplicationCaseModal, closeApplicationCaseModal, refreshApplicationCasesOnLangChange } from './modules/application-cases.js'
 import { showToast } from './modules/utils.js'
 import { t } from './modules/i18n.js'
@@ -25,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const navItems = document.querySelectorAll('.nav-item[data-page]')
   const pages = document.querySelectorAll('.page')
 
-  function navigateTo(pageId) {
+  async function navigateTo(pageId) {
+    if (!(await canLeaveSchoolPlanningPage(pageId))) return
     if (pageId !== 'resource-center') closeResourceDetail()
     pages.forEach(page => page.classList.remove('active'))
     navItems.forEach(item => item.classList.remove('active'))
@@ -78,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initApplicationCaseModal()
 
   navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
+    item.addEventListener('click', async (e) => {
       e.preventDefault()
       const pageId = item.getAttribute('data-page')
       if (!pageId) return
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
       void closeResourceDetail()
       const overlay = getOverlay()
       if (overlay?.classList.contains('active')) closeSchoolDetail()
-      navigateTo(pageId)
+      await navigateTo(pageId)
     })
   })
 

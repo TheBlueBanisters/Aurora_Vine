@@ -107,8 +107,10 @@ export function resetSchoolPlanningForm() {
   })
   setPreferredRegions([])
   form.querySelectorAll('select').forEach((select) => {
-    select.selectedIndex = 0
+    const isCountSelect = ['sp-research-count', 'sp-internship-count', 'sp-paper-count'].includes(select.id)
+    select.value = isCountSelect ? '0' : ''
     select.disabled = false
+    delete select.dataset.noneLocked
   })
   form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
     checkbox.checked = false
@@ -123,12 +125,19 @@ export function resetSchoolPlanningForm() {
     if (err) err.textContent = ''
   })
 
+  refreshSelectsIn(form)
   document.dispatchEvent(new CustomEvent('aurora:school-planning-form-populated'))
 }
 
-function beginSchoolPlanningRefill() {
+export function beginSchoolPlanningRefill() {
   enterSchoolPlanningEditMode()
-  populateSchoolPlanningForm(getSchoolPlanningProfile())
+  resetSchoolPlanningForm()
+  const mainContent = document.querySelector('.main-content')
+  if (mainContent) mainContent.scrollTop = 0
+}
+
+function handleSchoolPlanningRefillClick() {
+  beginSchoolPlanningRefill()
 }
 
 export function initSchoolPlanningForm() {
@@ -179,20 +188,56 @@ export function initSchoolPlanningForm() {
   populatePreferredRegionSelect(preferredRegionSelect)
 
   function syncIeltsNone() {
-    if (ieltsSelect) { ieltsSelect.disabled = !!ieltsNone?.checked; if (ieltsNone?.checked) ieltsSelect.value = '' }
+    if (!ieltsSelect) return
+    const checked = !!ieltsNone?.checked
+    if (checked) {
+      ieltsSelect.value = ''
+      ieltsSelect.dataset.noneLocked = 'true'
+    } else {
+      delete ieltsSelect.dataset.noneLocked
+    }
+    ieltsSelect.disabled = false
     refreshSelect(ieltsSelect)
   }
   function syncToeflNone() {
-    if (toeflSelect) { toeflSelect.disabled = !!toeflNone?.checked; if (toeflNone?.checked) toeflSelect.value = '' }
+    if (!toeflSelect) return
+    const checked = !!toeflNone?.checked
+    if (checked) {
+      toeflSelect.value = ''
+      toeflSelect.dataset.noneLocked = 'true'
+    } else {
+      delete toeflSelect.dataset.noneLocked
+    }
+    toeflSelect.disabled = false
     refreshSelect(toeflSelect)
   }
   function syncGreNone() {
-    const checked = greNone?.checked
-    if (greSelect) { greSelect.disabled = !!checked; if (checked) greSelect.value = '' }
-    if (greWritingSelect) { greWritingSelect.disabled = !!checked; if (checked) greWritingSelect.value = '' }
-    refreshSelect(greSelect)
-    refreshSelect(greWritingSelect)
+    const checked = !!greNone?.checked
+    ;[greSelect, greWritingSelect].forEach((select) => {
+      if (!select) return
+      if (checked) {
+        select.value = ''
+        select.dataset.noneLocked = 'true'
+      } else {
+        delete select.dataset.noneLocked
+      }
+      select.disabled = false
+      refreshSelect(select)
+    })
   }
+
+  function bindNoneUnlock(select, noneCheckbox, syncFn) {
+    select?.addEventListener('aurora:select-none-unlock', () => {
+      if (!noneCheckbox?.checked) return
+      noneCheckbox.checked = false
+      syncFn()
+    })
+  }
+
+  bindNoneUnlock(ieltsSelect, ieltsNone, syncIeltsNone)
+  bindNoneUnlock(toeflSelect, toeflNone, syncToeflNone)
+  bindNoneUnlock(greSelect, greNone, syncGreNone)
+  bindNoneUnlock(greWritingSelect, greNone, syncGreNone)
 
   ieltsNone?.addEventListener('change', syncIeltsNone)
   toeflNone?.addEventListener('change', syncToeflNone)
@@ -255,11 +300,11 @@ export function initSchoolPlanningForm() {
     const topPct = normalizeGpaTopPercent(gpaPercentile)
     if (topPct === undefined) { setFieldError('gpaPercentile', t('planning.err.gpaPercentile')); errors.push('gpaPercentile') }
 
-    if (!ieltsNone?.checked && (!ieltsSelect?.value || ieltsSelect.disabled)) { setFieldError('ielts', t('planning.err.ielts')); errors.push('ielts') }
-    if (!toeflNone?.checked && (!toeflSelect?.value || toeflSelect.disabled)) { setFieldError('toefl', t('planning.err.toefl')); errors.push('toefl') }
+    if (!ieltsNone?.checked && !ieltsSelect?.value) { setFieldError('ielts', t('planning.err.ielts')); errors.push('ielts') }
+    if (!toeflNone?.checked && !toeflSelect?.value) { setFieldError('toefl', t('planning.err.toefl')); errors.push('toefl') }
     if (!greNone?.checked) {
-      if (!greSelect?.value || greSelect.disabled) { setFieldError('gre', t('planning.err.gre')); errors.push('gre') }
-      else if (!greWritingSelect?.value || greWritingSelect.disabled) { setFieldError('gre', t('planning.err.greWriting')); if (!errors.includes('gre')) errors.push('gre') }
+      if (!greSelect?.value) { setFieldError('gre', t('planning.err.gre')); errors.push('gre') }
+      else if (!greWritingSelect?.value) { setFieldError('gre', t('planning.err.greWriting')); if (!errors.includes('gre')) errors.push('gre') }
     }
 
     return { valid: errors.length === 0, errors }
@@ -310,8 +355,8 @@ export function initSchoolPlanningForm() {
     }
   })
 
-  document.getElementById('school-planning-refill')?.addEventListener('click', beginSchoolPlanningRefill)
-  document.addEventListener(REFILL_EVENT, beginSchoolPlanningRefill)
+  document.getElementById('school-planning-refill')?.addEventListener('click', handleSchoolPlanningRefillClick)
+  document.addEventListener(REFILL_EVENT, handleSchoolPlanningRefillClick)
 
   enhanceSelectsIn(form)
   initSchoolPlanningResumePicker()

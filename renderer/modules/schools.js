@@ -1,4 +1,5 @@
-import { t } from './i18n.js'
+import { t, registerLangChangeHook, getLang } from './i18n.js'
+import { pickLocalized } from './localized-content.js'
 import { escapeHtml } from './utils.js'
 import { PAGE_SIZE } from './state.js'
 import { isFavorite, toggleFavorite, getTargetSchools, setTargetSchools } from './storage.js'
@@ -49,7 +50,7 @@ const EUROPE_ALIASES = [
   '希腊', 'greece'
 ]
 
-let overlay, backBtn, titleEl, starBtn, heroBg, logoEl, nameEl, metaEl, introEl, programsEl, relatedCasesEl, detailBody, carouselTrack
+let overlay, backBtn, titleEl, starBtn, heroBg, logoEl, nameZhEl, nameEnEl, namesWrapEl, metaEl, introEl, programsEl, relatedCasesEl, detailBody, carouselTrack
 let lightbox, lightboxImg, lightboxClose
 
 function renderSkeletonCards(container, count) {
@@ -309,7 +310,6 @@ function loadRelatedCases(school) {
   })
 }
 
-/** 与 data/init_db.js 中逻辑一致：列表英文行不显示「，正式名称…」「，全称…」等括号内中文说明 */
 function stripChineseAliasSuffixFromEnglishName(nameEn) {
   return String(nameEn || '')
     .replace(/[,，]\s*正式名称[\s\S]*$/u, '')
@@ -318,14 +318,91 @@ function stripChineseAliasSuffixFromEnglishName(nameEn) {
     .trim()
 }
 
-function formatLocationZh(countryZh, cityZh) {
-  const normalizedCountry = String(countryZh || '').trim()
-  let normalizedCity = String(cityZh || '').trim()
+function getSchoolNameParts(school) {
+  const zh = String(school?.school_name_zh || '').trim()
+  const en = stripChineseAliasSuffixFromEnglishName(school?.school_name_en || '')
+  return { zh, en }
+}
+
+function areSchoolNamesDuplicate(zh, en) {
+  if (!zh || !en) return false
+  const normalize = (value) => String(value).replace(/\s+/g, '').toLowerCase()
+  const left = normalize(zh)
+  const right = normalize(en)
+  return left === right || left.includes(right) || right.includes(left)
+}
+
+function formatLocationText(school, lang = getLang()) {
+  if (!school) return '-'
+  if (lang === 'en') {
+    const country = String(school.country_en || school.country_zh || '').trim()
+    const city = String(school.city_en || school.city_zh || '').trim()
+    return [city, country].filter(Boolean).join(', ') || '-'
+  }
+  const normalizedCountry = String(school.country_zh || school.country_en || '').trim()
+  let normalizedCity = String(school.city_zh || school.city_en || '').trim()
   if (normalizedCountry && normalizedCity.startsWith(normalizedCountry)) {
     normalizedCity = normalizedCity.slice(normalizedCountry.length)
   }
-  const zh = [normalizedCountry, normalizedCity].filter(Boolean).join('')
-  return escapeHtml(zh || '-')
+  return [normalizedCountry, normalizedCity].filter(Boolean).join('') || '-'
+}
+
+function buildSchoolNameMarkup(school) {
+  const { zh, en } = getSchoolNameParts(school)
+  return `
+    <span class="school-card-name-zh">${escapeHtml(zh)}</span>
+    <span class="school-card-name-en">${escapeHtml(en)}</span>
+  `
+}
+
+function buildSchoolLocationMarkup(school) {
+  const zh = formatLocationText(school, 'zh')
+  const en = formatLocationText(school, 'en')
+  if (zh === en) {
+    return `<span class="school-card-location-line">${escapeHtml(zh)}</span>`
+  }
+  return `
+    <span class="school-card-location-zh">${escapeHtml(zh)}</span>
+    <span class="school-card-location-en">${escapeHtml(en)}</span>
+  `
+}
+
+function applySchoolNamePresentation(namesWrap, school) {
+  if (!namesWrap) return
+  const { zh, en } = getSchoolNameParts(school)
+  const hasBoth = !!(zh && en)
+  namesWrap.classList.toggle('is-single', hasBoth && areSchoolNamesDuplicate(zh, en))
+  namesWrap.classList.toggle('is-missing-alt', !hasBoth && !!(zh || en))
+}
+
+function getSchoolDisplayName(school) {
+  if (!school) return ''
+  const { zh, en } = getSchoolNameParts(school)
+  return pickLocalized({ zh, en })
+}
+
+function formatSchoolDetailMeta(school) {
+  if (!school) return ''
+  const location = formatLocationText(school)
+  const qs = `QS #${school.ranking_qs || '-'}`
+  return [location, qs].filter(Boolean).join(' · ')
+}
+
+function syncSchoolDetailLocalizedText() {
+  if (!currentDetailSchool) return
+  const school = currentDetailSchool
+  const { zh, en } = getSchoolNameParts(school)
+  if (titleEl) titleEl.textContent = getSchoolDisplayName(school)
+  if (nameZhEl) nameZhEl.textContent = zh
+  if (nameEnEl) nameEnEl.textContent = en
+  if (namesWrapEl) applySchoolNamePresentation(namesWrapEl, school)
+  if (metaEl) metaEl.textContent = formatSchoolDetailMeta(school)
+}
+
+function syncSchoolListCardLabels() {
+  document.querySelectorAll('.school-card-meta-block-location .school-card-meta-label').forEach((el) => {
+    el.textContent = t('uniDb.locationLabel')
+  })
 }
 
 function normalizeSearchText(value) {
@@ -420,12 +497,11 @@ function renderSchoolCard(school, container, onClick) {
     <div class="school-card-main" ${onClick ? 'role="button" tabindex="0"' : ''}>
       <img class="school-card-logo" alt="" src="" loading="lazy">
       <div class="school-card-names">
-        <span class="school-card-name-zh">${escapeHtml(school.school_name_zh || '')}</span>
-        <span class="school-card-name-en">${escapeHtml(stripChineseAliasSuffixFromEnglishName(school.school_name_en || ''))}</span>
+        ${buildSchoolNameMarkup(school)}
       </div>
       <div class="school-card-meta-block school-card-meta-block-location">
         <span class="school-card-meta-label">${t('uniDb.locationLabel')}</span>
-        <span class="school-card-meta-value school-card-meta-location">${formatLocationZh(school.country_zh, school.city_zh)}</span>
+        <span class="school-card-meta-value school-card-meta-location">${buildSchoolLocationMarkup(school)}</span>
       </div>
       <div class="school-card-meta-block school-card-meta-block-qs">
         <span class="school-card-meta-label">QS</span>
@@ -449,6 +525,7 @@ function renderSchoolCard(school, container, onClick) {
     main.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); main.blur(); onClick(school) } })
   }
   decorateFireflyHost(card, 'dark-hover')
+  applySchoolNamePresentation(card.querySelector('.school-card-names'), school)
   container.appendChild(card)
 }
 
@@ -499,7 +576,7 @@ export function openSchoolDetail(school, fromPage) {
   document.body.classList.add('school-detail-open')
   requestAnimationFrame(() => resetSchoolViewScroll())
 
-  titleEl.textContent = school.school_name_zh || stripChineseAliasSuffixFromEnglishName(school.school_name_en || '') || ''
+  syncSchoolDetailLocalizedText()
   const fav = isFavorite(school.school_id)
   starBtn.classList.toggle('favorited', fav)
 
@@ -523,8 +600,6 @@ export function openSchoolDetail(school, fromPage) {
     logoEl.style.display = 'none'
   }
 
-  nameEl.textContent = school.school_name_zh || stripChineseAliasSuffixFromEnglishName(school.school_name_en || '') || ''
-  metaEl.textContent = [school.country_zh, school.city_zh, `QS #${school.ranking_qs || '-'}`].filter(Boolean).join(' · ')
   loadSchoolPrograms(school)
   loadRelatedCases(school)
 
@@ -724,7 +799,9 @@ export function initSchools() {
   starBtn = document.getElementById('school-detail-star')
   heroBg = document.getElementById('school-detail-hero-bg')
   logoEl = document.getElementById('school-detail-logo')
-  nameEl = document.getElementById('school-detail-name')
+  namesWrapEl = document.getElementById('school-detail-names')
+  nameZhEl = document.getElementById('school-detail-name-zh')
+  nameEnEl = document.getElementById('school-detail-name-en')
   metaEl = document.getElementById('school-detail-meta')
   introEl = document.getElementById('school-detail-intro')
   programsEl = document.getElementById('school-detail-programs')
@@ -813,6 +890,11 @@ export function initSchools() {
 
   syncFilterChipState(regionFilters, 'region', explorerRegion)
   syncFilterChipState(rankingFilters, 'ranking', explorerRanking)
+
+  registerLangChangeHook(() => {
+    syncSchoolDetailLocalizedText()
+    syncSchoolListCardLabels()
+  })
 
   const logoWrap = document.querySelector('.sidebar-logo-wrap')
   const logoHi = document.querySelector('.sidebar-logo-hi')

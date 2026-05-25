@@ -118,6 +118,13 @@ const translations = {
   'planning.majorPlaceholder': { zh: '请输入专业名称', en: 'Enter major' },
   'planning.submitBtn': { zh: '提交', en: 'Submit' },
   'planning.refillBtn': { zh: '重新填写', en: 'Re-fill' },
+  'planning.leaveRefillTitle': { zh: '尚未保存本次填写', en: 'Unsaved changes' },
+  'planning.leaveRefillDesc': {
+    zh: '你正在重新填写定校规划，当前内容尚未提交。若现在离开，本次修改将不会保存；再次进入时将仍显示上一次的评分结果。',
+    en: 'You are re-filling school planning and have not submitted yet. If you leave now, your changes will be lost. When you return, you will still see your previous score.'
+  },
+  'planning.leaveRefillStay': { zh: '继续填写', en: 'Keep editing' },
+  'planning.leaveRefillConfirm': { zh: '仍然离开', en: 'Leave anyway' },
 
   // ── Planning Validation ──
   'planning.err.gradYear': { zh: '请选择本科毕业年份', en: 'Please select graduation year' },

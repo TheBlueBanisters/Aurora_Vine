@@ -351,6 +351,13 @@ textarea {
   width: 270px;
   height: 126px;
   object-fit: contain;
+  opacity: 1;
+  transition: opacity 360ms ease-in-out;
+  will-change: opacity;
+}
+
+.auth-gate-logo.is-fading {
+  opacity: 0;
 }
 
 /* 登录页小精灵 */
@@ -2615,23 +2622,78 @@ textarea {
 .school-card-names {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   flex: 0 0 320px;
   min-width: 0;
   max-width: 320px;
 }
 
-.school-card-name-zh {
-  font-size: 19px;
-  font-weight: 600;
-  color: var(--content-text);
-  line-height: 1.4;
+.school-card-name-zh,
+.school-card-name-en {
+  display: block;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.school-card-name-en {
-  font-size: 15px;
+.school-card-name-zh:empty,
+.school-card-name-en:empty {
+  display: none;
+}
+
+[data-lang="zh"] .school-card-name-zh {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--content-text);
+  letter-spacing: 0.02em;
+}
+
+[data-lang="zh"] .school-card-name-en {
+  font-size: 12.5px;
+  font-weight: 450;
   color: var(--content-text-secondary);
-  line-height: 1.4;
+  letter-spacing: 0.015em;
+  opacity: 0.9;
+}
+
+[data-lang="en"] .school-card-name-en {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--content-text);
+  letter-spacing: 0.01em;
+}
+
+[data-lang="en"] .school-card-name-zh {
+  font-size: 12.5px;
+  font-weight: 450;
+  color: var(--content-text-secondary);
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+
+.school-card-names.is-single .school-card-name-zh,
+.school-card-names.is-single .school-card-name-en {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--content-text);
+  opacity: 1;
+}
+
+[data-lang="zh"] .school-card-names.is-single .school-card-name-en {
+  display: none;
+}
+
+[data-lang="en"] .school-card-names.is-single .school-card-name-zh {
+  display: none;
+}
+
+.school-card-names.is-missing-alt .school-card-name-zh,
+.school-card-names.is-missing-alt .school-card-name-en {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--content-text);
+  opacity: 1;
 }
 
 .school-card-meta-block {
@@ -2678,12 +2740,32 @@ textarea {
 }
 
 .school-card-meta-location {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   font-size: 14px;
   font-weight: 500;
   width: 180px;
+  line-height: 1.35;
+}
+
+.school-card-location-line,
+.school-card-location-zh,
+.school-card-location-en {
+  display: block;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+[data-lang="zh"] .school-card-location-en {
+  display: none;
+}
+
+[data-lang="en"] .school-card-location-zh {
+  display: none;
 }
 
 .school-card-star {
@@ -3031,13 +3113,75 @@ body.application-case-modal-open .main-content {
 
 .school-detail-hero-info {
   flex: 1;
+  min-width: 0;
 }
 
-.school-detail-name {
+.school-detail-names {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.school-detail-name-zh,
+.school-detail-name-en {
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.school-detail-name-zh:empty,
+.school-detail-name-en:empty {
+  display: none;
+}
+
+[data-lang="zh"] .school-detail-name-zh {
   font-size: 28px;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.02em;
+}
+
+[data-lang="zh"] .school-detail-name-en {
+  font-size: 15px;
+  font-weight: 450;
+  color: rgba(255, 255, 255, 0.82);
+  letter-spacing: 0.015em;
+}
+
+[data-lang="en"] .school-detail-name-en {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
+[data-lang="en"] .school-detail-name-zh {
+  font-size: 15px;
+  font-weight: 450;
+  color: rgba(255, 255, 255, 0.82);
+  letter-spacing: 0.02em;
+}
+
+.school-detail-names.is-single .school-detail-name-zh,
+.school-detail-names.is-single .school-detail-name-en {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+
+[data-lang="zh"] .school-detail-names.is-single .school-detail-name-en {
+  display: none;
+}
+
+[data-lang="en"] .school-detail-names.is-single .school-detail-name-zh {
+  display: none;
+}
+
+.school-detail-names.is-missing-alt .school-detail-name-zh,
+.school-detail-names.is-missing-alt .school-detail-name-en {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .school-detail-meta {

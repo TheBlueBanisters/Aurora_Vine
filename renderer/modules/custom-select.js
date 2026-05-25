@@ -41,10 +41,12 @@ function syncOpenState(select, ui) {
 function updateTriggerState(select, ui) {
   const { wrapper, trigger, labelEl } = ui
   const selected = select.options[select.selectedIndex]
+  const noneLocked = select.dataset.noneLocked === 'true'
   labelEl.textContent = selected?.textContent || ''
   wrapper.classList.toggle('is-placeholder', !select.value)
-  wrapper.classList.toggle('is-disabled', select.disabled)
-  trigger.disabled = select.disabled
+  wrapper.classList.toggle('is-disabled', select.disabled || noneLocked)
+  wrapper.classList.toggle('is-none-locked', noneLocked)
+  trigger.disabled = select.disabled && !noneLocked
 }
 
 function rebuildOptions(select, ui) {
@@ -83,6 +85,10 @@ function bindSelectEvents(select, ui) {
   trigger.addEventListener('click', (event) => {
     event.stopPropagation()
     if (select.disabled) return
+    if (select.dataset.noneLocked === 'true') {
+      select.dispatchEvent(new CustomEvent('aurora:select-none-unlock', { bubbles: true }))
+    }
+    if (select.disabled) return
     const willOpen = !wrapper.classList.contains('is-open')
     closeAllOpen(willOpen ? wrapper : null)
     wrapper.classList.toggle('is-open', willOpen)
@@ -102,7 +108,7 @@ function bindSelectEvents(select, ui) {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['disabled', 'selected'],
+    attributeFilter: ['disabled', 'selected', 'data-none-locked'],
     characterData: true
   })
   ui.observer = observer
