@@ -1,0 +1,46 @@
+/* 筛选/分页切换：旧内容上浮淡出 → 新内容自下上浮淡入 */
+.school-list-container,
+.application-cases-list,
+.resource-items-panel {
+  transition:
+    opacity 260ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.school-list-container.is-content-switching,
+.application-cases-list.is-content-switching,
+.resource-items-panel.is-content-switching {
+  opacity: 0;
+  transform: translateY(-14px);
+  pointer-events: none;
+}
+
+.school-list-container.is-content-entering,
+.application-cases-list.is-content-entering,
+.resource-items-panel.is-content-entering {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .school-list-container,
+  .application-cases-list,
+  .resource-items-panel,
+  .school-detail-slide-panel,
+  .resource-detail-slide-panel,
+  .resource-detail-backdrop,
+  .application-case-modal-card,
+  .daily-checkin-day {
+    transition: none;
+  }
+
+  .school-list-container.is-content-switching,
+  .application-cases-list.is-content-switching,
+  .resource-items-panel.is-content-switching,
+  .school-list-container.is-content-entering,
+  .application-cases-list.is-content-entering,
+  .resource-items-panel.is-content-entering {
+    opacity: 1;
+    transform: none;
+  }
+}

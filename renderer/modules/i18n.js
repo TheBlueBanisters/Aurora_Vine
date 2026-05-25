@@ -58,6 +58,7 @@ const translations = {
 
   // ── Page Titles ──
   'page.schoolPlanning.title': { zh: '定校规划', en: 'School Planning' },
+  'page.schoolPlanning.subtitle': { zh: '定校规划', en: 'School Planning' },
   'page.myProfile.title': { zh: '我的背景', en: 'My Profile' },
   'page.targetUniversities.title': { zh: '目标院校', en: 'Target Universities' },
   'page.studyPlanning.title': { zh: '留学规划', en: 'Study Planning' },
@@ -71,12 +72,29 @@ const translations = {
   // ── School Planning Form ──
   'planning.introTitle': { zh: '欢迎你的加入！', en: 'Welcome aboard!' },
   'planning.introTextZh': {
-    zh: '欢迎来到 Aurora Vine 的定校规划模块。在这里，我们会根据你的本科背景、成绩情况和语言成绩，为你生成一份个性化的留学定校建议。填写这些信息只需要几分钟，但它将帮助系统更准确地评估你的申请竞争力，并为你推荐合适的目标院校梯度，同时生成一份未来申请规划路径。请尽量如实填写，你随时可以返回修改；准备好了的话，就从下面开始吧。',
-    en: 'Welcome to the School Planning module of Aurora Vine. Here, we will generate personalized study-abroad school recommendations based on your undergraduate background, academic performance, and language test scores. Completing this information only takes a few minutes, but it will help the system evaluate your application competitiveness more accurately, recommend appropriate tiers of target universities, and outline a future application roadmap. Please fill in the information as accurately as possible — you can always return to edit it later. When you\'re ready, simply begin below.'
+    zh: '欢迎来到 Aurora Vine 定校规划。请填写本科背景、绩点、语言与标化成绩；选填的软背景、留学意向与简历将用于冲稳保匹配与 AI 评估。提交后会显示综合竞争力评分；在「设置」中配置 LLM Key 后，还可自动生成留学规划大纲并匹配冲稳保院校。随后可在「我的背景」查看详情，在「留学规划」生成智能日程并同步每日打卡。信息可随时重新填写。',
+    en: 'Welcome to Aurora Vine School Planning. Enter your undergraduate background, GPA, and language test scores; optional soft background, preferences, and resume refine reach/match/safety matching and AI review. After submit you will see an overall competitiveness score. With an LLM Key configured in Settings, the app can also generate a study-abroad planning outline and match reach/match/safety schools. Then open My Profile for details and Study Planning to build a smart schedule and sync Daily Check-in. You can re-fill anytime.'
   },
+  'planning.tier.985': { zh: '985', en: '985' },
+  'planning.tier.211': { zh: '211', en: '211' },
+  'planning.tier.nonTop': { zh: '双非', en: 'Non-985/211' },
+  'planning.tier.overseasUg': { zh: '海外本科', en: 'Overseas undergraduate' },
   'planning.sectionBasicInfo': { zh: '基本信息', en: 'Basic Info' },
   'planning.sectionLanguageScores': { zh: '语言与标化成绩', en: 'Language & Test Scores' },
+  'planning.sectionPreferences': { zh: '留学意向', en: 'Study Preferences' },
+  'planning.sectionPreferencesDesc': { zh: '以下均为选填，填写后将用于冲稳保院校匹配与 AI 审核。', en: 'All fields below are optional. They refine school matching and AI review.' },
+  'planning.optional': { zh: '（选填）', en: ' (optional)' },
+  'planning.regionNone': { zh: '不限 / 由系统推荐', en: 'No preference' },
   'planning.sectionResume': { zh: '简历', en: 'Resume' },
+  'planning.region.us': { zh: '美国', en: 'United States' },
+  'planning.region.uk': { zh: '英国', en: 'United Kingdom' },
+  'planning.region.eu': { zh: '欧洲大陆', en: 'Europe' },
+  'planning.region.sg_hk': { zh: '新加坡/港澳', en: 'Singapore / HK / Macau' },
+  'planning.region.ca': { zh: '加拿大', en: 'Canada' },
+  'planning.region.au': { zh: '澳洲/新西兰', en: 'Australia / NZ' },
+  'planning.region.other': { zh: '其他地区', en: 'Other' },
+  'planning.studyGoalPlaceholder': { zh: '例如：申请美国 CS 硕士，偏 AI/系统方向，毕业后留美工作', en: 'e.g. US CS master’s, AI/systems focus, work in the US after graduation' },
+  'planning.preferencesExtraPlaceholder': { zh: '可写心仪院校、预算/国家偏好、转专业限制等（示例：CMU MSCS；不考虑澳洲；学费预算 50 万/年）', en: 'Dream schools, budget, countries to avoid, major limits, etc.' },
   'planning.labelGradYear': { zh: '本科毕业年份', en: 'Undergraduate Graduation Year' },
   'planning.labelTier': { zh: '本科院校层次', en: 'Institution Tier' },
   'planning.labelSchool': { zh: '本科学校名称', en: 'Undergraduate School' },
@@ -90,6 +108,8 @@ const translations = {
   'planning.labelInternshipCount': { zh: '实习数量', en: 'Internship Count' },
   'planning.labelPaperCount': { zh: '论文数量', en: 'Paper Count' },
   'planning.labelResumeFile': { zh: '简历（选填）', en: 'Resume (Optional)' },
+  'planning.chooseResumeFile': { zh: '选择文件', en: 'Choose file' },
+  'planning.noResumeFile': { zh: '未选择任何文件', en: 'No file selected' },
   'planning.select': { zh: '请选择', en: 'Select' },
   'planning.none': { zh: '无', en: 'None' },
   'planning.scale4': { zh: '四分制', en: '4.0 Scale' },
@@ -128,7 +148,7 @@ const translations = {
   'planning.llmScoreFail': { zh: '简历 AI 评分失败', en: 'Resume AI scoring failed' },
   'planning.outlineFail': { zh: '生成留学规划大纲失败', en: 'Failed to generate planning outline' },
   'planning.scheduleFail': { zh: '生成智能日程失败', en: 'Failed to generate smart schedule' },
-  'planning.submitFail': { zh: '提交失败，请检查 API Key 或稍后重试', en: 'Submit failed. Check API Key or try again later' },
+  'planning.submitFail': { zh: '提交失败，请检查 LLM Key 或稍后重试', en: 'Submit failed. Check your LLM Key or try again later' },
   'planning.submitSuccess': { zh: '背景分析完成，已生成 {0} 条规划大纲。请前往「留学规划」生成智能日程与打卡任务。', en: 'Profile analyzed. {0} outline entries generated. Go to Study Planning to generate schedule and check-in tasks.' },
 
   'loading.default': { zh: 'AI 正在分析，请稍候…', en: 'AI is analyzing, please wait…' },
@@ -168,6 +188,9 @@ const translations = {
   'profile.major': { zh: '本科专业', en: 'Major' },
   'profile.gpa': { zh: '绩点', en: 'GPA' },
   'profile.gpaPercentile': { zh: '年级排名前 %', en: 'Class rank (top %)' },
+  'profile.preferredRegions': { zh: '意向地区', en: 'Preferred region' },
+  'profile.studyGoal': { zh: '留学目标', en: 'Study goal' },
+  'profile.preferencesExtra': { zh: '心仪院校与其他说明', en: 'Dream schools & notes' },
   'profile.gpaTopTooltip': { zh: '前 {0}%', en: 'Top {0}%' },
   'profile.ielts': { zh: '雅思', en: 'IELTS' },
   'profile.toefl': { zh: '托福', en: 'TOEFL' },
@@ -677,15 +700,15 @@ const translations = {
   'settings.avatarReadFail': { zh: '图片读取失败', en: 'Failed to read image' },
   'settings.avatarUploadFail': { zh: '头像上传失败', en: 'Avatar upload failed' },
   'settings.avatarUpdated': { zh: '头像已更新', en: 'Avatar updated' },
-  'settings.apiKey': { zh: 'API Key', en: 'API Key' },
-  'settings.apiKeyPlaceholder': { zh: '请输入 API Key', en: 'Enter your API Key' },
+  'settings.apiKey': { zh: 'LLM Key', en: 'LLM Key' },
+  'settings.apiKeyPlaceholder': { zh: '请输入 LLM Key', en: 'Enter your LLM Key' },
   'settings.saveApiKey': { zh: '保存 Key', en: 'Save Key' },
-  'settings.apiKeySaved': { zh: 'API Key 已保存', en: 'API Key saved' },
-  'settings.apiKeySaveFail': { zh: 'API Key 保存失败', en: 'Failed to save API Key' },
-  'settings.apiKeyEmpty': { zh: '请输入 API Key', en: 'Please enter an API Key' },
+  'settings.apiKeySaved': { zh: 'LLM Key 已保存', en: 'LLM Key saved' },
+  'settings.apiKeySaveFail': { zh: 'LLM Key 保存失败', en: 'Failed to save LLM Key' },
+  'settings.apiKeyEmpty': { zh: '请输入 LLM Key', en: 'Please enter an LLM Key' },
   'settings.clearApiKey': { zh: '清除', en: 'Clear' },
-  'settings.apiKeyCleared': { zh: 'API Key 已清除', en: 'API Key cleared' },
-  'settings.apiKeyClearFail': { zh: 'API Key 清除失败', en: 'Failed to clear API Key' },
+  'settings.apiKeyCleared': { zh: 'LLM Key 已清除', en: 'LLM Key cleared' },
+  'settings.apiKeyClearFail': { zh: 'LLM Key 清除失败', en: 'Failed to clear LLM Key' },
   'settings.apiKeyConfigured': { zh: '已配置', en: 'Configured' },
   'settings.apiKeyNotConfigured': { zh: '未配置', en: 'Not configured' },
   'settings.clearPersonalData': { zh: '清空个人资料', en: 'Clear Personal Data' },
@@ -708,25 +731,55 @@ const translations = {
   'guide.done': { zh: '完成', en: 'Done' },
   'guide.noMore': { zh: '不再出现', en: 'Don\'t show again' },
   'guide.step.schoolPlanning': { zh: '定校规划', en: 'School Planning' },
-  'guide.step.schoolPlanningDesc': { zh: '填写本科背景、成绩和语言，获取留学定校建议与规划路径。', en: 'Fill in your background, grades and language scores to get school recommendations.' },
+  'guide.step.schoolPlanningDesc': {
+    zh: '填写背景、绩点与语言标化（含可选软背景、留学意向与简历）。提交后显示综合竞争力评分；配置 LLM Key 后将生成规划大纲并匹配冲稳保院校。',
+    en: 'Enter background, GPA, and test scores (optional soft background, preferences, resume). Submit for a competitiveness score; with an LLM Key, get an AI outline and reach/match/safety school tiers.'
+  },
   'guide.step.myProfile': { zh: '我的背景', en: 'My Profile' },
-  'guide.step.myProfileDesc': { zh: '查看已填写的学术背景与标化成绩可视化图表。', en: 'View your academic background and test score visualizations.' },
+  'guide.step.myProfileDesc': {
+    zh: '查看已保存的定校信息与标化成绩图表；配置 LLM Key 后可浏览个人陈述草稿。',
+    en: 'Review saved planning data and score charts; view your AI personal statement draft when an LLM Key is configured.'
+  },
   'guide.step.targetUniversities': { zh: '目标院校', en: 'Target Universities' },
-  'guide.step.targetUniversitiesDesc': { zh: '管理已收藏的目标院校列表。', en: 'Manage your list of favorited target universities.' },
+  'guide.step.targetUniversitiesDesc': {
+    zh: '集中管理在院校数据库中收藏的院校，按排名浏览并进入详情。',
+    en: 'Manage schools favorited from the University Database—sorted by ranking with quick detail access.'
+  },
   'guide.step.studyPlanning': { zh: '留学规划', en: 'Study Planning' },
-  'guide.step.studyPlanningDesc': { zh: '制定个性化的留学时间线与任务规划，并同步到每日打卡。', en: 'Create personalized study abroad timelines and sync tasks to daily check-ins.' },
+  'guide.step.studyPlanningDesc': {
+    zh: '查看 AI 规划大纲与冲稳保推荐，生成智能日程，并可导入「每日打卡」或编辑自定义规划。',
+    en: 'View the AI outline and reach/match/safety tiers, generate a smart schedule, import to Daily Check-in, or edit a custom plan.'
+  },
   'guide.step.dailyCheckin': { zh: '每日打卡', en: 'Daily Check-in' },
-  'guide.step.dailyCheckinDesc': { zh: '记录每日学习任务与完成情况，保持前进动力。', en: 'Track daily study tasks and progress to stay motivated.' },
+  'guide.step.dailyCheckinDesc': {
+    zh: '用月历记录每日任务（最多 9 条），标记完成状态，并用颜色标签区分事项。',
+    en: 'Use the calendar for up to 9 tasks per day, track completion, and organize with color tags.'
+  },
   'guide.step.universityDatabase': { zh: '院校数据库', en: 'University Database' },
-  'guide.step.universityDatabaseDesc': { zh: '浏览院校列表，收藏感兴趣院校并查看详情。', en: 'Browse universities, save favorites and view details.' },
+  'guide.step.universityDatabaseDesc': {
+    zh: '搜索筛选全球院校，查看简介、项目与相关申请案例，收藏心仪学校。',
+    en: 'Search and filter schools worldwide, view intros, programs, related cases, and save favorites.'
+  },
   'guide.step.applicationCases': { zh: '申请案例', en: 'Application Cases' },
-  'guide.step.applicationCasesDesc': { zh: '浏览留学申请背景案例，按 GPA、语言成绩和软背景筛选参考样本。', en: 'Browse application profile cases and filter reference samples by GPA, language scores, and soft background.' },
+  'guide.step.applicationCasesDesc': {
+    zh: '浏览真实申请背景案例，按本科层次、GPA、语言与软背景筛选参考。',
+    en: 'Browse real application profiles; filter by undergrad tier, GPA, language, and soft background.'
+  },
   'guide.step.resourceCenter': { zh: '资源中心', en: 'Resource Center' },
-  'guide.step.resourceCenterDesc': { zh: '获取留学相关的备考资料、文书模板、简历模板和申请指南。', en: 'Access test prep resources, writing templates, resume templates, and application guides.' },
+  'guide.step.resourceCenterDesc': {
+    zh: '查阅 GRE/雅思/托福等备考资料，以及文书、简历模板与申请指南。',
+    en: 'GRE/IELTS/TOEFL prep, SOP and resume templates, and application guides.'
+  },
   'guide.step.communityMessages': { zh: '社区留言', en: 'Community' },
-  'guide.step.communityMessagesDesc': { zh: '发帖、回复，与其他留学伙伴交流经验。', en: 'Post, reply, and share experiences with peers.' },
+  'guide.step.communityMessagesDesc': {
+    zh: '发布帖子与回复，与其他申请者交流选校、备考与申请经验。',
+    en: 'Post and reply to exchange school selection, test prep, and application tips with peers.'
+  },
   'guide.step.settings': { zh: '设置', en: 'Settings' },
-  'guide.step.settingsDesc': { zh: '切换主题、编辑个人信息、认证、更换头像等。', en: 'Switch themes, edit profile, certify, change avatar, etc.' },
+  'guide.step.settingsDesc': {
+    zh: '切换主题与界面语言，编辑个人资料，配置 LLM Key 以启用 AI 功能等。',
+    en: 'Switch theme and language, edit profile, configure your LLM Key for AI features, and more.'
+  },
   'guide.step.final': { zh: '开始使用', en: 'Get Started' },
   'guide.step.finalDesc': { zh: '如需再次查看本指南，请点击侧边栏中的「使用指南」。', en: 'To view this guide again, click "Usage Guide" in the sidebar.' },
   'planningNextHint.text': { zh: '接下来，你可以前往「我的背景」查看水平详情，或前往「留学规划」查看 AI 规划。', en: 'Next, visit My Profile to review your background, or Study Planning for your AI-generated plan.' },
@@ -842,6 +895,7 @@ function onLanguageToggle() {
   applyLang()
   updateLangHint()
   langChangeHooks.forEach((fn) => fn())
+  document.dispatchEvent(new CustomEvent('aurora:sync-school-planning-form-i18n'))
 }
 
 export function initLang() {

@@ -1,5 +1,6 @@
 import * as echarts from 'echarts'
 import { t } from './i18n.js'
+import { institutionTierLabel } from './institution-tier.js'
 import { escapeHtml } from './utils.js'
 import { isAccountMode, getCurrentUserDisplayName } from './state.js'
 import { getSchoolPlanningProfile } from './storage.js'
@@ -54,7 +55,7 @@ export function loadMyProfile() {
 
   const infoItems = [
     { label: t('profile.gradYear'), value: profile.graduationYear },
-    { label: t('profile.tier'), value: profile.institutionTier },
+    { label: t('profile.tier'), value: institutionTierLabel(profile.institutionTier) },
     { label: t('profile.school'), value: profile.schoolName },
     { label: t('profile.major'), value: profile.major },
     { label: t('profile.gpa'), value: profile.gpa ? `${profile.gpa} (${profile.gpaScale === '4' ? t('planning.scale4') : t('planning.scale5')})` : '-' },
@@ -62,6 +63,19 @@ export function loadMyProfile() {
     { label: t('profile.ielts'), value: profile.ielts != null ? profile.ielts : t('profile.noData') },
     { label: t('profile.toefl'), value: profile.toefl != null ? profile.toefl : t('profile.noData') },
     { label: 'GRE', value: profile.gre != null ? `${profile.gre} (${t('profile.greWriting')} ${profile.greWriting || '-'})` : t('profile.noData') },
+    {
+      label: t('profile.preferredRegions'),
+      value: Array.isArray(profile.preferredRegions) && profile.preferredRegions.length
+        ? profile.preferredRegions.map((id) => t(`planning.region.${id}`)).join(' / ')
+        : '-'
+    },
+    { label: t('profile.studyGoal'), value: profile.studyGoal || '-' },
+    {
+      label: t('profile.preferencesExtra'),
+      value: profile.preferencesExtra
+        || [profile.preferredSchools, profile.constraintsNotes].filter(Boolean).join('；')
+        || '-'
+    },
   ]
   if (infoGrid) {
     infoGrid.innerHTML = infoItems
@@ -295,6 +309,7 @@ export function syncSchoolPlanningIdentityState() {
   const currentProfile = getSchoolPlanningProfile()
   if (schoolPlanningEditing) {
     setSchoolPlanningView(false)
+    document.dispatchEvent(new CustomEvent('aurora:sync-school-planning-form-i18n'))
     return
   }
   setSchoolPlanningView(!!currentProfile)
@@ -303,6 +318,7 @@ export function syncSchoolPlanningIdentityState() {
     const result = computeStudentScore(scoreInput)
     renderScoreResult(result)
   }
+  document.dispatchEvent(new CustomEvent('aurora:sync-school-planning-form-i18n'))
 }
 
 export function initProfile(navigateTo) {

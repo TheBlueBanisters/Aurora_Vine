@@ -1,10 +1,7 @@
-import { registerLangChangeHook } from './i18n.js'
-
 /** @type {WeakMap<HTMLSelectElement, { wrapper: HTMLElement, trigger: HTMLButtonElement, labelEl: HTMLElement, list: HTMLElement, observer: MutationObserver }>} */
 const enhanced = new WeakMap()
 
 let globalListenersBound = false
-let langHookRegistered = false
 
 function closeAllOpen(exceptWrapper = null) {
   document.querySelectorAll('.custom-select.is-open').forEach((wrapper) => {
@@ -175,9 +172,4 @@ export function enhanceSelectsIn(container) {
   if (!container) return
   bindGlobalListeners()
   container.querySelectorAll('select.form-select').forEach(enhanceSelect)
-
-  if (!langHookRegistered && container.id === 'school-planning-form') {
-    langHookRegistered = true
-    registerLangChangeHook(() => refreshSelectsIn(container))
-  }
 }

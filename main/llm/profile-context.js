@@ -1,4 +1,5 @@
 import { normalizeGpaTopPercent } from '../utils/gpa-percent.js';
+import { buildStudyPreferencesBlock } from './study-preferences.js';
 
 const TIER_LABELS = {
   '985': { zh: '985 工程院校', en: '985 Project university' },
@@ -169,6 +170,11 @@ function buildBackgroundNarrative(structured, hasResume) {
     enParts.push(`Estimated competitiveness score: ${competitiveness.totalScore}/100 (form-based only when no resume).`);
   }
 
+  if (structured.studyPreferences?.display?.zh) {
+    zhParts.push(structured.studyPreferences.display.zh);
+    enParts.push(structured.studyPreferences.display.en);
+  }
+
   if (hasResume) {
     zhParts.push('详细经历见下方简历文本。');
     enParts.push('See resume text below for detailed experiences.');
@@ -220,7 +226,10 @@ export function buildProfileForLlm(profile = {}, options = {}) {
       }
     : null;
 
+  const studyPreferences = buildStudyPreferencesBlock(profile);
+
   const structured = {
+    studyPreferences,
     academic: {
       graduationYear: parseOptionalInt(profile.graduationYear),
       institutionTier: profile.institutionTier || null,

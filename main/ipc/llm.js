@@ -12,11 +12,8 @@ import {
   validatePersonalStatementResponse,
   entriesToSavePayload
 } from '../llm/plan-schema.js';
-import {
-  loadSchoolCatalog,
-  catalogForPrompt,
-  resolveSchoolTiers
-} from '../llm/school-matcher.js';
+import { loadSchoolCatalog } from '../llm/school-matcher.js';
+import { reviewAndFinalizeSchoolTiers } from '../llm/school-tier-review.js';
 import { tasksToDbJson, taskToCheckinContent } from '../llm/i18n-content.js';
 import { buildProfileForLlm } from '../llm/profile-context.js';
 
@@ -88,16 +85,16 @@ export function registerLlmIpc() {
       const raw = await runPromptTemplate('plan-outline', {
         profileJson: profilePayloadForPrompt(profile, resumeText, { totalScore, scoreDetail }),
         resumeText,
-        timelineJson: timeline,
-        schoolCatalogJson: catalogForPrompt(catalog)
+        timelineJson: timeline
       });
       const parsed = validateOutlineResponse(parseJsonFromLlm(raw));
-      const schoolRecommendations = resolveSchoolTiers(
-        parsed.schoolTiers,
-        catalog,
+      const schoolRecommendations = await reviewAndFinalizeSchoolTiers({
         profile,
-        totalScore
-      );
+        catalog,
+        totalScore,
+        scoreDetail,
+        resumeText
+      });
 
       let encouragementNote = parsed.encouragementNote;
       if (timeline.seasonPassed && (!encouragementNote.zh || !encouragementNote.en)) {

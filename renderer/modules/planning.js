@@ -1,5 +1,4 @@
-import { t } from './i18n.js'
-import { normalizeGpaTopPercent } from './gpa-percent.js'
+import { t, registerLangChangeHook } from './i18n.js'
 import { normalizeGpaTopPercent } from './gpa-percent.js'
 import {
   setSchoolPlanningView,
@@ -10,8 +9,49 @@ import {
 import { executeSchoolPlanningSubmit } from './llm-planning-service.js'
 import { getSchoolPlanningProfile } from './storage.js'
 import { enhanceSelectsIn, refreshSelect, refreshSelectsIn } from './custom-select.js'
+import { populateInstitutionTierSelect } from './institution-tier.js'
+import {
+  populatePreferredRegionSelect,
+  syncSchoolPlanningFormI18n
+} from './school-planning-form-i18n.js'
+import {
+  initSchoolPlanningResumePicker,
+  clearSchoolPlanningResumePicker
+} from './school-planning-resume-picker.js'
 
 const REFILL_EVENT = 'aurora:school-planning-refill'
+
+function mergeLegacyPreferencesExtra(profile = {}) {
+  if (profile.preferencesExtra) return profile.preferencesExtra
+  return [profile.preferredSchools, profile.constraintsNotes]
+    .map((s) => String(s || '').trim())
+    .filter(Boolean)
+    .join('\n')
+}
+
+const REGION_OPTION_DEFS = [
+  { value: 'us', labelKey: 'planning.region.us' },
+  { value: 'uk', labelKey: 'planning.region.uk' },
+  { value: 'eu', labelKey: 'planning.region.eu' },
+  { value: 'sg_hk', labelKey: 'planning.region.sg_hk' },
+  { value: 'ca', labelKey: 'planning.region.ca' },
+  { value: 'au', labelKey: 'planning.region.au' },
+  { value: 'other', labelKey: 'planning.region.other' }
+]
+
+function collectPreferredRegions() {
+  const value = document.getElementById('sp-preferred-region')?.value?.trim() || ''
+  return value ? [value] : []
+}
+
+function setPreferredRegions(regions = []) {
+  const select = document.getElementById('sp-preferred-region')
+  if (!select) return
+  const list = Array.isArray(regions) ? regions : []
+  const first = list.find((id) => REGION_OPTION_DEFS.some((d) => d.value === id)) || ''
+  select.value = first
+  refreshSelect(select)
+}
 
 export function populateSchoolPlanningForm(profile) {
   if (!profile) return
@@ -47,8 +87,12 @@ export function populateSchoolPlanningForm(profile) {
   setValue('sp-research-count', String(profile.researchCount ?? 0))
   setValue('sp-internship-count', String(profile.internshipCount ?? 0))
   setValue('sp-paper-count', String(profile.paperCount ?? 0))
+  setValue('sp-study-goal', profile.studyGoal)
+  setValue('sp-preferences-extra', profile.preferencesExtra || mergeLegacyPreferencesExtra(profile))
+  setPreferredRegions(profile.preferredRegions)
+  refreshSelect(document.getElementById('sp-preferred-region'))
 
-  document.getElementById('sp-resume')?.replaceChildren()
+  clearSchoolPlanningResumePicker()
 
   document.dispatchEvent(new CustomEvent('aurora:school-planning-form-populated'))
 }
@@ -57,10 +101,11 @@ export function resetSchoolPlanningForm() {
   const form = document.getElementById('school-planning-form')
   if (!form) return
 
-  form.querySelectorAll('input[type="text"], input[type="number"]').forEach((input) => {
+  form.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach((input) => {
     input.value = ''
     input.disabled = false
   })
+  setPreferredRegions([])
   form.querySelectorAll('select').forEach((select) => {
     select.selectedIndex = 0
     select.disabled = false
@@ -71,7 +116,7 @@ export function resetSchoolPlanningForm() {
   form.querySelectorAll('input[type="radio"]').forEach((radio) => {
     radio.checked = false
   })
-  document.getElementById('sp-resume')?.replaceChildren()
+  clearSchoolPlanningResumePicker()
   form.querySelectorAll('.form-field').forEach((field) => {
     field.classList.remove('error')
     const err = field.querySelector('.form-error')
@@ -103,6 +148,8 @@ export function initSchoolPlanningForm() {
   const researchCountSelect = document.getElementById('sp-research-count')
   const internshipCountSelect = document.getElementById('sp-internship-count')
   const paperCountSelect = document.getElementById('sp-paper-count')
+  const preferredRegionSelect = document.getElementById('sp-preferred-region')
+  const institutionTierSelect = document.getElementById('sp-institution-tier')
 
   function populateSelect(select, options, placeholder) {
     if (!select) return
@@ -128,6 +175,8 @@ export function initSchoolPlanningForm() {
   populateCountSelect(researchCountSelect)
   populateCountSelect(internshipCountSelect)
   populateCountSelect(paperCountSelect)
+  populateInstitutionTierSelect(institutionTierSelect)
+  populatePreferredRegionSelect(preferredRegionSelect)
 
   function syncIeltsNone() {
     if (ieltsSelect) { ieltsSelect.disabled = !!ieltsNone?.checked; if (ieltsNone?.checked) ieltsSelect.value = '' }
@@ -153,8 +202,17 @@ export function initSchoolPlanningForm() {
     syncToeflNone()
     syncGreNone()
     syncGpaRangeByScale()
+    const savedRegion = preferredRegionSelect?.value || ''
+    const savedTier = institutionTierSelect?.value || ''
+    populateInstitutionTierSelect(institutionTierSelect)
+    populatePreferredRegionSelect(preferredRegionSelect)
+    if (institutionTierSelect) institutionTierSelect.value = savedTier
+    if (preferredRegionSelect) preferredRegionSelect.value = savedRegion
     refreshSelectsIn(form)
   })
+
+  registerLangChangeHook(() => syncSchoolPlanningFormI18n())
+  document.addEventListener('aurora:sync-school-planning-form-i18n', () => syncSchoolPlanningFormI18n())
 
   function syncGpaRangeByScale() {
     if (!gpaInput) return
@@ -228,6 +286,9 @@ export function initSchoolPlanningForm() {
       researchCount: parseInt(researchCountSelect?.value || '0', 10),
       internshipCount: parseInt(internshipCountSelect?.value || '0', 10),
       paperCount: parseInt(paperCountSelect?.value || '0', 10),
+      studyGoal: document.getElementById('sp-study-goal')?.value?.trim() || '',
+      preferredRegions: collectPreferredRegions(),
+      preferencesExtra: document.getElementById('sp-preferences-extra')?.value?.trim() || '',
       resumeFile: document.getElementById('sp-resume')?.files?.[0]?.name || null,
     }
   }
@@ -253,5 +314,7 @@ export function initSchoolPlanningForm() {
   document.addEventListener(REFILL_EVENT, beginSchoolPlanningRefill)
 
   enhanceSelectsIn(form)
+  initSchoolPlanningResumePicker()
+  syncSchoolPlanningFormI18n()
   syncSchoolPlanningIdentityState()
 }

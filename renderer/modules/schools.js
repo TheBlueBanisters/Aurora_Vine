@@ -7,6 +7,7 @@ import { getTheme } from './theme.js'
 import { openApplicationCaseDetail } from './application-cases.js'
 import { decorateFireflyHost } from './firefly-effect.js'
 import { translateCaseTag, translateOfferTier, translateUndergradTier } from './case-display.js'
+import { runContentFadeTransition, runPanelSlideClose, cancelPanelSlideClose } from './ui-transition.js'
 
 let explorerPage = 1
 let explorerTotal = 0
@@ -490,7 +491,11 @@ export function openSchoolDetail(school, fromPage) {
   currentDetailSchool = school
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   resetSchoolViewScroll()
-  overlay.classList.add('active')
+  if (overlay) {
+    cancelPanelSlideClose(overlay)
+    overlay.classList.remove('is-closing')
+    overlay.classList.add('active')
+  }
   document.body.classList.add('school-detail-open')
   requestAnimationFrame(() => resetSchoolViewScroll())
 
@@ -580,19 +585,21 @@ export function openSchoolDetail(school, fromPage) {
 }
 
 export function closeSchoolDetail() {
+  if (!overlay?.classList.contains('active')) return
   closeLightbox()
-  overlay.classList.remove('active')
-  document.body.classList.remove('school-detail-open')
-  resetSchoolViewScroll()
-  if (detailBackPage === 'university-database') loadSchoolListExplorer()
-  if (detailBackPage === 'target-universities') loadSchoolListTarget()
+  void runPanelSlideClose(overlay, () => {
+    document.body.classList.remove('school-detail-open')
+    resetSchoolViewScroll()
+  })
 }
 
 export async function loadSchoolListExplorer() {
   const grid = document.getElementById('school-list-explorer-grid')
   const paginationEl = document.getElementById('school-list-explorer-pagination')
+  const listContainer = document.getElementById('school-list-explorer')
   if (!grid || !paginationEl) return
 
+  await runContentFadeTransition(listContainer, async () => {
   grid.innerHTML = ''
   paginationEl.innerHTML = ''
 
@@ -662,6 +669,7 @@ export async function loadSchoolListExplorer() {
     console.error('loadSchoolListExplorer:', err)
     grid.innerHTML = `<p class="placeholder-hint">${escapeHtml(t('uniDb.loadFail', err?.message || t('uniDb.refreshRetry')))}</p>`
   }
+  })
 }
 
 export async function loadSchoolListTarget() {

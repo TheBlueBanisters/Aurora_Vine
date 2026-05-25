@@ -4,6 +4,7 @@ import { EXTRA_PLACEHOLDER_ITEMS } from './resource-placeholder-extra.js'
 import { RESOURCE_CONTENT } from './resource-content.js'
 import { renderResourceSections } from './resource-content-renderer.js'
 import { decorateFireflyHosts } from './firefly-effect.js'
+import { runContentFadeTransition, runPanelSlideClose, cancelPanelSlideClose } from './ui-transition.js'
 
 const ITEMS_PER_PAGE = 7
 
@@ -346,12 +347,11 @@ function renderResourceDetailContent(item) {
 }
 
 function openResourceDetail(item) {
-  const page = document.getElementById('page-resource-center')
-  const detailPage = document.getElementById('resource-detail-page')
+  const overlay = document.getElementById('resource-detail-page')
   const dateEl = document.getElementById('resource-detail-date')
   const titleEl = document.getElementById('resource-detail-title')
   const descEl = document.getElementById('resource-detail-desc')
-  if (!page || !detailPage || !titleEl || !descEl) return
+  if (!overlay || !titleEl || !descEl) return
 
   activeDetailItem = item
   if (dateEl) dateEl.textContent = item.date || ''
@@ -359,18 +359,20 @@ function openResourceDetail(item) {
   descEl.textContent = getItemDesc(item)
   renderResourceDetailContent(item)
 
-  page.classList.add('is-detail-open')
-  detailPage.hidden = false
+  cancelPanelSlideClose(overlay)
+  overlay.classList.add('active')
+  document.body.classList.add('resource-detail-open')
+  const body = overlay.querySelector('.resource-detail-body')
+  if (body) body.scrollTop = 0
 }
 
 function closeResourceDetail() {
-  const page = document.getElementById('page-resource-center')
-  const detailPage = document.getElementById('resource-detail-page')
-  if (!page || !detailPage) return
-
-  page.classList.remove('is-detail-open')
-  detailPage.hidden = true
-  activeDetailItem = null
+  const overlay = document.getElementById('resource-detail-page')
+  if (!overlay?.classList.contains('active')) return
+  void runPanelSlideClose(overlay, () => {
+    document.body.classList.remove('resource-detail-open')
+    activeDetailItem = null
+  })
 }
 
 export { closeResourceDetail }
@@ -433,9 +435,10 @@ function renderResourcePagination(totalPages) {
   })
 }
 
-function renderResourceItems() {
+async function renderResourceItems() {
   const titleEl = document.getElementById('resource-items-title')
   const listEl = document.getElementById('resource-items-grid')
+  const itemsPanel = listEl?.closest('.resource-items-panel')
   if (!titleEl || !listEl) return
 
   const category = CATEGORIES.find((cat) => cat.id === activeCategoryId) || CATEGORIES[0]
@@ -447,30 +450,32 @@ function renderResourceItems() {
   const start = (activePage - 1) * ITEMS_PER_PAGE
   const pageItems = allItems.slice(start, start + ITEMS_PER_PAGE)
 
-  titleEl.textContent = t(category.labelKey)
-  listEl.innerHTML = pageItems.map((entry) => `
-    <button type="button" class="resource-item-row" data-item-id="${entry.id}">
-      <span class="resource-item-row-date">${escapeHtml(entry.date || '')}</span>
-      <span class="resource-item-row-body">
-        <span class="resource-item-row-title">${escapeHtml(getItemTitle(entry))}</span>
-        <span class="resource-item-row-desc">${escapeHtml(getItemDesc(entry))}</span>
-      </span>
-      <span class="resource-item-row-arrow" aria-hidden="true">›</span>
-    </button>
-  `).join('')
+  await runContentFadeTransition(itemsPanel, () => {
+    titleEl.textContent = t(category.labelKey)
+    listEl.innerHTML = pageItems.map((entry) => `
+      <button type="button" class="resource-item-row" data-item-id="${entry.id}">
+        <span class="resource-item-row-date">${escapeHtml(entry.date || '')}</span>
+        <span class="resource-item-row-body">
+          <span class="resource-item-row-title">${escapeHtml(getItemTitle(entry))}</span>
+          <span class="resource-item-row-desc">${escapeHtml(getItemDesc(entry))}</span>
+        </span>
+        <span class="resource-item-row-arrow" aria-hidden="true">›</span>
+      </button>
+    `).join('')
 
-  listEl.querySelectorAll('.resource-item-row').forEach((row, index) => {
-    row.addEventListener('click', () => openResourceDetail(pageItems[index]))
+    listEl.querySelectorAll('.resource-item-row').forEach((row, index) => {
+      row.addEventListener('click', () => openResourceDetail(pageItems[index]))
+    })
+
+    renderResourcePagination(totalPages)
   })
-
-  renderResourcePagination(totalPages)
 }
 
 export function initResourceCenterPage() {
   renderCategoryBar()
   renderResourceItems()
-  const detailPage = document.getElementById('resource-detail-page')
-  if (detailPage && !detailPage.hidden && activeDetailItem) {
+  const overlay = document.getElementById('resource-detail-page')
+  if (overlay?.classList.contains('active') && activeDetailItem) {
     openResourceDetail(activeDetailItem)
   }
 
@@ -478,9 +483,10 @@ export function initResourceCenterPage() {
   rcInitialized = true
 
   document.getElementById('resource-detail-back')?.addEventListener('click', closeResourceDetail)
+  document.getElementById('resource-detail-backdrop')?.addEventListener('click', closeResourceDetail)
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return
-    const detailPage = document.getElementById('resource-detail-page')
-    if (detailPage && !detailPage.hidden) closeResourceDetail()
+    const overlay = document.getElementById('resource-detail-page')
+    if (overlay?.classList.contains('active')) void closeResourceDetail()
   })
 }

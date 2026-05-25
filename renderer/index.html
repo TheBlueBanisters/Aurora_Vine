@@ -218,17 +218,14 @@
       <section class="page active" id="page-school-planning">
         <div class="page-header">
           <h1 class="page-title" data-i18n="page.schoolPlanning.title">定校规划</h1>
-          <p class="page-subtitle">School Planning</p>
+          <p class="page-subtitle" data-i18n="page.schoolPlanning.subtitle">School Planning</p>
         </div>
         <div class="page-body">
           <div class="planning-intro-box">
             <img src="../image/plan.png" alt="Plan" class="planning-intro-image">
             <h2 class="planning-intro-title" data-i18n="planning.introTitle">欢迎你的加入！</h2>
-            <p class="planning-intro-text lang-zh" data-i18n="planning.introZh">
-              欢迎来到 Aurora Vine 的定校规划模块。在这里，我们会根据你的本科背景、成绩情况和语言成绩，为你生成一份个性化的留学定校建议。填写这些信息只需要几分钟，但它将帮助系统更准确地评估你的申请竞争力，并为你推荐合适的目标院校梯度，同时生成一份未来申请规划路径。请尽量如实填写，你随时可以返回修改；准备好了的话，就从下面开始吧。
-            </p>
-            <p class="planning-intro-text planning-intro-text-en lang-en">
-              Welcome to the School Planning module of Aurora Vine. Here, we will generate personalized study-abroad school recommendations based on your undergraduate background, academic performance, and language test scores. Completing this information only takes a few minutes, but it will help the system evaluate your application competitiveness more accurately, recommend appropriate tiers of target universities, and outline a future application roadmap. Please fill in the information as accurately as possible-you can always return to edit it later. When you're ready, simply begin below.
+            <p class="planning-intro-text" data-i18n="planning.introTextZh">
+              欢迎来到 Aurora Vine 定校规划。请填写本科背景、绩点、语言与标化成绩；选填的软背景、留学意向与简历将用于冲稳保匹配与 AI 评估。提交后会显示综合竞争力评分；在「设置」中配置 LLM Key 后，还可自动生成留学规划大纲并匹配冲稳保院校。随后可在「我的背景」查看详情，在「留学规划」生成智能日程并同步每日打卡。信息可随时重新填写。
             </p>
           </div>
           <div id="school-planning-form" class="school-planning-form">
@@ -260,10 +257,6 @@
                   </label>
                   <select id="sp-institution-tier" class="form-select">
                     <option value="" data-i18n="planning.select">请选择</option>
-                    <option value="985">985</option>
-                    <option value="211">211</option>
-                    <option value="双非">双非</option>
-                    <option value="海外本科">海外本科</option>
                   </select>
                   <span class="form-error"></span>
                 </div>
@@ -410,17 +403,52 @@
                 </div>
               </div>
               <div class="form-field" data-field="resume">
-                <label class="form-label">
-                  <span class="form-label-zh lang-zh">简历（选填）</span>
-                  <span class="form-label-en lang-en">Resume（Optional）</span>
-                </label>
-                <input type="file" id="sp-resume" class="form-file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg">
+                <label class="form-label" data-i18n="planning.labelResumeFile">简历（选填）</label>
+                <div class="form-file-picker">
+                  <input type="file" id="sp-resume" class="form-file-native" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg" tabindex="-1" aria-hidden="true">
+                  <button type="button" class="form-file-picker-btn" id="sp-resume-choose-btn">选择文件</button>
+                  <span class="form-file-picker-name is-empty" id="sp-resume-filename">未选择任何文件</span>
+                </div>
                 <span class="form-error"></span>
               </div>
             </div>
 
-            <div class="form-actions">
+            <div class="form-section form-section-preferences">
+              <h3 class="form-section-title" data-i18n="planning.sectionPreferences">留学意向</h3>
+              <p class="form-section-desc" data-i18n="planning.sectionPreferencesDesc">以下均为选填，填写后将用于冲稳保院校匹配与 AI 审核。</p>
+              <div class="form-preferences-stack">
+                <div class="form-field form-field-full" data-field="preferredRegions">
+                  <label class="form-label">
+                    <span class="form-label-zh lang-zh">意向留学地区<span class="form-optional" data-i18n="planning.optional">（选填）</span></span>
+                    <span class="form-label-en lang-en">Preferred region<span class="form-optional" data-i18n="planning.optional"> (optional)</span></span>
+                  </label>
+                  <select id="sp-preferred-region" class="form-select form-control-full">
+                    <option value="" data-i18n="planning.regionNone">不限 / 由系统推荐</option>
+                  </select>
+                  <span class="form-error"></span>
+                </div>
+                <div class="form-field form-field-full" data-field="studyGoal">
+                  <label class="form-label">
+                    <span class="form-label-zh lang-zh">留学目标与方向<span class="form-optional" data-i18n="planning.optional">（选填）</span></span>
+                    <span class="form-label-en lang-en">Study goal & direction<span class="form-optional" data-i18n="planning.optional"> (optional)</span></span>
+                  </label>
+                  <textarea id="sp-study-goal" class="form-input form-textarea form-control-full" rows="2" maxlength="800" data-i18n-placeholder="planning.studyGoalPlaceholder"></textarea>
+                  <span class="form-error"></span>
+                </div>
+                <div class="form-field form-field-full" data-field="preferencesExtra">
+                  <label class="form-label">
+                    <span class="form-label-zh lang-zh">心仪院校与其他说明<span class="form-optional" data-i18n="planning.optional">（选填）</span></span>
+                    <span class="form-label-en lang-en">Dream schools & other notes<span class="form-optional" data-i18n="planning.optional"> (optional)</span></span>
+                  </label>
+                  <textarea id="sp-preferences-extra" class="form-input form-textarea form-control-full" rows="3" maxlength="1000" data-i18n-placeholder="planning.preferencesExtraPlaceholder"></textarea>
+                  <span class="form-error"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions school-planning-form-actions">
               <button type="button" id="school-planning-submit" class="form-submit-btn" data-i18n="planning.submitBtn">提交</button>
+              <p class="school-planning-submit-hint" id="school-planning-submit-hint" hidden></p>
             </div>
           </div>
 
@@ -439,7 +467,7 @@
 
               <div class="score-breakdown">
                 <div class="score-bar-item" data-dim="gpa">
-                  <span class="score-bar-label">GPA</span>
+                  <span class="score-bar-label" data-i18n="planning.labelGpa">绩点</span>
                   <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-gpa"></div></div>
                   <span class="score-bar-value" id="score-val-gpa">0</span>
                 </div>
@@ -816,22 +844,6 @@
             </div>
           </div>
         </div>
-
-        <div class="resource-detail-page" id="resource-detail-page" hidden>
-          <div class="resource-detail-page-toolbar">
-            <button type="button" class="resource-detail-back" id="resource-detail-back" data-i18n="resource.back">返回</button>
-          </div>
-          <div class="resource-detail-page-body app-scrollbar">
-            <article class="resource-detail-article">
-              <p class="resource-detail-date" id="resource-detail-date"></p>
-              <h2 class="resource-detail-title" id="resource-detail-title"></h2>
-              <p class="resource-detail-desc" id="resource-detail-desc"></p>
-              <div class="resource-detail-placeholder" id="resource-detail-placeholder">
-                <p data-i18n="resource.detailEmpty">请选择一个资源条目查看详情</p>
-              </div>
-            </article>
-          </div>
-        </div>
       </section>
 
       <!-- 社区留言 -->
@@ -907,8 +919,29 @@
         </div>
       </section>
 
+      <!-- 资源详情层：幕布 + 全屏侧滑，内容区圆角容器居中 -->
+      <div class="resource-detail-overlay" id="resource-detail-page">
+        <div class="resource-detail-backdrop" id="resource-detail-backdrop" aria-hidden="true"></div>
+        <div class="resource-detail-slide-panel">
+          <div class="resource-detail-header" style="-webkit-app-region: no-drag;">
+            <button type="button" class="resource-detail-back" id="resource-detail-back" data-i18n="resource.back">返回</button>
+            <h1 class="resource-detail-header-title" id="resource-detail-title"></h1>
+          </div>
+          <div class="resource-detail-body app-scrollbar">
+            <article class="resource-detail-article">
+              <p class="resource-detail-date" id="resource-detail-date"></p>
+              <p class="resource-detail-desc" id="resource-detail-desc"></p>
+              <div class="resource-detail-placeholder" id="resource-detail-placeholder">
+                <p data-i18n="resource.detailEmpty">请选择一个资源条目查看详情</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+
       <!-- 院校详情层（覆盖在主内容区之上） -->
       <div class="school-detail-overlay" id="school-detail-overlay">
+        <div class="school-detail-slide-panel">
         <div class="school-detail-header" style="-webkit-app-region: no-drag;">
           <button class="school-detail-back" id="school-detail-back" type="button" data-i18n="schoolDetail.back">返回</button>
           <h1 class="school-detail-title" id="school-detail-title"></h1>
@@ -941,6 +974,7 @@
             <button class="school-detail-lightbox-close" id="school-detail-lightbox-close">×</button>
             <img class="school-detail-lightbox-img" id="school-detail-lightbox-img" alt="">
           </div>
+        </div>
         </div>
       </div>
 
@@ -1055,7 +1089,7 @@
 
               <div class="settings-item-card settings-nav-item settings-expand-card" id="settings-api-item">
                 <button type="button" class="settings-expand-header" id="settings-api-trigger">
-                  <span class="settings-item-label" data-i18n="settings.apiKey">API Key</span>
+                  <span class="settings-item-label" data-i18n="settings.apiKey">LLM Key</span>
                   <span class="settings-expand-status" id="settings-api-status">-</span>
                 </button>
                 <div class="settings-expand-body" id="settings-api-body" hidden>

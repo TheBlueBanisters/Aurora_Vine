@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pageId === 'usage-guide') { startUsageGuide(true); return }
       if (pageId !== 'community-messages') { closeCommunityReplySheet(); closeCommunityDetailModal(); /* closeCommunityPostModal handled internally */ }
       closeApplicationCaseModal()
+      void closeResourceDetail()
       const overlay = getOverlay()
       if (overlay?.classList.contains('active')) closeSchoolDetail()
       navigateTo(pageId)
@@ -97,6 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (authModal?.classList.contains('active')) { closeAuthModal(); return }
     const caseModal = document.getElementById('application-case-modal')
     if (caseModal?.classList.contains('active')) { closeApplicationCaseModal(); return }
+    const resourceOverlay = document.getElementById('resource-detail-page')
+    if (resourceOverlay?.classList.contains('active')) { void closeResourceDetail(); return }
     handleGlobalEscape()
   })
 

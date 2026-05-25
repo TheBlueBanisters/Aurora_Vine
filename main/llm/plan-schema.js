@@ -252,21 +252,50 @@ export function validateOutlineResponse(data) {
   const entries = Array.isArray(data?.entries) ? data.entries.slice(0, 6) : [];
   if (entries.length === 0) throw new Error('outline entries 不能为空');
 
-  const schoolTiers = {
-    reach: Array.isArray(data?.schoolTiers?.reach) ? data.schoolTiers.reach : [],
-    match: Array.isArray(data?.schoolTiers?.match) ? data.schoolTiers.match : [],
-    safety: Array.isArray(data?.schoolTiers?.safety) ? data.schoolTiers.safety : []
-  };
-
   return {
     entries: entries.map((entry, idx) => validateOutlineEntry(entry, idx)),
-    schoolTiers,
     encouragementNote: assertLocalized(
       data?.encouragementNote ?? { zh: '', en: '' },
       'encouragementNote',
       { allowEmpty: true }
     )
   };
+}
+
+const TIER_KEYS = ['reach', 'match', 'safety'];
+
+function validateTierSchoolItem(item, tier, idx, allowedIds) {
+  const schoolId = Number(item?.schoolId ?? item?.school_id);
+  if (!Number.isFinite(schoolId) || schoolId <= 0) {
+    throw new Error(`schoolTiers.${tier}[${idx}].schoolId 无效`);
+  }
+  if (allowedIds && !allowedIds.has(schoolId)) {
+    throw new Error(`schoolTiers.${tier}[${idx}] schoolId ${schoolId} 不在候选池内`);
+  }
+  return {
+    schoolId,
+    reason: assertLocalized(item?.reason, `schoolTiers.${tier}[${idx}].reason`)
+  };
+}
+
+export function validateSchoolTierReviewResponse(data, { allowedByTier = {} } = {}) {
+  const schoolTiers = { reach: [], match: [], safety: [] };
+
+  for (const tier of TIER_KEYS) {
+    const raw = Array.isArray(data?.schoolTiers?.[tier]) ? data.schoolTiers[tier] : [];
+    const allowedList = allowedByTier[tier];
+    const allowedIds = Array.isArray(allowedList) ? new Set(allowedList) : null;
+
+    for (let idx = 0; idx < Math.min(raw.length, 4); idx++) {
+      try {
+        schoolTiers[tier].push(validateTierSchoolItem(raw[idx], tier, idx, allowedIds));
+      } catch (err) {
+        if (!allowedIds) throw err;
+      }
+    }
+  }
+
+  return { schoolTiers };
 }
 
 export function validateScheduleResponse(data) {

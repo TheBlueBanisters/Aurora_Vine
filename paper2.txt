@@ -1,0 +1,564 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper, margin=0.8in]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{listings}
+
+\setstretch{1.0}
+\pagenumbering{arabic}
+\lstdefinestyle{reportcode}{
+  basicstyle=\ttfamily\small,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  captionpos=b
+}
+\newcommand{\figureplaceholder}[1]{%
+  \begin{center}
+    \fbox{\parbox{0.88\textwidth}{\centering #1}}
+  \end{center}
+}
+
+\title{\textbf{Aurora Vine: An Integrated AI-Assisted Desktop System for Study-Abroad Planning and Application Support}}
+\author{
+Group Number: [To be completed] \\
+Team Members: [To be completed] \\
+Course: JC3510 Intelligent Software Implementation
+}
+\date{1 June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\Large\textbf{User Manual for Proof-of-Concept Software}
+\end{center}
+
+\vspace{1em}
+
+\begin{abstract}
+This user manual explains how to install, configure, run, and use Aurora Vine, a proof-of-concept desktop application for study-abroad planning and application support. Aurora Vine integrates user background profiling, university exploration, real application cases, AI-assisted planning, study schedules, daily check-ins, resources, and community discussion into a single Electron-based workspace. The manual is intended for evaluators, demonstrators, and first-time users who need to operate the submitted PoC software. It covers system requirements, installation steps, database initialization, AI API configuration, core workflows, troubleshooting, data storage, and current limitations.
+\end{abstract}
+
+\noindent\textbf{GitHub Repository:} \url{https://github.com/TheBlueBanisters/Aurora_Vine}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\subsection{Purpose of This Manual}
+
+This document provides practical instructions for using the Aurora Vine proof-of-concept software. It is prepared as part of the PoC software submission for JC3510 Intelligent Software Implementation. The purpose of the manual is to help users install the project, start the application, configure necessary options, and complete the main user workflows without needing to inspect the source code.
+
+The manual covers the following areas:
+
+\begin{itemize}
+  \item Hardware, software, network, and API prerequisites.
+  \item Installation from the submitted project folder or the GitHub repository.
+  \item Database initialization and application startup.
+  \item User registration, login, and guest access.
+  \item School planning, profile management, target university management, study planning, and daily check-in.
+  \item University database browsing, application case retrieval, resource browsing, community discussion, and settings.
+  \item Troubleshooting, data privacy notes, and known limitations of the PoC version.
+\end{itemize}
+
+\subsection{System Overview}
+
+Aurora Vine is an integrated AI-assisted desktop application designed for undergraduate students preparing for graduate study abroad. The study-abroad preparation process often requires students to collect school information, compare application cases, evaluate their background, plan long-term tasks, prepare materials, and keep track of daily progress. These activities are usually distributed across separate platforms, which increases the cost of information acquisition and makes systematic planning difficult.
+
+Aurora Vine addresses this problem by bringing multiple functions into one local desktop system. Users can enter their academic background, browse universities and programs, inspect real application cases, generate AI-assisted school planning suggestions, transform planning content into daily tasks, and monitor progress through a check-in calendar. The system is implemented as an Electron desktop application using HTML, CSS, JavaScript, Node.js, SQLite, and optional large language model API integration.
+
+\figureplaceholder{Figure 1. Suggested screenshot: Aurora Vine welcome page or main interface.}
+
+\subsection{Target Users}
+
+The primary users of Aurora Vine are students who are preparing for study-abroad applications. They can be divided into two practical groups.
+
+\textbf{Exploration-stage users} have not yet decided on their application direction. They need to understand different countries, universities, programs, admission expectations, and previous application cases. For these users, the university database, application case library, and resource center are the most relevant starting points.
+
+\textbf{Planning-stage users} already have preliminary goals and need to organize their background, evaluate their competitiveness, generate a structured plan, and execute it over time. For these users, school planning, My Profile, target universities, study planning, and daily check-in form a complete workflow from information input to action tracking.
+
+The manual is also written for course evaluators and demonstrators who need to verify that the submitted PoC implements the core functionality described in the approved project proposal.
+
+\subsection{PoC Scope}
+
+The PoC version of Aurora Vine demonstrates the core feasibility of the proposed system. It includes account access, profile construction, university and case browsing, AI-assisted planning, study plan generation, task tracking, resource browsing, community interaction, and system settings. These functions are sufficient to show that the system architecture can support the proposed end-to-end workflow.
+
+However, the PoC is not intended to be a complete commercial admission platform. It does not train an in-house large language model, does not submit official applications to universities, and does not replace professional admission advice. AI outputs are treated as assistive suggestions. Users should review, edit, and confirm them according to their own situation and official university requirements.
+
+\section{System Requirements}
+
+\subsection{Hardware Requirements}
+
+Aurora Vine can run on an ordinary personal computer. For smooth use during demonstration and testing, the following hardware is recommended:
+
+\begin{itemize}
+  \item Processor: modern dual-core or higher CPU.
+  \item Memory: 8 GB RAM or above.
+  \item Storage: sufficient free disk space for project dependencies, the SQLite database, university images, uploaded resumes, and user data.
+  \item Display: a desktop or laptop screen with enough resolution to display the sidebar navigation and main content area comfortably.
+\end{itemize}
+
+\subsection{Software Requirements}
+
+The recommended environment for the submitted PoC is Windows 10 or Windows 11. Since Aurora Vine is built with Electron, the architecture can be adapted to other desktop platforms, but the current manual focuses on the Windows-based demonstration environment.
+
+The following software should be installed before running the project:
+
+\begin{itemize}
+  \item Node.js, preferably the current Long-Term Support version.
+  \item npm, normally installed together with Node.js.
+  \item Git, if the project is cloned from the GitHub repository.
+  \item Python, optional, only needed for running the community sample data repair script.
+\end{itemize}
+
+\subsection{Network and API Requirements}
+
+Most browsing and local data functions can run on a local machine once the database has been initialized. AI-assisted functions require internet access and a valid DeepSeek API key. The API key is configured inside the application through the Settings page. It is stored in the local user data directory and should not be committed to the source repository or shown in public screenshots.
+
+Without an API key, users can still access many system functions, including account access, university browsing, case browsing, target university management, resource browsing, community functions, and manual planning. AI-generated planning outlines, school tiers, resume scoring, personal statement drafts, and smart schedules may be unavailable or limited.
+
+\subsection{Included Project Files}
+
+The submitted project folder contains source code, data preparation scripts, assets, and configuration files. Important files and directories include:
+
+\begin{longtable}{p{0.30\textwidth}p{0.62\textwidth}}
+\toprule
+\textbf{File or Directory} & \textbf{Purpose} \\
+\midrule
+\endhead
+\texttt{package.json} & Defines project metadata, dependencies, and npm scripts. \\
+\texttt{main.js} & Electron main process entry file. \\
+\texttt{preload.js} & Exposes selected APIs to the renderer process through Electron contextBridge. \\
+\texttt{main/} & Contains IPC handlers, LLM modules, prompt templates, and utility functions. \\
+\texttt{renderer/} & Contains the user interface, styles, and feature modules. \\
+\texttt{data/init\_db.js} & Initializes the SQLite database from local university, program, and case data. \\
+\texttt{data/school\_item.db} & SQLite database used by the application. \\
+\texttt{school/} & University information and school image assets. \\
+\texttt{major/} & Optional program data spreadsheets. \\
+\texttt{personalCase/} & Optional application case data. \\
+\texttt{image/} & Branding and interface illustrations. \\
+\bottomrule
+\end{longtable}
+
+\section{Installation Guide}
+
+\subsection{Obtain the Project}
+
+If the project is obtained from GitHub, open a terminal in the directory where the project should be stored and run:
+
+\begin{lstlisting}[style=reportcode, caption={Clone the repository}]
+git clone https://github.com/TheBlueBanisters/Aurora_Vine.git
+cd Aurora_Vine
+\end{lstlisting}
+
+If the project is obtained from the course submission zip file, extract the zip file and open a terminal in the extracted project root directory. The remaining installation steps are the same.
+
+\subsection{Install Dependencies}
+
+Run the following command in the project root directory:
+
+\begin{lstlisting}[style=reportcode, caption={Install npm dependencies}]
+npm install
+\end{lstlisting}
+
+This installs the JavaScript dependencies required by the application. Important dependencies include Electron for the desktop shell, electron-vite for development and build tooling, better-sqlite3 for local database access, ECharts for charts, document extraction libraries for resume processing, and the OpenAI-compatible SDK used by the LLM integration.
+
+\subsection{Rebuild Native Dependencies}
+
+The project uses \texttt{better-sqlite3}, which is a native Node.js addon. Native addons sometimes need to be rebuilt for the Electron runtime. The project is configured to rebuild it after installation, but if the application fails to start with a \texttt{better-sqlite3} related error, run:
+
+\begin{lstlisting}[style=reportcode, caption={Rebuild the SQLite native dependency}]
+npm run prestart
+\end{lstlisting}
+
+If the error continues, remove the incomplete dependency installation and run \texttt{npm install} again. During normal demonstration, this step is usually only needed when the environment changes.
+
+\subsection{Initialize the Database}
+
+Before the first run, initialize the local SQLite database:
+
+\begin{lstlisting}[style=reportcode, caption={Initialize the database}]
+node data/init_db.js
+\end{lstlisting}
+
+This command recreates \texttt{data/school\_item.db}. It imports school information from the \texttt{school/} directory, optional program information from \texttt{major/*.xlsx}, and optional application case information from \texttt{personalCase/*.csv}. The same database file is then used by the running application for the university database, application case library, accounts, study plans, check-ins, and community data; runtime tables are created by the application when it starts.
+
+\textbf{Important warning:} running \texttt{node data/init\_db.js} deletes and recreates the database file. Runtime data such as accounts, check-ins, community posts, and study plans may be removed. Before reinitializing the database during later use, back up \texttt{data/school\_item.db} if the data should be preserved.
+
+\section{Running the Application}
+
+\subsection{Development Mode}
+
+For development and live demonstration, run:
+
+\begin{lstlisting}[style=reportcode, caption={Run in development mode}]
+npm run dev
+\end{lstlisting}
+
+This starts the Electron application with the renderer development server. The renderer process supports hot module replacement, which is useful when adjusting interface code. Changes to Electron main-process files, preload scripts, or IPC handlers normally require restarting the Electron process.
+
+\subsection{Production Build}
+
+To build and run the application from the compiled output, use:
+
+\begin{lstlisting}[style=reportcode, caption={Build and run the production version}]
+npm run build
+npm start
+\end{lstlisting}
+
+The build output is placed in the \texttt{out/} directory. The configured production entry point is \texttt{out/main/main.js}. This mode is closer to the packaged application behavior and is suitable for final verification before submission.
+
+\subsection{First Launch}
+
+After the application starts, the user sees the Aurora Vine welcome page. The welcome page introduces the purpose of the system and provides access to the authentication dialog. Users can log in, register a new account, or enter guest mode.
+
+\figureplaceholder{Figure 2. Suggested screenshot: welcome page and authentication dialog.}
+
+For quick evaluation, guest mode is the fastest way to inspect the interface. For testing persistent personal data, registration is recommended because account-specific profiles, target schools, plans, and check-ins can be associated with the created user.
+
+\section{Account Access and Basic Navigation}
+
+\subsection{Login, Registration, and Guest Mode}
+
+Aurora Vine provides three entry paths. New users can register by entering an email address, an optional nickname, and a password. Existing users can log in with their email address and password. Evaluators can also use guest mode to enter the application without creating an account.
+
+Account information is stored locally in the SQLite database. The PoC does not depend on a remote authentication server. This local design is appropriate for the desktop-based project scope and keeps the demonstration self-contained.
+
+\subsection{Main Layout}
+
+The main interface is organized around a left sidebar and a right content area. The sidebar groups functions according to user goals. Core entry points include School Planning and My Profile. Goal-oriented functions include Target Universities, Study Planning, and Daily Check-in. Information reference functions include University Database, Application Cases, Resource Center, Community, and Settings.
+
+\figureplaceholder{Figure 3. Suggested screenshot: main layout with sidebar navigation and content area.}
+
+Users switch modules by clicking items in the sidebar. The right content area updates without leaving the desktop application. This structure supports a continuous workflow: users can enter their background, browse schools, save targets, generate plans, and track tasks in the same workspace.
+
+\subsection{Language and Theme}
+
+The Settings module allows users to switch the interface language between Chinese and English. It also supports light and dark themes. The light theme uses mint-green visual accents, while the dark theme applies darker panels and warm highlighted buttons. Theme and language preferences are saved locally, so the selected appearance is restored in later sessions.
+
+\section{School Planning}
+
+\subsection{Opening the School Planning Page}
+
+School Planning is the starting point for personalized application support. Users open it from the sidebar by selecting \textit{School Planning} or the corresponding Chinese navigation item. The page collects structured background information, including academic performance, standardized tests, school tier, research experience, internships, publications, resume information, and application preferences.
+
+\figureplaceholder{Figure 4. Suggested screenshot: School Planning input form.}
+
+\subsection{Filling in the Academic Profile}
+
+Users should fill in the form as completely as possible. The most important fields include undergraduate school information, major, GPA, GPA scale, ranking or percentile information, IELTS or TOEFL results, GRE results if available, and counts of research, internship, and paper experience. These fields help the system create a structured representation of the user profile.
+
+Some fields are optional because students may be at different preparation stages. For example, a student may not have taken a language test yet, or may not have a finalized resume. In such cases, users can still submit available information. The system uses the provided data to compute a local competitiveness score and, when AI is enabled, to construct prompts for planning generation.
+
+\subsection{Uploading a Resume}
+
+Resume upload is optional but useful. Aurora Vine accepts PDF, DOC, DOCX, PNG, JPG, and JPEG files. For PDF, DOC, and DOCX resumes, the system extracts text from the document. For image resumes, the file is stored, but OCR is not implemented; the AI module is informed that it should rely mainly on the structured profile fields.
+
+If no resume is uploaded, the system still works. It builds a structured LLM input from the form fields. This design ensures that the planning workflow is available even when a user is at an early stage and has not prepared a resume.
+
+\subsection{Generating the Competitiveness Score and AI Outline}
+
+After the user submits the School Planning form, the system computes a local competitiveness score. The scoring considers academic information, standardized test results, background experience, school tier, and an additional LLM resume score when a parsable resume is available. This gives the user an initial view of their application competitiveness.
+
+If a valid DeepSeek API key has been configured in Settings, Aurora Vine can also generate AI-assisted outputs. These include a planning outline, reach/match/safety school-tier recommendations, optional resume scoring when a resume is uploaded, a personal statement draft, and later smart schedules from the Study Planning page. Recommended schools are organized into reach, match, and safety categories to help users compare different levels of application difficulty.
+
+\figureplaceholder{Figure 5. Suggested screenshot: AI-generated school tier recommendations and planning outline.}
+
+Users should treat the output as a planning reference rather than a final decision. Admission results depend on many factors, including official program requirements, application season, recommendation letters, essays, interviews, funding, and competition in the applicant pool.
+
+\section{My Profile and Target Universities}
+
+\subsection{My Profile}
+
+The My Profile module displays the user's saved background information in a more readable form. It helps users review the data submitted through School Planning and inspect generated content such as a personal statement draft. Charts are used to present key test scores and profile indicators when the relevant data is available.
+
+\figureplaceholder{Figure 6. Suggested screenshot: My Profile dashboard.}
+
+If the user finds outdated or incomplete information, they can return to School Planning to revise the profile. The updated profile can then be used for later planning generation and school recommendation.
+
+\subsection{Target Universities}
+
+Target Universities is used to collect schools that the user wants to track. Users can add schools from the university database or from AI-generated school recommendations. The list can display ranking and school information, allowing users to compare options and quickly open the detail page of a selected institution.
+
+This module acts as a bridge between exploration and planning. A user may first browse many institutions, then save a smaller set of realistic targets, and finally use that list during study planning and application preparation.
+
+\figureplaceholder{Figure 7. Suggested screenshot: target university list.}
+
+\section{Study Planning and Daily Check-in}
+
+\subsection{Study Planning Overview}
+
+The Study Planning module transforms higher-level planning advice into structured actions. It contains AI planning outline content, smart schedule generation, custom plan input, school tier information, and intended-school panels. This module directly supports the project objective of bridging the gap between abstract recommendations and executable tasks.
+
+\figureplaceholder{Figure 8. Suggested screenshot: Study Planning page.}
+
+\subsection{Generating a Smart Schedule}
+
+After the user has entered a profile and configured the API key, they can generate or regenerate a smart schedule. The system sends structured user background and planning context to the LLM. The model returns a phase-level schedule, which may include preparation stages such as language testing, school research, resume improvement, personal statement drafting, recommendation preparation, and application submission.
+
+The system further transforms the schedule into daily check-in tasks. If the AI response is incomplete, fallback logic expands phase milestones into daily tasks and fills uncovered dates with appropriate nearby phase tasks. This makes the generated plan more practical for daily execution.
+
+\subsection{Importing Tasks into Daily Check-in}
+
+Once the smart schedule has been generated, users can import tasks into the Daily Check-in module. Daily Check-in displays tasks on a calendar. Each day can contain multiple tasks, with a practical limit of up to nine displayed tasks per day. Users can mark tasks as complete and use visual color tags to track task status.
+
+\figureplaceholder{Figure 9. Suggested screenshot: Daily Check-in calendar with imported tasks.}
+
+This feature helps users maintain consistency over a long preparation period. Instead of reading a broad plan once and forgetting it, users can interact with a daily task list and gradually convert the plan into visible progress.
+
+\subsection{Custom Plan Input}
+
+Users can also create custom plans manually. The custom plan function is useful when the user wants to modify AI-generated content, enter a plan received from an advisor, or add personal tasks that are not covered by the smart schedule. The system parses structured text and saves the result into the local SQLite database.
+
+This manual editing option is important for controllability. AI output may be helpful, but the final plan should remain editable by the user.
+
+\section{Information Browsing Modules}
+
+\subsection{University Database}
+
+The University Database module allows users to browse approximately 200 schools. Users can search by keyword and filter by region or other available conditions. Selecting a school opens a detail panel that may include the school introduction, official website, address, contact information, image carousel, program list, and related application cases.
+
+\figureplaceholder{Figure 10. Suggested screenshot: University Database list and school detail panel.}
+
+Users can add a school to the Target Universities list from the detail view. This makes it possible to move from broad exploration to a focused list of application targets.
+
+\subsection{Application Cases}
+
+The Application Cases module provides a library of previous application examples. Users can search by keyword and filter cases by undergraduate tier, GPA band, language band, background focus, and sorting mode. Case details then show richer background information, including test results, soft-background indicators, and offer records, helping users compare their own background with similar applicants.
+
+\figureplaceholder{Figure 11. Suggested screenshot: Application Cases filtering and detail view.}
+
+The case library is intended as a reference tool. It does not guarantee admission outcomes, but it helps users develop a more concrete understanding of competitiveness and school matching.
+
+\subsection{Resource Center}
+
+The Resource Center provides supporting materials for study-abroad preparation. It includes resources for GRE, IELTS, TOEFL, statement of purpose writing, resumes, and related application tasks. Rich content rendering and mathematical notation support are available through the interface where needed.
+
+This module complements the planning workflow. After tasks are generated, users can use the Resource Center to find study and material-preparation references related to those tasks.
+
+\figureplaceholder{Figure 12. Suggested screenshot: Resource Center page.}
+
+\section{Community and Settings}
+
+\subsection{Community}
+
+The Community module supports peer discussion. Users can create posts, view post details, reply to posts, and delete their own posts or replies. In the PoC version, the community is stored locally and demonstrates how discussion features can be integrated into the broader planning workspace.
+
+The purpose of this module is to support experience sharing. Study-abroad planning is not only a data problem; students often benefit from examples, questions, and informal feedback from peers.
+
+\subsection{Settings}
+
+The Settings module contains personal and system-level preferences. Users can switch language, switch theme, edit profile-related information, upload or change avatars, configure the DeepSeek API key, perform invite-code verification if used in the demonstration, and clear personal data.
+
+\figureplaceholder{Figure 13. Suggested screenshot: Settings page and API key configuration area.}
+
+\subsection{Configuring the DeepSeek API Key}
+
+To enable AI-related functions, users should open Settings, find the API key section, enter a valid DeepSeek API key, and save it. After saving, users can return to School Planning or Study Planning to generate planning outlines, school tiers, resume scoring when a resume is uploaded, personal statement drafts, and smart schedules.
+
+The API key should be handled carefully. Do not include the full key in screenshots, public documents, or Git commits. If a screenshot of the Settings page is needed for the final PDF, the key should be hidden or masked.
+
+\section{Typical User Workflow}
+
+\subsection{Complete Workflow Example}
+
+A typical first-time user workflow is as follows:
+
+\begin{enumerate}
+  \item Start the application with \texttt{npm run dev} or the production run command.
+  \item Register a new account or enter guest mode.
+  \item Open School Planning and fill in academic background, GPA, standardized test results, and soft background information.
+  \item Optionally upload a resume.
+  \item Submit the form and generate a competitiveness score.
+  \item If the API key is configured, generate AI school planning recommendations.
+  \item Open My Profile to review the saved background summary and generated personal statement draft.
+  \item Browse the University Database and add suitable schools to Target Universities.
+  \item Use Application Cases to compare similar applicant profiles.
+  \item Open Study Planning and generate a smart schedule.
+  \item Import generated tasks into Daily Check-in.
+  \item Complete daily tasks and update task status over time.
+\end{enumerate}
+
+This workflow shows how Aurora Vine connects information input, AI assistance, school exploration, plan generation, and execution tracking.
+
+\subsection{Recommended Demonstration Path}
+
+If the available demonstration time is limited, evaluators can inspect the following path:
+
+\begin{enumerate}
+  \item Enter the application through guest mode or a prepared test account.
+  \item Show the School Planning form and explain the profile fields.
+  \item Demonstrate AI-generated school tiers or show a prepared result if API access is unavailable.
+  \item Open the University Database and inspect a school detail page.
+  \item Open Application Cases and apply filters.
+  \item Open Study Planning and show the smart schedule.
+  \item Open Daily Check-in and show imported tasks.
+  \item Open Settings and show language, theme, and API key configuration options.
+\end{enumerate}
+
+This path covers the main functions required to demonstrate the viability of the PoC.
+
+\section{Troubleshooting and FAQ}
+
+\subsection{The School List Is Empty}
+
+The most likely reason is that the database has not been initialized. Run:
+
+\begin{lstlisting}[style=reportcode, caption={Fix an empty school list}]
+node data/init_db.js
+\end{lstlisting}
+
+After initialization, restart the application and open the University Database again.
+
+\subsection{The Application Reports a better-sqlite3 Error}
+
+This usually means the native SQLite dependency was not correctly rebuilt for Electron. Run:
+
+\begin{lstlisting}[style=reportcode, caption={Fix a better-sqlite3 runtime error}]
+npm run prestart
+\end{lstlisting}
+
+If the problem remains, reinstall dependencies and then run the rebuild command again.
+
+\subsection{AI Functions Do Not Work}
+
+Check the following points:
+
+\begin{itemize}
+  \item Confirm that the computer has internet access.
+  \item Confirm that a valid DeepSeek API key has been saved in Settings.
+  \item Confirm that the API key has available quota.
+  \item Check the main-process console output for detailed error messages.
+\end{itemize}
+
+If API access is unavailable during a demonstration, non-AI functions can still be shown. Previously saved AI results may also be used if they are already present in the local data.
+
+\subsection{The Smart Schedule or Daily Tasks Are Incomplete}
+
+The AI response may occasionally be incomplete or not detailed enough. Users can regenerate the smart schedule. The system includes fallback and gap-fill logic, but users should still review the generated tasks manually. Custom plan input can be used to add or adjust tasks.
+
+\subsection{Database Reinitialization Removed User Data}
+
+Running \texttt{node data/init\_db.js} deletes and recreates \texttt{data/school\_item.db}. This can remove accounts, study plans, check-ins, and community content. Before reinitializing the database after meaningful use, back up the database file.
+
+\section{Data, Privacy, and Limitations}
+
+\subsection{Local Data Storage}
+
+Aurora Vine is designed as a local desktop application. Most structured data is stored in the SQLite database \texttt{data/school\_item.db}. This includes school data, program data, application cases, accounts, app sessions, daily check-ins, study plans, community posts, and community replies.
+
+Some user-specific files and configuration data are stored in the Electron user data directory. This includes the API key configuration, uploaded resumes, extracted resume text, and avatar files. Browser-side preferences and some per-account interface states are stored in localStorage.
+
+\subsection{AI Output Disclaimer}
+
+AI-generated analysis is intended to assist planning, not to replace human judgment. The system may generate school recommendations, planning outlines, daily tasks, or personal statement drafts, but users are responsible for checking the accuracy and suitability of all output.
+
+The output does not represent official university admission requirements, an admission guarantee, or professional legal or academic advice. Users should confirm program requirements on official university websites and revise any generated text before using it in real applications.
+
+\subsection{Current Limitations}
+
+The current PoC has several limitations:
+
+\begin{itemize}
+  \item It does not automate official application submission.
+  \item It does not train or host a proprietary large language model.
+  \item It does not provide full multi-device cloud synchronization.
+  \item The completeness of university, program, and case information depends on the local data set.
+  \item AI functions depend on third-party API availability, network stability, and API quota.
+  \item Image-format resumes can be stored, but OCR text extraction is not implemented.
+  \item Local database reinitialization can remove runtime user data if no backup is made.
+\end{itemize}
+
+These limitations are acceptable for the PoC stage because the main objective is to demonstrate technical credibility, architectural alignment, and extensibility.
+
+\section{Appendix}
+
+\subsection{Command Summary}
+
+\begin{longtable}{p{0.42\textwidth}p{0.48\textwidth}}
+\toprule
+\textbf{Purpose} & \textbf{Command} \\
+\midrule
+\endhead
+Clone repository & \texttt{git clone https://github.com/TheBlueBanisters/Aurora\_Vine.git} \\
+Enter project folder & \texttt{cd Aurora\_Vine} \\
+Install dependencies & \texttt{npm install} \\
+Rebuild native dependency & \texttt{npm run prestart} \\
+Initialize database & \texttt{node data/init\_db.js} \\
+Run in development mode & \texttt{npm run dev} \\
+Build application & \texttt{npm run build} \\
+Run production build & \texttt{npm start} \\
+\bottomrule
+\end{longtable}
+
+\subsection{Main Feature Checklist}
+
+\begin{longtable}{p{0.08\textwidth}p{0.78\textwidth}}
+\toprule
+\textbf{No.} & \textbf{Feature} \\
+\midrule
+\endhead
+1 & Login, registration, and guest mode. \\
+2 & Academic background input and profile saving. \\
+3 & Resume upload and text extraction. \\
+4 & Local competitiveness score calculation. \\
+5 & AI-assisted resume scoring and school planning. \\
+6 & Reach, match, and safety school tier recommendations. \\
+7 & My Profile dashboard and generated personal statement draft. \\
+8 & Target university collection and management. \\
+9 & University database browsing and school detail panels. \\
+10 & Application case filtering and detail browsing. \\
+11 & Study planning, smart schedule generation, and custom plan input. \\
+12 & Daily check-in task import and completion tracking. \\
+13 & Resource center for exams and application materials. \\
+14 & Community posts and replies. \\
+15 & Language switching, theme switching, avatar settings, and API key configuration. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Suggested Figure List}
+
+The final PDF version of this manual should replace placeholder boxes with actual screenshots. Suggested figures are:
+
+\begin{itemize}
+  \item Figure 1. Aurora Vine welcome page or main interface.
+  \item Figure 2. Welcome page and authentication dialog.
+  \item Figure 3. Main layout with sidebar navigation.
+  \item Figure 4. School Planning input form.
+  \item Figure 5. AI-generated school tier recommendations.
+  \item Figure 6. My Profile dashboard.
+  \item Figure 7. Target university list.
+  \item Figure 8. Study Planning page.
+  \item Figure 9. Daily Check-in calendar.
+  \item Figure 10. University Database and school detail panel.
+  \item Figure 11. Application Cases filtering and detail view.
+  \item Figure 12. Resource Center page.
+  \item Figure 13. Settings and API key configuration area.
+\end{itemize}
+
+\subsection{Submission Notes}
+
+For the PoC software submission, the source code, required data files, and the PDF version of this user manual should be included in a single zip file. The zip file should be named clearly with the group number. Before submission, the team should verify that:
+
+\begin{itemize}
+  \item The application can be installed from a clean project folder.
+  \item The database can be initialized successfully.
+  \item The application can start in the chosen demonstration mode.
+  \item Required screenshots in the PDF are up to date.
+  \item No private API key or personal secret is visible in the submitted files.
+  \item The GitHub repository link is correct and accessible if it is included in the submission.
+\end{itemize}
+
+\end{document}

@@ -11,6 +11,40 @@ let dailyInitialized = false
 let dailyModalInitialized = false
 let dailySaveTimer = null
 let dailyActiveTaskIndex = -1
+let dailyDateSwitching = false
+
+const DAILY_DATE_SWITCH_MS = 240
+
+function getDailyDateSwitchMs() {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ? 0 : DAILY_DATE_SWITCH_MS
+}
+
+function waitMs(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function syncDailyCalendarSelection() {
+  const grid = document.getElementById('daily-checkin-calendar-grid')
+  if (!grid) return
+  grid.querySelectorAll('.daily-checkin-day').forEach((el) => {
+    el.classList.toggle('is-selected', el.dataset.dateKey === dailySelectedDateKey)
+  })
+}
+
+async function runDailyDateSwitchTransition(updateContent) {
+  if (dailyDateSwitching) return
+  dailyDateSwitching = true
+  const taskPanel = document.querySelector('.daily-checkin-task-panel')
+  try {
+    taskPanel?.classList.add('is-date-switching')
+    await waitMs(getDailyDateSwitchMs())
+    await updateContent()
+    void taskPanel?.offsetHeight
+    taskPanel?.classList.remove('is-date-switching')
+  } finally {
+    dailyDateSwitching = false
+  }
+}
 
 function monthRangeDays(monthDate) {
   const year = monthDate.getFullYear()
@@ -90,6 +124,25 @@ function updateDailyTaskCounter() {
   counter.textContent = `${dailyTaskItems.length}/${DAILY_MAX_TASKS}`
 }
 
+/** 按内容预估高度排序，避免操作态（勾选/删除栏）改变实测高度导致条目跳动 */
+function estimateTaskItemSortHeight(item) {
+  const parsed = parseCheckinTaskContent(item.content)
+  const title = pickTaskTitle(parsed)
+  const subtitle = pickTaskSubtitle(parsed)
+  let height = 62
+  if (subtitle) height += 20
+  const titleLines = Math.ceil(Math.max(title.length, 1) / 32)
+  if (titleLines > 1) height += (titleLines - 1) * 18
+  return height
+}
+
+function getTaskDisplayOrder() {
+  return dailyTaskItems
+    .map((item, idx) => ({ idx, height: estimateTaskItemSortHeight(item) }))
+    .sort((a, b) => b.height - a.height)
+    .map(({ idx }) => idx)
+}
+
 function renderDailyTaskList() {
   const listEl = document.getElementById('daily-checkin-task-list')
   const addBtn = document.getElementById('daily-checkin-add-task')
@@ -101,12 +154,14 @@ function renderDailyTaskList() {
   listEl.innerHTML = ''
   emptyEl.style.display = dailyTaskItems.length === 0 ? 'flex' : 'none'
 
-  dailyTaskItems.forEach((item, idx) => {
+  getTaskDisplayOrder().forEach((idx) => {
+    const item = dailyTaskItems[idx]
     const parsed = parseCheckinTaskContent(item.content)
     const title = pickTaskTitle(parsed)
     const subtitle = pickTaskSubtitle(parsed)
     const row = document.createElement('div')
     row.className = 'daily-checkin-task-item'
+    row.dataset.taskIndex = String(idx)
     if (idx === dailyActiveTaskIndex) row.classList.add('is-operating')
     if (item.completed) row.classList.add('is-completed')
     row.style.setProperty('--task-color', String(item.color || DAILY_TASK_COLORS[0].value))
@@ -144,6 +199,27 @@ function renderDailyTaskList() {
   updateDailyTaskCounter()
 }
 
+async function selectDailyDate(day) {
+  if (day.dateKey === dailySelectedDateKey || dailyDateSwitching) return
+  await persistDailyTasks()
+  dailyActiveTaskIndex = -1
+  const monthChanged =
+    day.date.getMonth() !== dailyCurrentMonth.getMonth() ||
+    day.date.getFullYear() !== dailyCurrentMonth.getFullYear()
+  dailySelectedDateKey = day.dateKey
+  if (!monthChanged) syncDailyCalendarSelection()
+
+  await runDailyDateSwitchTransition(async () => {
+    if (monthChanged) {
+      dailyCurrentMonth = new Date(day.date.getFullYear(), day.date.getMonth(), 1)
+      await loadDailyMonthData(dailyCurrentMonth)
+      renderDailyCalendar()
+    }
+    await loadDailyTasksByDate(dailySelectedDateKey)
+    renderDailyTaskList()
+  })
+}
+
 function renderDailyCalendar() {
   const monthTitle = document.getElementById('daily-checkin-month-title')
   const grid = document.getElementById('daily-checkin-calendar-grid')
@@ -164,6 +240,7 @@ function renderDailyCalendar() {
   days.forEach((day) => {
     const dayEl = document.createElement('button')
     dayEl.type = 'button'; dayEl.className = 'daily-checkin-day'
+    dayEl.dataset.dateKey = day.dateKey
     if (!day.isCurrentMonth) dayEl.classList.add('is-other-month')
     if (day.isToday) dayEl.classList.add('is-today')
     if (day.isSelected) dayEl.classList.add('is-selected')
@@ -178,16 +255,7 @@ function renderDailyCalendar() {
       .join('')
 
     dayEl.innerHTML = `<span class="daily-checkin-day-date">${day.date.getDate()}</span><div class="daily-checkin-day-grid">${gridCells}</div>`
-    dayEl.addEventListener('click', async () => {
-      await persistDailyTasks()
-      dailyActiveTaskIndex = -1; dailySelectedDateKey = day.dateKey
-      if (day.date.getMonth() !== dailyCurrentMonth.getMonth() || day.date.getFullYear() !== dailyCurrentMonth.getFullYear()) {
-        dailyCurrentMonth = new Date(day.date.getFullYear(), day.date.getMonth(), 1)
-        await loadDailyMonthData(dailyCurrentMonth)
-      }
-      await loadDailyTasksByDate(dailySelectedDateKey)
-      renderDailyCalendar(); renderDailyTaskList()
-    })
+    dayEl.addEventListener('click', () => { void selectDailyDate(day) })
     grid.appendChild(dayEl)
   })
 }

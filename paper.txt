@@ -1,0 +1,573 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper, margin=0.8in]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{listings}
+
+\setstretch{1.0}
+\pagenumbering{arabic}
+\lstdefinestyle{reportcode}{
+  basicstyle=\ttfamily\small,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  captionpos=b
+}
+\newcommand{\figureplaceholder}[1]{%
+  \begin{center}
+    \fbox{\parbox{0.88\textwidth}{\centering #1}}
+  \end{center}
+}
+
+\title{\textbf{Aurora Vine: An Integrated AI-Assisted Desktop System for Study-Abroad Planning and Application Support}}
+\author{
+Group Number: [To be completed] \\
+Team Members: [To be completed] \\
+Course: JC3510 Intelligent Software Implementation
+}
+\date{1 June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Aurora Vine is a desktop-based proof-of-concept system designed to support students during the complex process of study-abroad preparation. The project was originally proposed as an integrated AI-assisted system for study-abroad planning and application support. In the final implementation, this proposal has been developed into a working Electron application that connects information acquisition, profile modelling, AI-assisted analysis, planning generation, execution tracking, and user feedback. Applicants often need to manage scattered information about universities, programmes, application cases, language tests, personal documents, and long-term preparation tasks. This fragmentation makes it difficult for users to understand their own competitiveness, construct a realistic school list, and maintain consistent progress across the application timeline. Aurora Vine addresses this problem by integrating profile collection, university exploration, real application case browsing, AI-assisted planning, study scheduling, daily check-ins, learning resources, and community discussion within a single desktop application.
+
+The system is implemented using Electron, vanilla HTML/CSS/JavaScript modules, SQLite, and a DeepSeek-powered large language model pipeline. Its architecture separates renderer-side interaction from privileged main-process operations through a controlled preload and IPC layer. User data, school data, application cases, plans, and check-in records are stored locally, while optional AI functions generate planning outlines, school-tier recommendations, schedules, daily tasks, and personal statement drafts. The project demonstrates how a local-first desktop application can combine structured data management with AI assistance to produce a coherent and extensible planning tool. This report describes the motivation, system design, implementation decisions, development process, evaluation outcomes, and future improvements of Aurora Vine.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction and System Overview}
+
+\subsection{Project Background}
+
+Studying abroad is a long and information-intensive process. A typical undergraduate applicant preparing for graduate study needs to understand university rankings, programme requirements, application deadlines, language test preparation, personal statement writing, resume improvement, recommendation letters, and possible application outcomes. Although a large amount of information is available online, it is usually distributed across university websites, commercial platforms, social media posts, public spreadsheets, and personal experience reports. As a result, students often spend considerable time collecting information before they can make even a preliminary decision.
+
+This problem is especially significant for applicants who are still evaluating their own competitiveness. A student may know their GPA, undergraduate institution, language scores, research experience, internship experience, and target region, but may not know how these factors translate into a practical school list. General advice is often too broad, while commercial consulting services may be expensive or difficult to verify. Applicants therefore need a tool that helps them organise their background, explore relevant universities and application cases, and convert a vague goal into an actionable plan. This motivation is consistent with the original project proposal, which identified a gap between fragmented information, abstract recommendations, and continuous execution.
+
+Aurora Vine was created in response to this need. It is designed as a calm and focused desktop workspace for study-abroad planning. Instead of acting as a complete commercial application service, it provides a proof-of-concept implementation of an intelligent planning assistant. The system combines local structured data with AI-generated guidance. Its purpose is not to guarantee admission outcomes, but to help users understand their situation, make more informed decisions, and maintain progress through a long preparation cycle.
+
+\figureplaceholder{Insert Figure 1: Aurora Vine landing page or main dashboard screenshot}
+
+\subsection{Problem Statement}
+
+The central problem addressed by Aurora Vine is the lack of an integrated and personalised planning environment for study-abroad applicants. Existing resources can help with individual tasks, such as searching for universities or reading application cases, but users still need to connect these resources manually. This creates several practical difficulties.
+
+First, user background information is rarely stored in a structured way. Applicants may repeatedly enter or rewrite the same information when checking different schools or asking for advice. Second, university exploration and application case analysis are often separated from personal planning. A user may find a strong application case but still struggle to understand whether it is comparable to their own profile. Third, long-term preparation tasks are difficult to maintain. A plan may be generated or written once, but it is less useful if it cannot be converted into daily actions. Finally, generic planning tools do not usually understand the specific workflow of international study applications.
+
+Aurora Vine therefore aims to answer three main questions:
+
+\begin{itemize}
+    \item How can a student organise their academic background, test scores, experience, preferences, and documents in one place?
+    \item How can structured user information and university data be used to generate a more relevant school planning result?
+    \item How can a high-level study-abroad plan be transformed into trackable daily tasks within the same application?
+\end{itemize}
+
+The boundary of the project is also important. Aurora Vine is not intended to replace official university admission decisions, professional counselling, or complete application management platforms. It is a technically credible proof-of-concept system that demonstrates how software design, local data storage, and large language model assistance can be combined to support the study-abroad planning workflow.
+
+\subsection{Target Users and User Needs}
+
+The primary target users are undergraduate students preparing for future postgraduate applications, either internationally or domestically. Following the user classification introduced in the project proposal, these users can be understood in two groups. Exploration-stage users have not yet decided their application direction and mainly need university information, programme comparison, application case references, and basic understanding of application difficulty. Planning-stage users already have preliminary targets and need structured background evaluation, school positioning, schedule generation, and execution tracking. Aurora Vine is designed to support both groups while keeping the workflow continuous.
+
+The user needs identified for this project are summarised in Table~\ref{tab:user-needs}. The table is intentionally limited to the most important needs so that the report focuses on the core design rationale rather than listing every interface detail.
+
+\begin{table}[h]
+\centering
+\caption{Main target users and needs}
+\label{tab:user-needs}
+\begin{tabular}{p{0.28\textwidth} p{0.62\textwidth}}
+\toprule
+\textbf{User Need} & \textbf{System Response} \\
+\midrule
+Profile organisation & Users can enter academic background, GPA, language scores, GRE results, research, internship, paper counts, target regions, and additional preferences. \\
+University exploration & Users can browse, search, and filter a local university database with rankings, school details, programme information, images, and related cases. \\
+Application reference & Users can inspect real application cases and compare background patterns such as GPA, language scores, undergraduate tier, and offer outcomes. \\
+Personalised planning & The system can generate AI-assisted planning outlines, school-tier recommendations, schedules, and personal statement drafts based on structured user information. \\
+Task execution & Long-term plans can be converted into daily check-in tasks, allowing users to track progress through a calendar-based workflow. \\
+Accessible experience & The application supports bilingual interface text, theme switching, user profiles, resource browsing, and community discussion. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Project Objectives}
+
+The project objectives can be divided into functional objectives, technical objectives, and course-related learning objectives.
+
+The first functional objective is to build a desktop application that covers the main stages of study-abroad planning. The application should allow users to enter their background, browse university data, review application cases, generate school planning suggestions, build study plans, and track daily progress. These functions together form a practical workflow: profile input, analysis, exploration, planning, execution, and reflection.
+
+The second functional objective is to integrate AI assistance in a controlled way. The system should not simply forward a free-form user message to a chatbot. Instead, it should convert user inputs into structured profile context, combine that context with local data where appropriate, and validate AI-generated outputs before presenting them in the interface. This objective is important because a planning system should be more reliable and explainable than a general conversation.
+
+The main technical objective is to implement a modular Electron application. The renderer layer should focus on user interaction, while privileged operations such as database access, file processing, and API calls should remain in the main process. The application should use SQLite for structured local data and should expose only controlled operations to the renderer through the preload and IPC mechanism.
+
+Another technical objective is maintainability. Since the system contains many features, including school planning, university browsing, application cases, study planning, daily check-in, resources, community, settings, and AI generation, the implementation should avoid concentrating all behaviour in one large file. Feature-specific modules and IPC handlers are therefore used to keep the system understandable and extensible.
+
+Finally, the project is intended to demonstrate the learning outcomes of the course. It applies software design principles, implements a software-centric system, uses project management and teamwork practices, and reflects professional considerations such as security boundaries, data handling, documentation, and evaluation.
+
+\subsection{System Overview}
+
+Aurora Vine is implemented as an Electron desktop application. The user interacts with the renderer interface, while the main process manages database access, file operations, custom protocols, and LLM service calls. A preload script exposes a restricted API to the renderer so that the interface can request data or trigger operations without direct access to Node.js internals. The local SQLite database stores schools, programmes, application cases, user accounts, study plans, daily check-in records, and community content. Additional user-specific files, such as uploaded resumes, avatars, and API key configuration, are stored in the Electron user data directory.
+
+At a high level, the system consists of several connected modules rather than a set of isolated pages. \textbf{School Planning} collects user background information, computes a competitiveness score, and generates AI-assisted planning results. \textbf{My Profile} displays saved user information, score visualisations, and AI-generated personal statement content. \textbf{University Database} and \textbf{Application Cases} provide the information-acquisition layer through school search, filtering, detail views, programme information, and real-case comparison. \textbf{Study Planning} and \textbf{Daily Check-in} form the execution layer by turning high-level plans into scheduled tasks and calendar-based progress tracking. Around these core functions, \textbf{Resource Center}, \textbf{Community}, and \textbf{Settings} provide learning materials, peer discussion, language and theme configuration, account settings, avatar support, and API key management.
+
+\figureplaceholder{Insert Figure 2: Feature map showing the main Aurora Vine modules}
+
+The core planning flow starts when a user fills in the School Planning form. The form captures academic, test, experience, and preference information. If the user uploads a resume, the system extracts text from the document and can use it as additional context. The local scoring logic produces a competitiveness score, while the LLM pipeline generates a planning outline and school-tier recommendations. These outputs are saved and reused in the profile and study planning sections. The user can then regenerate a smart schedule, which is converted into daily tasks and imported into the check-in module.
+
+\figureplaceholder{Insert Figure 3: User flow from School Planning to Study Planning and Daily Check-in}
+
+\subsection{Scope and Exclusions}
+
+The implemented scope of Aurora Vine focuses on a local-first proof-of-concept desktop application. It includes user profile collection, local university and application case browsing, AI-assisted school planning, schedule generation, daily task tracking, resource browsing, community discussion, theme switching, bilingual interface support, and basic account or guest usage. These features are sufficient to demonstrate the viability of the proposed end-to-end workflow: information acquisition, profile construction, planning generation, task execution, and feedback.
+
+Several features are intentionally outside the current scope. The system does not provide official admission probability prediction, because such prediction would require reliable institutional data, historical admissions datasets, and careful statistical validation. It also does not implement cloud synchronisation, multi-device collaboration, payment, professional consulting workflows, or a production-scale online community. Resume upload supports PDF, DOC, DOCX, PNG, JPG, and JPEG files, but only PDF/DOC/DOCX files are parsed into real text; image resumes are stored and represented by an OCR-unavailable placeholder. These exclusions keep the project feasible within the course timeline and maintain focus on the core software design objectives.
+
+\subsection{Report Structure}
+
+The remainder of this report is organised as follows. Section 2 presents the system design, including architecture, component responsibilities, data design, user interaction flows, interface design, and key design decisions. Section 3 describes the implementation, covering the technology stack, project structure, database implementation, planning features, LLM pipeline, university and case modules, account management, settings, security, reliability, and technical challenges. Section 4 explains the development process, including methodology, roles, milestones, adaptations, collaboration, and professional practice. Section 5 evaluates the project outcomes against the original objectives and discusses functional results, technical quality, user experience, testing, strengths, and limitations. Section 6 concludes the report and outlines future work.
+
+\section{System Design}
+
+\subsection{Design Goals and Principles}
+
+The design of Aurora Vine follows the goals stated in the proposal while adapting them to the final implementation. The first goal is integration. Rather than treating university browsing, application cases, AI planning, and task tracking as separate tools, the system connects them into a single workflow. A user can move from information acquisition to personal evaluation, from evaluation to planning, and from planning to daily execution without leaving the application.
+
+The second goal is usability. Study-abroad planning is already cognitively demanding, so the interface should reduce rather than increase user pressure. The application therefore uses a clear navigation structure, persistent profile data, visual feedback, bilingual labels, light and dark themes, toast notifications, confirmation dialogs, and loading overlays. These design choices support both exploration-stage users, who need a broad overview, and planning-stage users, who need more concrete guidance.
+
+The third goal is modularity. Aurora Vine contains many functional areas, including school planning, profile display, university data, application cases, study planning, daily check-in, resources, community, settings, and LLM services. To keep this complexity manageable, the renderer code is divided into feature modules, the main process is divided into IPC handlers, and the AI pipeline is divided into prompt templates, schema validation, profile context construction, and school matching logic.
+
+The fourth goal is local-first data management. The system is designed as a desktop proof of concept, so SQLite is used for structured application data, while Electron user data storage is used for files and configuration. This approach supports persistent local usage without requiring a deployed server.
+
+The fifth goal is AI controllability. The proposal identified the uncertainty of AI-generated outputs as an important non-functional concern. In the final system, LLM results are treated as assistive suggestions rather than authoritative decisions. Structured input, prompt templates, schema validation, candidate pools, fallback logic, and user review together reduce the risk of uncontrolled AI behaviour.
+
+\subsection{High-Level Architecture}
+
+Aurora Vine follows the standard Electron split between a renderer process, a preload bridge, and a main process. The renderer process contains the user interface and page-level interaction logic. It is implemented with HTML, CSS, and JavaScript ES modules. The preload script exposes a controlled \texttt{window.api} object through Electron's \texttt{contextBridge}. The main process handles privileged operations such as SQLite access, file processing, custom protocol handling, settings management, and LLM requests.
+
+The architecture is shown conceptually below:
+
+\figureplaceholder{Insert Figure 4: High-level architecture diagram showing Renderer, Preload API, Main Process, SQLite, userData, local assets, and DeepSeek API}
+
+The most important architectural boundary is between the renderer and the main process. The renderer does not directly access Node.js APIs, the file system, the database, or external API credentials. Instead, it invokes named IPC functions exposed through the preload script. This structure improves security and maintainability because data access logic is centralised in the main process and can be validated before execution.
+
+\subsection{Component Design}
+
+\subsubsection{Renderer Layer}
+
+The renderer layer is responsible for presenting the interface and responding to user actions. It is divided into modules under the \texttt{renderer/modules/} directory. Each module focuses on one feature area. For example, the school planning module collects user background data, the profile module displays saved information and visualisations, the schools module handles browsing and detail views, and the daily check-in module manages calendar-based tasks.
+
+This modular structure is important because the application includes multiple semi-independent workflows. If all UI behaviour were concentrated in one file, the cost of maintenance would increase quickly. By splitting modules according to feature boundaries, new functions such as institution-tier selection, school-planning form translation, resume picking, and UI transitions can be added without heavily modifying unrelated code.
+
+\subsubsection{Preload and IPC Layer}
+
+The preload layer exposes a curated list of application functions. These functions include authentication, school queries, case queries, daily check-in operations, study plan operations, community actions, resume upload and parsing, settings access, theme application, and LLM generation. The preload layer does not expose general-purpose file or database APIs; it only exposes the operations that the renderer needs.
+
+The IPC layer also supports separation of responsibility. For example, school browsing is handled by school-related IPC handlers, while LLM generation is handled by LLM-specific handlers. This allows each handler group to manage its own validation, database access, error handling, and return format.
+
+\subsubsection{Main Process Layer}
+
+The main process is responsible for application-level capabilities that require Node.js or Electron privileges. These include window creation, database connections, custom protocols, user data storage, resume text extraction, API key storage, and calls to the external LLM service. This design follows Electron security recommendations by keeping privileged operations outside the renderer.
+
+Main process modules can be grouped by responsibility. \textbf{IPC modules} cover authentication, schools, application cases, daily check-in, study plans, community, resumes, LLM calls, and API-key settings; the native theme application IPC is registered in the Electron entry file because it directly affects the current browser window. \textbf{Utility modules} support database access, application configuration, security helpers, and resume text extraction. \textbf{LLM modules} contain prompt templates, schema validation, profile context construction, study preference handling, school matching, and school-tier review.
+
+\subsubsection{LLM Pipeline}
+
+The LLM pipeline is designed as a structured process rather than a free-form chat interface. User inputs are first converted into a profile context. This context contains academic background, GPA information, standardised test results, research and internship counts, study preferences, competitiveness score, and optional resume text. The resulting structured object is used as the model input for different prompt templates.
+
+The LLM pipeline supports several related tasks: \textbf{resume quality scoring}, \textbf{planning outline generation}, \textbf{school-tier recommendation}, \textbf{phase-level schedule generation}, \textbf{daily check-in task generation}, and \textbf{personal statement draft generation}. Keeping these tasks in the same pipeline makes prompt design and output validation more consistent, while still allowing each feature to use its own template and schema expectations.
+
+The school recommendation design is especially important. The system first loads a school catalogue from SQLite, removes mainland China schools from the abroad-planning catalogue, filters by preferred regions, calculates a QS anchor rank from the user's competitiveness score and institution tier, and builds reach, match, and safety candidate pools. The LLM then reviews candidates within allowed ranges. If the model fails or returns invalid data, local fallback logic finalises the tiers. This design reduces hallucinated school recommendations and aligns AI output with the actual database.
+
+\subsection{Data and Storage Design}
+
+Aurora Vine uses a hybrid storage strategy. SQLite stores structured and queryable data, localStorage stores lightweight user-interface state, and the Electron user data directory stores files and configuration.
+
+\begin{table}[h]
+\centering
+\caption{Storage responsibilities in Aurora Vine}
+\label{tab:storage}
+\begin{tabular}{p{0.25\textwidth} p{0.62\textwidth}}
+\toprule
+\textbf{Storage Area} & \textbf{Responsibility} \\
+\midrule
+SQLite database & Schools, programmes, application cases, offers, accounts, sessions, daily check-in records, study plans, community posts, and replies. \\
+localStorage & Planning form state, target school IDs, theme, language, and other lightweight interface preferences. \\
+Electron userData & DeepSeek API key configuration, uploaded resumes, extracted resume text, and avatar files. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The SQLite database is appropriate for the project because the application needs local persistence and structured queries but does not require a remote database server. It supports pagination, filtering, joining related data, and storing user-generated records. localStorage is used only for state that is simple and closely tied to the renderer experience. Files and configuration are stored in userData because they are specific to the local installation and should not be committed to the repository.
+
+\subsection{User Interaction and Data Flow}
+
+\subsubsection{School Planning Flow}
+
+The school planning flow begins with structured profile input. The user fills in undergraduate institution tier, school name, major, graduation year, GPA, GPA scale, class ranking percentile, IELTS or TOEFL score, GRE score, research count, internship count, paper count, target regions, study goal, and additional preference notes. The user may also upload a resume in PDF, DOC, DOCX, PNG, JPG, or JPEG format. Text extraction is available for document formats, while image resumes are accepted for storage but not OCR recognition.
+
+After submission, the system calculates a competitiveness score and prepares a structured LLM context. If resume text is available, it is included as additional evidence. The LLM generates a planning outline and school-tier recommendations, while the local school-matching logic ensures that selected schools come from valid candidate pools. The resulting plan is saved and reused by My Profile and Study Planning.
+
+\figureplaceholder{Insert Figure 5: School Planning data flow from form input to score, LLM output, saved profile, and school tiers}
+
+\subsubsection{Smart Schedule and Daily Check-in Flow}
+
+The smart schedule flow continues from the planning output. A user can request a study plan in the Study Planning section. The LLM first generates a phase-level schedule, such as background improvement, standardised test preparation, school research, document preparation, and application submission. The system then asks the LLM to produce daily task suggestions. When daily output is incomplete, fallback expansion and gap filling convert schedule milestones into check-in tasks. These tasks can be imported into the daily calendar.
+
+This flow directly implements one of the proposal's main objectives: transforming abstract recommendations into structured and executable tasks. Instead of ending with a paragraph of advice, the application produces tasks that can be tracked over time.
+
+\subsubsection{University and Application Case Exploration Flow}
+
+The university and application case modules support information acquisition. A user can search and filter schools, open a detail view, inspect introductions, view images, check programme information, and access related application cases. The application case module supports filters that help users compare profiles and outcomes. This exploration flow helps users move from a broad understanding of the application landscape to a more specific planning decision.
+
+\subsection{Interface and UX Design}
+
+The interface design aims to create a calm, readable, and continuous workspace. The sidebar navigation allows users to move between major modules. The school planning form uses grouped fields so that users can enter academic, test, experience, and preference information in a structured way. My Profile displays saved data and charts so that the user can review their status after submission. The university database and application case pages use search, filtering, pagination, and detail panels to support exploration.
+
+The application also includes bilingual interface text, a light theme, a dark theme, custom select controls, transition effects, and visual feedback. These features are not merely decorative. They support usability by reducing uncertainty during asynchronous operations such as LLM generation, database loading, and task import.
+
+\figureplaceholder{Insert Figure 6: Screenshots of School Planning, University Database, AI result view, and Daily Check-in}
+
+\subsection{Key Design Decisions and Rationale}
+
+Electron was selected because the project needs a desktop environment with local storage, file access, and a rich interface. It also allows the team to use familiar web technologies while still accessing local system capabilities through the main process.
+
+SQLite was selected because it is lightweight, local, and well suited for a proof-of-concept desktop application. It supports structured school and application case data without requiring server deployment. This matches the scope defined in the proposal, which did not include full web or mobile deployment.
+
+Vanilla HTML, CSS, and JavaScript modules were selected to keep the implementation direct and understandable. Although a frontend framework could also have been used, the modular ES module structure was sufficient for the course project and reduced additional framework overhead.
+
+DeepSeek was selected for the final AI integration because it provides LLM generation through an API compatible with the OpenAI SDK. The proposal mentioned external large model APIs, including illustrative examples from other providers, as an assistive component rather than in-house model training. The final implementation narrows this to a configurable DeepSeek key while preserving the proposal's main architectural direction: AI remains an external service wrapped by application-specific prompts, validation, and fallbacks.
+
+\section{Implementation}
+
+\subsection{Technology Stack and Code Organisation}
+
+Aurora Vine is implemented with \textbf{Electron 33} as the desktop framework, \textbf{electron-vite} as the build tool, and \textbf{HTML/CSS/JavaScript ES modules} for the renderer interface. The main process runs on \textbf{Node.js}, while persistent local data is handled through \textbf{better-sqlite3}. The AI-related functions use an \textbf{OpenAI SDK compatible client} connected to the \textbf{DeepSeek API}. Other supporting libraries include \textbf{ECharts} for profile visualisation, \textbf{KaTeX} for mathematical rendering in resource content, \textbf{pdf-parse}, \textbf{mammoth}, and \textbf{word-extractor} for resume text extraction, \textbf{xlsx} for data import, and \textbf{NotifyX} for user notifications. This stack keeps the application local and relatively lightweight while still supporting a rich desktop experience.
+
+The code organisation reflects the same separation described in the system design. The main entry file creates and manages the Electron application. The preload script exposes controlled APIs to the renderer. The \texttt{main/ipc/} directory contains IPC handlers grouped by feature, while \texttt{main/llm/} contains prompt templates, schema validation, profile context construction, study preferences, school matching, and school-tier review. The \texttt{renderer/} directory contains the interface, global styles, and feature modules. This layout makes future changes easier to place: UI logic normally belongs in a renderer module, privileged data operations belong in an IPC handler, and AI-specific behaviour belongs in the LLM pipeline.
+
+\subsubsection{Controlled Renderer-to-Main Communication}
+
+The following simplified listing illustrates the boundary between renderer code and privileged main-process operations. It is not a full source-code extract; it summarises the pattern used throughout the implementation. The key design point is that the renderer calls named methods such as \texttt{schoolsList} or \texttt{llmGenerateOutline}, while direct database, file-system, and API-key access remain outside the renderer.
+
+\begin{lstlisting}[style=reportcode, caption={Simplified IPC bridge pattern used by Aurora Vine}]
+contextBridge.exposeInMainWorld("api", {
+  schoolsList: (page, pageSize, filters) =>
+    ipcRenderer.invoke("schools:list", page, pageSize, filters),
+
+  dailyCheckinImportPlan: (payload) =>
+    ipcRenderer.invoke("dailyCheckin:importPlan", payload),
+
+  llmGenerateOutline: (payload) =>
+    ipcRenderer.invoke("llm:generateOutline", payload)
+});
+\end{lstlisting}
+
+\subsection{Data Layer and Content Import}
+
+The database implementation uses \textbf{SQLite} through \textbf{better-sqlite3}. It stores school information, programme information, application cases, account data, sessions, study plans, daily check-ins, and community posts. Data is loaded from local folders and spreadsheets during the initialisation process. School information is read from ranked school directories, programme data can be imported from workbook files, and application cases can be imported from CSV data.
+
+The school module uses SQL queries for pagination, keyword search, filtering, and detail retrieval. The application case module similarly supports pagination and filtering by background and outcome. The daily check-in module stores task lists by date, while the study plan module stores generated or custom planning entries. Bulk imports, especially from generated plans to check-in tasks, are treated as structured operations so that the interface can provide clear success or failure feedback.
+
+\subsection{Planning and AI Implementation}
+
+\subsubsection{Profile Construction and Resume Handling}
+
+The \textbf{School Planning} module implements the profile construction and evaluation objective from the proposal. It collects structured academic and experiential information, including school tier, school name, major, graduation year, GPA, GPA scale, class percentile, IELTS, TOEFL, GRE, research count, internship count, paper count, study goal, preferred regions, and additional preference notes.
+
+Before the data is sent into the planning workflow, it is normalised into a structured profile context. GPA is interpreted with its scale, language and GRE fields can be marked as not taken, and experience values are converted into numeric counts. The context builder produces bilingual display summaries and separates academic, standardised-test, experience, preference, competitiveness, and resume information. This structure allows the LLM to receive consistent evidence even when no resume is uploaded.
+
+Resume handling is implemented as an optional enhancement. Users can upload PDF, DOC, DOCX, PNG, JPG, or JPEG files. For PDF, DOC, and DOCX files, the system extracts text using document parsing libraries and caches extracted content. For image resumes, the file is stored and the LLM receives an explicit note that OCR is unavailable, so evaluation should rely mainly on structured profile fields. Extracted resume text can then be used for resume scoring, planning generation, and personal statement drafting when available.
+
+\subsubsection{School-Tier Recommendation}
+
+The \textbf{school-tier recommendation} feature combines local scoring, catalogue filtering, and LLM review. First, the system loads the school catalogue from SQLite and removes schools that are not appropriate for the abroad-planning catalogue. It then filters by the user's preferred regions. A competitiveness score and institution-tier adjustment are mapped to an anchor QS rank. Around this anchor, the system builds wide candidate ranges for reach, match, and safety tiers.
+
+The LLM is not allowed to recommend arbitrary schools. Instead, it receives candidate pools and supplemental allowed ranges. The output must pass schema validation and must refer to valid school identifiers. If the LLM response fails validation or the API call fails, local fallback logic selects schools from the candidate pools. This approach addresses the proposal's concern about AI output controllability and makes the result more consistent with the actual database.
+
+\begin{lstlisting}[style=reportcode, caption={Simplified school-tier recommendation logic}]
+profile = buildStructuredProfile(formInput, resumeText)
+catalog = loadSchoolCatalogFromSQLite()
+candidatePools = buildPools(catalog, profile.score, profile.preferences)
+
+try:
+  llmResult = askModelToReview(candidatePools, profile)
+  validated = validateSchoolTierJson(llmResult, candidatePools)
+  finalTiers = mergeModelResultWithCatalog(validated, catalog)
+catch:
+  finalTiers = chooseFallbackSchools(candidatePools)
+
+return finalTiers
+\end{lstlisting}
+
+\subsubsection{Study Planning and Daily Task Generation}
+
+The \textbf{Study Planning} module extends the school planning result into a longer preparation workflow. It can display the AI-generated outline, generate a phase-level schedule, parse custom planning text, and save planning entries into the database. It also presents school-tier results and intended-school panels so that users can connect school choices with preparation tasks.
+
+The daily task generation pipeline works in stages. The LLM first generates a structured schedule and then creates daily tasks based on that schedule. If there are missing days or incomplete results, fallback logic expands milestones into tasks and fills uncovered dates. The resulting tasks are imported into the \textbf{Daily Check-in} module through a batch operation. This is a key implementation of the proposal's "planning to execution" bridge.
+
+\subsection{User-Facing Functional Modules}
+
+\subsubsection{University Database and Application Cases}
+
+The \textbf{University Database} contains approximately 200 schools with search, filtering, detail views, rankings, locations, images, and programme information. School assets are served through a custom protocol so that local images and files can be loaded safely by the application. The detail view connects school descriptions, contact information, programme data, and related application cases.
+
+The \textbf{Application Cases} module provides a reference layer for users who want to compare real outcomes. Cases can be filtered and opened in detail. This helps users understand how academic background, test scores, internship experience, research experience, and offers relate to each other. Although these cases do not provide statistical admission prediction, they support realistic exploration and reflection.
+
+\subsubsection{Account, Settings, Theme, and Internationalisation}
+
+Aurora Vine supports registered users and guest usage. Registered users can create an account, log in, update profile information, and upload avatars. Guest mode allows users to explore the system without registration while keeping guest data separate from account data.
+
+The \textbf{Settings} module manages language, theme, profile information, API key configuration, and personal data clearing. API keys are stored in the local user data configuration rather than in the repository. The application supports Chinese and English interface text, and LLM outputs are designed with bilingual fields where appropriate. Theme support includes a light mode and a dark mode; the selected theme is also synchronised with the native title bar through the theme IPC function.
+
+\subsection{Security, Reliability, and Technical Challenges}
+
+The implementation follows several practical security and reliability measures. \textbf{Electron context isolation} is enabled, and privileged operations are kept in the main process. The renderer communicates through the preload API rather than accessing Node.js directly. Custom protocols for school assets and avatars are constrained to expected paths. API keys are stored locally and are not committed to the source code. Reliability is addressed through controlled IPC errors, LLM validation, fallback logic, loading states, notifications, and structured batch operations for plan import.
+
+The main technical challenges also connect closely to these implementation decisions. \textbf{LLM output reliability} required prompt templates, JSON parsing, schema validation, candidate-pool restrictions, and fallback selection. \textbf{Data preparation} required import scripts, encoding handling, field mapping, and tolerance for optional data. \textbf{UI complexity} required modular renderer files and feature-focused IPC handlers. \textbf{Plan-to-task conversion} required a combination of phase-level generation, daily task generation, fallback expansion, and gap filling because LLMs do not always produce complete date-by-date schedules.
+
+\section{Development Process}
+
+\subsection{Development Methodology}
+
+The project followed an Agile development approach, consistent with the proposal. Agile was suitable because the system contained many user-facing modules and required iterative refinement. Instead of attempting to complete all design decisions at the beginning, the team built functional increments and adjusted the system as the implementation became clearer.
+
+The project also followed the spirit of Dual Track Agile. The delivery track focused on stable software components such as the Electron shell, database modules, profile forms, school browsing, case browsing, study plan storage, and daily check-in. The discovery track focused on AI-related uncertainty, including prompt design, model output format, school-tier recommendation quality, resume text handling, and fallback strategies. This separation allowed ordinary system development to continue while AI functions were being explored and refined.
+
+\subsection{Team Roles and Responsibilities}
+
+The proposal assigned responsibilities across project planning, architecture, frontend development, backend implementation, database management, AI integration, research, data collection, testing, and debugging. The final project continued to rely on functional division rather than a single-person workflow. This was necessary because Aurora Vine covers a broad feature set: UI design, local data preparation, Electron security, LLM prompts, database queries, and final documentation each required different forms of work.
+
+In the report, the group should replace this paragraph with the final workload profile if required by the course. The key point is that responsibilities were organised around project functions: coordination, architecture, frontend modules, main-process IPC, database and data import, AI and prompt engineering, testing, and documentation.
+
+\subsection{Milestones and Iterations}
+
+The development process can be summarised in seven iterations:
+
+\begin{enumerate}
+    \item \textbf{Requirement analysis and proposal}: the team identified fragmented information, weak planning support, and poor execution tracking as the core problems. Target users, scope, exclusions, technical direction, and methodology were defined.
+    \item \textbf{Core architecture setup}: the Electron project structure was created, including main process, preload bridge, renderer files, basic navigation, and development scripts.
+    \item \textbf{Data-driven modules}: school data, programme data, and application cases were imported into SQLite. Browsing, searching, filtering, detail panels, and target-school state were implemented.
+    \item \textbf{Planning and profile features}: the School Planning form, profile storage, profile display, competitiveness scoring, and visual presentation were developed.
+    \item \textbf{LLM integration}: DeepSeek API support, prompt templates, resume scoring, planning outline generation, school-tier recommendation, schedule generation, daily task generation, and personal statement drafting were added.
+    \item \textbf{Execution tracking}: smart schedules were connected to Daily Check-in, allowing generated plans to become executable tasks.
+    \item \textbf{UX refinement and documentation}: bilingual text, theme switching, custom controls, transitions, notifications, README documentation, and final report preparation were improved.
+\end{enumerate}
+
+\subsection{Adaptations During Development}
+
+Several adaptations were made during development. First, the AI module evolved from a simple plan-generation idea into a structured pipeline with profile context, prompts, schema validation, candidate pools, and fallback logic. This change was necessary because uncontrolled model output was not reliable enough for a planning system.
+
+Second, school recommendation became more data-grounded. Instead of asking the model to freely recommend institutions, the system now builds candidate pools from the local school catalogue and lets the model review schools within allowed ranges. This better connects university data with AI planning.
+
+Third, the planning workflow was extended into daily task execution. The proposal emphasised the gap between abstract advice and concrete action. The final implementation responds to this by converting schedules into daily check-in tasks.
+
+Fourth, feature modules were separated more carefully as the codebase grew. New modules such as institution-tier handling, school-planning form internationalisation, resume picking, and UI transitions were introduced to avoid overloading large existing files.
+
+\subsection{Version Control and Collaboration}
+
+Git was used to manage the project repository. The repository includes source code, data preparation scripts, renderer modules, main-process modules, assets, and documentation. The README records installation steps, database preparation, development commands, project structure, architecture, IPC API groups, storage design, and troubleshooting information. This documentation supports both team collaboration and final assessment.
+
+The public repository link was included in the proposal. If the final submitted version uses a specific release or tagged commit, that information should be added here before submission.
+
+\subsection{Professional Practice}
+
+The project reflects several professional practices. Sensitive configuration such as API keys is stored outside the repository. Uploaded user files are kept in local user data storage. Privileged operations are isolated in the main process. The renderer uses a controlled API rather than direct system access. Feature code is organised by responsibility. Documentation explains installation, data setup, development commands, and common issues.
+
+The project also acknowledges the limitations of AI assistance. AI-generated recommendations are presented as support rather than final decisions. Users remain responsible for checking official university requirements, making final school choices, and reviewing generated text.
+
+\section{Evaluation of Outcomes}
+
+\subsection{Evaluation Objectives}
+
+The evaluation considers how well Aurora Vine meets its stated objectives. The main evaluation questions are:
+
+\begin{itemize}
+    \item Does the system provide an integrated workflow for study-abroad planning?
+    \item Does it support both information acquisition and personalised planning?
+    \item Does the AI module produce useful planning outputs while remaining controllable?
+    \item Can high-level plans be converted into daily executable tasks?
+    \item Is the system technically coherent, maintainable, and suitable as a proof of concept?
+\end{itemize}
+
+\subsection{Functional Evaluation}
+
+\begin{longtable}{p{0.24\textwidth} p{0.31\textwidth} p{0.31\textwidth}}
+\caption{Functional evaluation of main modules}
+\label{tab:functional-evaluation} \\
+\toprule
+\textbf{Module} & \textbf{Expected Behaviour} & \textbf{Outcome} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Expected Behaviour} & \textbf{Outcome} \\
+\midrule
+\endhead
+Account and guest mode & Users can enter the system with an account or guest identity. & Implemented with registration, login, session handling, guest entry, nickname update, certification, and avatar upload. \\
+School Planning & Users can enter structured profile data and receive planning support. & Implemented with academic, test, experience, preference, resume, scoring, AI outline, school tiers, and profile persistence. \\
+University Database & Users can browse, search, filter, and inspect schools and programmes. & Implemented with SQLite-backed pagination, search, school detail views, programme queries, images, and related cases. \\
+Application Cases & Users can browse real cases and compare backgrounds. & Implemented with case list, filters, detail view, and school-related case retrieval. \\
+Study Planning & Users can generate and manage study plans. & Implemented with AI outline display, smart schedule generation, custom plans, school-tier panels, and saved plan records. \\
+Daily Check-in & Users can execute plans through daily tasks. & Implemented with calendar-based task storage, monthly view, completion status, task appending, and plan import. \\
+Resource Center & Users can access preparation resources. & Implemented with GRE, IELTS, TOEFL, SOP, resume, and related resource content, including rich formatting support. \\
+Community & Users can discuss through posts and replies. & Implemented as a local proof-of-concept community with post and reply creation and deletion. \\
+Settings & Users can configure language, theme, API key, profile, and data. & Implemented with bilingual switching, theme application, API key management, avatar/profile support, and data clearing. \\
+\bottomrule
+\end{longtable}
+
+Overall, the final implementation covers the main functional scope proposed at the beginning of the project. The most important achievement is that the modules are connected into a coherent workflow rather than implemented as isolated pages.
+
+\subsection{Technical Evaluation}
+
+From an architectural perspective, the system meets the main technical objectives. The Electron process separation is clear: renderer modules focus on UI, preload exposes a restricted API, and the main process handles privileged work. This separation improves security and makes the system easier to reason about.
+
+The database design is suitable for the proof-of-concept scope. SQLite supports local persistence, structured queries, and simple deployment. The application uses it for both reference data and user-generated data, which allows university browsing, case exploration, study planning, daily check-in, and community content to share a consistent local data layer.
+
+The LLM design is stronger than a simple chatbot integration. It uses structured profile context, prompt templates, schema validation, school candidate pools, and fallback logic. This improves reliability and directly addresses the proposal's non-functional requirement of AI controllability.
+
+The maintainability of the project is also acceptable for a course-scale PoC. Feature modules and IPC handlers are separated, and the README documents architecture and development procedures. Some areas could still be improved, especially automated tests and deeper type validation, but the current structure provides a reasonable foundation for future work.
+
+\subsection{User Experience Evaluation}
+
+The user experience supports the main usage scenarios. Exploration-stage users can begin by browsing schools, application cases, and resources without immediately committing to a detailed plan. Planning-stage users can fill in the School Planning form, receive AI-assisted output, inspect target schools, and generate daily tasks.
+
+The interface also supports continuity. Saved profile information can be reused, target schools can be managed, generated plans can be imported into check-in, and settings such as language and theme persist across use. This continuity is important because study-abroad planning is not a one-time action.
+
+\figureplaceholder{Insert Figure 7: Example user journey screenshot sequence: profile input, school-tier output, smart schedule, daily check-in}
+
+\subsection{Testing and Validation}
+
+The system was primarily validated through manual functional testing. The team checked the main application lifecycle by launching the Electron app, registering and logging into an account, entering guest mode, and confirming that session-dependent data remained separated. The information-acquisition workflow was tested by browsing the school database, searching by keyword, opening school detail views, filtering application cases, and checking that related case records could be reached from school pages.
+
+The planning workflow was tested with both complete and incomplete School Planning forms. This included saving profile information, uploading supported resume formats, retrieving extracted resume text, entering an API key, generating AI planning results, and observing fallback behaviour when LLM generation failed or returned incomplete data. The execution workflow was tested by generating a smart schedule, importing tasks into \textbf{Daily Check-in}, updating task state, and checking the monthly calendar view. Supporting functions such as community posts, replies, language switching, and theme switching were also tested as part of the final demonstration flow.
+
+The system also has data-level validation through database queries and import scripts. School lists, programme records, application cases, and check-in records were checked through application workflows. However, automated unit tests and end-to-end tests are limited. This is a remaining weakness and should be addressed in future development.
+
+\subsection{Strengths}
+
+The first strength of Aurora Vine is the completeness of its workflow. It does not only provide information, nor does it only generate AI text. It connects background input, school exploration, case reference, AI planning, schedule generation, and daily execution.
+
+The second strength is its local-first desktop design. This is suitable for personal planning data and allows the system to operate without a remote server. It also makes the proof of concept easier to demonstrate and distribute.
+
+The third strength is the controlled use of AI. The LLM is integrated into specific workflows and supported by local data, structured prompts, validation, and fallback logic. This makes the AI module more reliable and more relevant to the application domain.
+
+The fourth strength is modularity. Renderer modules, IPC handlers, and LLM modules each have clearer responsibilities. This makes future extension easier, such as adding new planning prompts, more data filters, or cloud synchronisation.
+
+\subsection{Limitations}
+
+The most important limitation is that AI recommendations are not official admission predictions. They should be treated as planning suggestions only. Admission outcomes depend on many factors that the system cannot fully model, including programme-specific requirements, recommendation letters, personal statements, interview performance, application timing, and institutional policy changes.
+
+The second limitation is data coverage. Although the system includes a useful local school and case database, it does not guarantee complete or continuously updated information. University requirements and programme details change frequently, so future versions would need a stronger update mechanism.
+
+The third limitation is testing coverage. Manual testing confirms that the main workflows are demonstrable, but automated tests are still limited. A more mature system should include database tests, IPC tests, UI smoke tests, and end-to-end tests for key user journeys.
+
+The fourth limitation is deployment scope. The current system is a local desktop proof of concept. It does not include cloud synchronisation, multi-device accounts, or a production online community. These were intentionally excluded to keep the project feasible.
+
+\subsection{Evidence of Meeting Objectives}
+
+The final system meets the core objectives defined in the proposal. It provides a unified information platform through the university database, programme information, application cases, resources, and community. It provides user profiling through the School Planning form and My Profile. It supports study plan generation through AI outlines, smart schedules, and custom plans. It supports execution tracking through Daily Check-in. It introduces AI-assisted analysis through DeepSeek-powered LLM generation. Finally, it transforms AI outputs into structured tasks that can be saved and tracked in the system.
+
+The system also satisfies the main non-functional requirements at a proof-of-concept level. It is usable through a clear desktop interface, reliable enough for demonstration with fallback logic, responsive in local usage, maintainable through modular structure, and more controllable than a free-form chatbot because AI outputs are constrained and validated.
+
+\section{Conclusion and Future Work}
+
+\subsection{Conclusion}
+
+Aurora Vine successfully implements a proof-of-concept desktop application for study-abroad planning and application support. It responds to the problem identified in the proposal: students face fragmented information, abstract recommendations, and difficulty maintaining long-term execution. The final system addresses this through an integrated workflow that combines university browsing, application case reference, structured user profiling, AI-assisted planning, study schedule generation, daily task tracking, resources, community, and settings.
+
+Technically, the project demonstrates a modular Electron architecture with renderer modules, a preload IPC bridge, main-process handlers, SQLite storage, local file handling, custom protocols, and an LLM pipeline. The implementation shows how AI can be integrated responsibly into a software system when paired with structured inputs, validation, data grounding, and fallback behaviour.
+
+From a project perspective, Aurora Vine also demonstrates iterative development and team-based software practice. The system evolved from the proposal into a more complete implementation, with design adaptations made in response to real technical challenges.
+
+\subsection{Key Design Insights}
+
+Several design insights emerged from the project. First, AI is most useful when it is connected to structured system data rather than used as an isolated chat interface. Second, study-abroad planning requires both information acquisition and execution support; a plan is less valuable if it cannot become daily action. Third, local-first desktop applications remain useful when the application needs persistent personal data and does not require immediate cloud collaboration. Fourth, modularity is essential when a PoC contains many user-facing modules.
+
+\subsection{Future Work}
+
+Future development could improve Aurora Vine in several directions. Data coverage should be expanded to include more schools, programmes, scholarships, deadlines, and updated application requirements. Recommendation quality could be improved by combining AI generation with more systematic analysis of historical cases and user feedback. The LLM pipeline could add prompt versioning, more detailed validation, and clearer explanations of why each recommendation is made.
+
+Testing should also be improved. Future versions should include unit tests for scoring and school matching, database tests for import and query logic, IPC tests for main-process handlers, and end-to-end tests for the major user journeys. Deployment could be improved through packaged installers, automatic updates, and better error logging.
+
+Additional features could include optional cloud synchronisation, multi-device usage, online community support, OCR for image-based resumes, document management for SOPs and recommendation letters, and mentor feedback workflows. These extensions should be added carefully so that the system remains focused on planning support rather than becoming an overly complex application portal.
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
+
+\begin{thebibliography}{20}
+
+\bibitem{international-students}
+J. Khanal and U. Gaulee, ``Challenges of International Students from Pre-Departure to Post-Study: A Literature Review,'' \textit{Journal of International Students}, vol. 9, no. 2, 2019.
+
+\bibitem{application-process}
+K. H. Kim and H. Spencer-Oatey, ``Enhancing the Recruitment of Postgraduate Researchers from Diverse Countries: Managing the Application Process,'' \textit{Higher Education}, vol. 82, no. 5, pp. 917--935, 2021.
+
+\bibitem{goal-setting}
+G. Martins van Jaarsveld, L. Y. J. Wong, M. Baars, M. M. Specht, and F. Paas, ``Goal Setting in Higher Education: How, Why, and When Are Students Prompted to Set Goals? A Systematic Review,'' \textit{Frontiers in Education}, vol. 9, 2025.
+
+\bibitem{deepseek}
+DeepSeek-AI, ``DeepSeek-V3 Technical Report,'' arXiv preprint arXiv:2412.19437, 2025.
+
+\bibitem{electron}
+Electron Documentation, ``Electron,'' Available: \url{https://www.electronjs.org/docs/latest/}.
+
+\bibitem{sqlite}
+SQLite Documentation, ``SQLite,'' Available: \url{https://www.sqlite.org/docs.html}.
+
+\bibitem{openai-sdk}
+OpenAI, ``OpenAI Node API Library,'' Available: \url{https://github.com/openai/openai-node}.
+
+\bibitem{echarts}
+Apache ECharts Documentation, ``ECharts,'' Available: \url{https://echarts.apache.org/}.
+
+\bibitem{katex}
+KaTeX Documentation, ``KaTeX,'' Available: \url{https://katex.org/}.
+
+\end{thebibliography}
+
+\newpage
+\appendix
+
+\section{Suggested Screenshot List}
+
+The final submission should include screenshots that demonstrate the main user journey rather than isolated decorative pages. A suitable sequence would begin with the main dashboard or landing page, then show the \textbf{School Planning} form, the AI-generated planning result with school tiers, and the \textbf{My Profile} page with visualisation. The information-acquisition side can be represented by the \textbf{University Database} detail view and the \textbf{Application Cases} filter or detail view. The execution side should be represented by the \textbf{Study Planning} smart schedule and the \textbf{Daily Check-in} calendar. A final screenshot of \textbf{Settings} can demonstrate language and theme configuration.
+
+\section{Suggested Test Scenario Summary}
+
+\begin{longtable}{p{0.3\textwidth} p{0.32\textwidth} p{0.25\textwidth}}
+\caption{Suggested manual test scenarios for final documentation}
+\label{tab:test-scenarios} \\
+\toprule
+\textbf{Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\midrule
+\endhead
+Launch application & Main window opens and navigation is available. & To be completed with evidence. \\
+Register and login & User session is created and profile functions are available. & To be completed with evidence. \\
+Browse schools & School list loads, filters work, and detail view opens. & To be completed with evidence. \\
+Browse cases & Case list loads, filters work, and detail view opens. & To be completed with evidence. \\
+Submit planning form & Profile is saved and planning result is generated or fallback appears. & To be completed with evidence. \\
+Generate smart schedule & Schedule entries are generated and saved. & To be completed with evidence. \\
+Import daily tasks & Tasks appear in Daily Check-in calendar. & To be completed with evidence. \\
+Switch theme and language & Interface updates according to selected preferences. & To be completed with evidence. \\
+\bottomrule
+\end{longtable}
+
+\section{AI Acknowledgement}
+
+AI-assisted tools were used as supplementary support during development and report preparation. Their use included brainstorming report structure, improving wording, and assisting with software implementation discussions. The team remains responsible for the final design, implementation, evaluation, and submitted content. AI-generated material should be reviewed, edited, and acknowledged according to the course academic integrity requirements.
+
+\end{document}

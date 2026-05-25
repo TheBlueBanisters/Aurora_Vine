@@ -2,6 +2,7 @@ import { escapeHtml, showToast } from './utils.js'
 import { t } from './i18n.js'
 import { pickLocalized } from './localized-content.js'
 import { translateCaseTag, translateOfferTier, translateUndergradTier } from './case-display.js'
+import { runContentFadeTransition, getPanelSlideMs, waitMs } from './ui-transition.js'
 
 const APPLICATION_CASE_PAGE_SIZE = 12
 
@@ -165,18 +166,29 @@ function buildDetailField(label, value) {
     </div>`
 }
 
-function closeApplicationCaseModal() {
+async function closeApplicationCaseModal() {
   const modal = document.getElementById('application-case-modal')
-  if (!modal) return
-  modal.classList.remove('active')
-  modal.setAttribute('aria-hidden', 'true')
-  document.body.classList.remove('application-case-modal-open')
-  lastOpenedCaseId = null
+  if (!modal?.classList.contains('active')) return
+  const ms = getPanelSlideMs()
+  const finish = () => {
+    modal.classList.remove('active', 'is-closing')
+    modal.setAttribute('aria-hidden', 'true')
+    document.body.classList.remove('application-case-modal-open')
+    lastOpenedCaseId = null
+  }
+  if (!ms) {
+    finish()
+    return
+  }
+  modal.classList.add('is-closing')
+  await waitMs(ms)
+  finish()
 }
 
 function openApplicationCaseModal() {
   const modal = document.getElementById('application-case-modal')
   if (!modal) return
+  modal.classList.remove('is-closing')
   modal.classList.add('active')
   modal.setAttribute('aria-hidden', 'false')
   document.body.classList.add('application-case-modal-open')
@@ -302,39 +314,44 @@ export async function loadApplicationCases() {
   const paginationEl = document.getElementById('application-cases-pagination')
   if (!listEl || !paginationEl || !window.api?.applicationCasesList) return
 
-  listEl.innerHTML = `
-    <div class="application-case-empty-card">
-      <p class="placeholder-text">${t('cases.loading')}</p>
-      <p class="placeholder-hint">${t('cases.loadingHint')}</p>
-    </div>`
-  paginationEl.innerHTML = ''
-
-  try {
-    const res = await window.api.applicationCasesList(casesCurrentPage, APPLICATION_CASE_PAGE_SIZE, getCaseFilters())
-    const { items = [], total = 0, error } = res || {}
-    if (error) {
-      renderCaseEmptyState(error)
-      return
-    }
-    casesTotal = total
-    renderCaseSummary(total)
-    if (!items.length) {
-      renderCaseEmptyState(t('cases.noMatch'))
-      return
-    }
-
-    listEl.innerHTML = items.map(renderCaseCard).join('')
-    listEl.querySelectorAll('.application-case-card').forEach((card) => {
-      card.addEventListener('click', () => {
-        const caseId = Number(card.getAttribute('data-case-id'))
-        if (caseId) openApplicationCaseDetail(caseId)
-      })
-    })
-    renderCasePagination()
-  } catch (err) {
-    console.error('loadApplicationCases:', err)
-    renderCaseEmptyState(t('cases.loadFail', err?.message || ''))
+  const hadCards = !!listEl.querySelector('.application-case-card')
+  if (!hadCards) {
+    listEl.innerHTML = `
+      <div class="application-case-empty-card">
+        <p class="placeholder-text">${t('cases.loading')}</p>
+        <p class="placeholder-hint">${t('cases.loadingHint')}</p>
+      </div>`
+    paginationEl.innerHTML = ''
   }
+
+  await runContentFadeTransition(listEl, async () => {
+    try {
+      const res = await window.api.applicationCasesList(casesCurrentPage, APPLICATION_CASE_PAGE_SIZE, getCaseFilters())
+      const { items = [], total = 0, error } = res || {}
+      if (error) {
+        renderCaseEmptyState(error)
+        return
+      }
+      casesTotal = total
+      renderCaseSummary(total)
+      if (!items.length) {
+        renderCaseEmptyState(t('cases.noMatch'))
+        return
+      }
+
+      listEl.innerHTML = items.map(renderCaseCard).join('')
+      listEl.querySelectorAll('.application-case-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const caseId = Number(card.getAttribute('data-case-id'))
+          if (caseId) openApplicationCaseDetail(caseId)
+        })
+      })
+      renderCasePagination()
+    } catch (err) {
+      console.error('loadApplicationCases:', err)
+      renderCaseEmptyState(t('cases.loadFail', err?.message || ''))
+    }
+  }, { animate: hadCards })
 }
 
 export function refreshApplicationCasesOnLangChange() {
