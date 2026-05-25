@@ -2,7 +2,7 @@
 set -e
 
 # ===== 用户手动控制区（只改这里） =====
-TAG_NAME="我要下班 谢谢"
+TAG_NAME="我要下班谢谢"
 REMOTE_NAME="origin"
 BRANCH_NAME="main"
 REMOTE_URL="https://github.com/TheBlueBanisters/Aurora_Vine.git"
