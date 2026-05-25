@@ -17,6 +17,7 @@ let _navigateTo = null
 let _maybeShowUsageGuide = null
 
 export function setNavigateTo(fn) { _navigateTo = fn }
+export function getNavigateTo() { return _navigateTo }
 export function setMaybeShowUsageGuide(fn) { _maybeShowUsageGuide = fn }
 
 export function switchAuthTab(tab) {

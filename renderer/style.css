@@ -508,6 +508,60 @@ textarea {
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
 }
 
+[data-theme="dark"] .auth-modal-close {
+  background: #45475a;
+  color: #eceff4;
+  border: 1px solid #585b70;
+}
+
+[data-theme="dark"] .auth-modal-close:hover {
+  background: #585b70;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .auth-tab {
+  background: #282836;
+  border-color: #585b70;
+  color: #cdd6f4;
+}
+
+[data-theme="dark"] .auth-tab:hover {
+  color: #eceff4;
+  border-color: var(--accent);
+}
+
+[data-theme="dark"] .auth-tab.active {
+  color: var(--btn-primary-text);
+}
+
+[data-theme="dark"] .auth-label {
+  color: #cdd6f4;
+}
+
+[data-theme="dark"] .auth-input {
+  background: #282836;
+  border-color: #585b70;
+  color: #eceff4;
+}
+
+[data-theme="dark"] .auth-input::placeholder {
+  color: #9399b2;
+}
+
+[data-theme="dark"] .auth-divider {
+  color: #bac2de;
+}
+
+[data-theme="dark"] .auth-guest-btn {
+  background: #282836;
+  border-color: #585b70;
+  color: #cdd6f4;
+}
+
+[data-theme="dark"] .auth-guest-btn:hover {
+  color: #eceff4;
+}
+
 /* ============================================
    应用布局
    ============================================ */

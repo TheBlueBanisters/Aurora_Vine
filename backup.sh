@@ -2,7 +2,7 @@
 set -e
 
 # ===== 用户手动控制区（只改这里） =====
-TAG_NAME="细微BUG修复之我为什么还没下班"
+TAG_NAME="救一下"
 REMOTE_NAME="origin"
 BRANCH_NAME="main"
 REMOTE_URL="https://github.com/TheBlueBanisters/Aurora_Vine.git"

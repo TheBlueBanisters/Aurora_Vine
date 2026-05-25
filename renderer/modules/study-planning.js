@@ -15,6 +15,7 @@ import { getFavoriteStarMarkup, bindFavoriteStar, updateFavoriteStarButton } fro
 import { regenerateSmartSchedule } from './llm-planning-service.js'
 import { initDailyCheckinPage } from './daily-checkin.js'
 import { showAppConfirm } from './confirm-dialog.js'
+import { getNavigateTo } from './auth.js'
 import { decorateFireflyHost } from './firefly-effect.js'
 
 let spInitialized = false
@@ -509,10 +510,30 @@ function initCustomPanel() {
   })
 }
 
+function hasLlmPlanningOutline(entries = spEntries) {
+  return entries.some((entry) => entry.source === 'llm' && entry.kind !== 'schedule')
+}
+
+async function promptSchoolPlanningOutlineRequired() {
+  const confirmed = await showAppConfirm({
+    title: t('studyPlanning.needOutlineTitle'),
+    description: t('studyPlanning.needOutlineDesc'),
+    cancelText: t('daily.cancel'),
+    confirmText: t('studyPlanning.goSchoolPlanning')
+  })
+  if (!confirmed) return
+  const navigateTo = getNavigateTo()
+  if (navigateTo) await navigateTo('school-planning')
+}
+
 function initRegenerateButton() {
   const btn = document.getElementById('study-planning-regenerate')
   btn?.addEventListener('click', async () => {
     if (!btn) return
+    if (!getSchoolPlanningProfile() || !hasLlmPlanningOutline()) {
+      await promptSchoolPlanningOutlineRequired()
+      return
+    }
     const confirmed = await showAppConfirm({
       title: t('studyPlanning.regenerateConfirmTitle'),
       description: t('studyPlanning.regenerateConfirmDesc'),

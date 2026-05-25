@@ -1,6 +1,7 @@
 import { showToast, escapeHtml, formatDateTime, renderAuthorWithBadgeAndAvatar, fillCommunityAvatarImages } from './utils.js'
 import { isAccountMode, getCurrentUserDisplayName, COMMUNITY_PAGE_SIZE } from './state.js'
 import { openAuthGate } from './auth.js'
+import { showAppConfirm } from './confirm-dialog.js'
 import { t } from './i18n.js'
 import picnicEmptyImg from '../../image/picnic.png'
 
@@ -41,10 +42,22 @@ function closeCommunityPostModal() {
   titleInput.value = ''; contentInput.value = ''
 }
 
-function openCommunityPostModal() {
+async function promptCommunityLoginRequired(intent = 'post') {
+  const isReply = intent === 'reply'
+  const confirmed = await showAppConfirm({
+    title: t(isReply ? 'community.loginRequiredReplyTitle' : 'community.loginRequiredPostTitle'),
+    description: t(isReply ? 'community.loginRequiredReplyDesc' : 'community.loginRequiredPostDesc'),
+    cancelText: t('daily.cancel'),
+    confirmText: t('community.loginRequiredConfirm')
+  })
+  if (confirmed) {
+    openAuthGate('login', t(isReply ? 'community.loginToReplyGate' : 'community.loginToPostGate'))
+  }
+}
+
+async function openCommunityPostModal() {
   if (!isAccountMode()) {
-    showToast(t('community.guestNoPost'), 'info')
-    openAuthGate('login', t('community.loginToPostGate'))
+    await promptCommunityLoginRequired('post')
     return
   }
   const modal = document.getElementById('community-post-modal')
@@ -78,10 +91,9 @@ export function closeCommunityReplySheet() {
   targetTextEl.textContent = t('community.replyTargetOP')
 }
 
-function openCommunityReplySheet(targetReply = null) {
+async function openCommunityReplySheet(targetReply = null) {
   if (!isAccountMode()) {
-    showToast(t('community.guestNoReply'), 'info')
-    openAuthGate('login', t('community.loginToReplyGate'))
+    await promptCommunityLoginRequired('reply')
     return
   }
   const sheet = document.getElementById('community-reply-sheet')
@@ -237,7 +249,7 @@ export async function initCommunityMessagesPage() {
       const title = titleInput.value.trim(); const content = contentInput.value.trim()
       if (!title) { showToast(t('community.titleRequired'), 'warning'); titleInput.focus(); return }
       if (!content) { showToast(t('community.contentRequired'), 'warning'); contentInput.focus(); return }
-      if (!isAccountMode()) { showToast(t('community.loginRequired'), 'info'); openAuthGate('login', t('community.loginToPostGate')); return }
+      if (!isAccountMode()) { await promptCommunityLoginRequired('post'); return }
       if (!window.api?.communityCreatePost) return
       const postRes = await window.api.communityCreatePost({ title, content })
       if (!postRes?.success) { showToast(postRes?.error || t('community.postFail'), 'error'); return }
@@ -264,7 +276,7 @@ export async function initCommunityMessagesPage() {
       if (!contentInput || !communityDetailPostId) return
       const content = contentInput.value.trim()
       if (!content) { showToast(t('community.replyEmpty'), 'warning'); contentInput.focus(); return }
-      if (!isAccountMode()) { showToast(t('community.loginToReplyRequired'), 'info'); openAuthGate('login', t('community.loginToReplyGate')); return }
+      if (!isAccountMode()) { await promptCommunityLoginRequired('reply'); return }
       if (!window.api?.communityCreateReply) return
       const replyRes = await window.api.communityCreateReply({ postId: communityDetailPostId, content, parentReplyId: communityReplyTarget?.replyId || null })
       if (!replyRes?.success) { showToast(replyRes?.error || t('community.replyFail'), 'error'); return }

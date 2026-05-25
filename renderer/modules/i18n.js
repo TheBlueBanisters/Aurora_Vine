@@ -224,6 +224,12 @@ const translations = {
   'studyPlanning.regenerateFail': { zh: '重新生成失败', en: 'Regeneration failed' },
   'studyPlanning.needOutline': { zh: '请先在定校规划中提交并生成规划大纲', en: 'Please submit School Planning to generate an outline first' },
   'studyPlanning.needProfile': { zh: '请先在定校规划中填写并提交背景信息', en: 'Please complete and submit School Planning first' },
+  'studyPlanning.needOutlineTitle': { zh: '尚未生成规划大纲', en: 'No planning outline yet' },
+  'studyPlanning.needOutlineDesc': {
+    zh: '「重新生成」需先完成定校规划，并由 AI 生成留学规划大纲。请前往定校规划填写并提交你的背景信息。',
+    en: 'Regenerate requires an AI planning outline from School Planning first. Go there to complete and submit your profile.'
+  },
+  'studyPlanning.goSchoolPlanning': { zh: '前往定校规划', en: 'Go to School Planning' },
   'studyPlanning.tiersTitle': { zh: '冲 / 稳 / 保 院校推荐', en: 'Reach / Match / Safety Schools' },
   'studyPlanning.tierReach': { zh: '冲', en: 'Reach' },
   'studyPlanning.tierMatch': { zh: '稳', en: 'Match' },
@@ -645,6 +651,17 @@ const translations = {
   'community.titleRequired': { zh: '请填写标题', en: 'Title is required' },
   'community.contentRequired': { zh: '请填写帖子内容', en: 'Content is required' },
   'community.loginRequired': { zh: '请先登录账号后再发帖', en: 'Please log in first' },
+  'community.loginRequiredPostTitle': { zh: '需要登录后才能发帖', en: 'Log in to post' },
+  'community.loginRequiredPostDesc': {
+    zh: '社区讨论仅对登录用户开放。登录后即可发布帖子，并将内容绑定到你的账号。',
+    en: 'Posting is available after you log in. Sign in to publish and link posts to your account.'
+  },
+  'community.loginRequiredReplyTitle': { zh: '需要登录后才能回复', en: 'Log in to reply' },
+  'community.loginRequiredReplyDesc': {
+    zh: '参与回复需要先登录账号。登录后即可在社区中讨论与交流。',
+    en: 'Replying requires an account. Log in to join the discussion.'
+  },
+  'community.loginRequiredConfirm': { zh: '前往登录', en: 'Log in' },
   'community.postFail': { zh: '发帖失败，请稍后再试', en: 'Post failed, please try again' },
   'community.postSuccess': { zh: '发帖成功', en: 'Post published' },
   'community.replyEmpty': { zh: '请填写回复内容', en: 'Reply content is required' },
