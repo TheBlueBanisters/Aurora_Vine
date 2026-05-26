@@ -8,7 +8,7 @@ import {
 } from './profile.js'
 import { executeSchoolPlanningSubmit } from './llm-planning-service.js'
 import { getSchoolPlanningProfile } from './storage.js'
-import { enhanceSelectsIn, refreshSelect, refreshSelectsIn } from './custom-select.js'
+import { enhanceSelectsIn, refreshSelect, refreshSelectsIn, getSelectValues, setSelectValues } from './custom-select.js'
 import { populateInstitutionTierSelect } from './institution-tier.js'
 import {
   populatePreferredRegionSelect,
@@ -40,16 +40,19 @@ const REGION_OPTION_DEFS = [
 ]
 
 function collectPreferredRegions() {
-  const value = document.getElementById('sp-preferred-region')?.value?.trim() || ''
-  return value ? [value] : []
+  const select = document.getElementById('sp-preferred-region')
+  if (!select) return []
+  const values = getSelectValues(select)
+  const allowed = new Set(REGION_OPTION_DEFS.map((d) => d.value))
+  return values.filter((v) => allowed.has(v))
 }
 
 function setPreferredRegions(regions = []) {
   const select = document.getElementById('sp-preferred-region')
   if (!select) return
   const list = Array.isArray(regions) ? regions : []
-  const first = list.find((id) => REGION_OPTION_DEFS.some((d) => d.value === id)) || ''
-  select.value = first
+  const allowed = new Set(REGION_OPTION_DEFS.map((d) => d.value))
+  setSelectValues(select, list.filter((id) => allowed.has(id)))
   refreshSelect(select)
 }
 
@@ -247,23 +250,30 @@ export function initSchoolPlanningForm() {
     syncToeflNone()
     syncGreNone()
     syncGpaRangeByScale()
-    const savedRegion = preferredRegionSelect?.value || ''
+    const savedRegions = preferredRegionSelect ? getSelectValues(preferredRegionSelect) : []
     const savedTier = institutionTierSelect?.value || ''
     populateInstitutionTierSelect(institutionTierSelect)
     populatePreferredRegionSelect(preferredRegionSelect)
     if (institutionTierSelect) institutionTierSelect.value = savedTier
-    if (preferredRegionSelect) preferredRegionSelect.value = savedRegion
+    if (preferredRegionSelect) setSelectValues(preferredRegionSelect, savedRegions)
     refreshSelectsIn(form)
   })
 
   registerLangChangeHook(() => syncSchoolPlanningFormI18n())
   document.addEventListener('aurora:sync-school-planning-form-i18n', () => syncSchoolPlanningFormI18n())
 
+  const gpaConversionHintEl = document.getElementById('sp-gpa-conversion-hint')
+
   function syncGpaRangeByScale() {
     if (!gpaInput) return
     const gpaScale = document.querySelector('input[name="sp-gpa-scale"]:checked')?.value
     gpaInput.min = '0'
     if (gpaScale === '4') gpaInput.max = '4'; else gpaInput.max = '5'
+    if (gpaConversionHintEl) {
+      const key = gpaScale === '4' ? 'planning.gpaConversionHint4' : 'planning.gpaConversionHint5'
+      gpaConversionHintEl.dataset.i18n = key
+      gpaConversionHintEl.textContent = t(key)
+    }
   }
   form.querySelectorAll('input[name="sp-gpa-scale"]').forEach((radio) => radio.addEventListener('change', syncGpaRangeByScale))
   syncGpaRangeByScale()

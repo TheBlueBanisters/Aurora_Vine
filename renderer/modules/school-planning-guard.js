@@ -3,6 +3,7 @@ import { showAppConfirm } from './confirm-dialog.js'
 import { getSchoolPlanningProfile } from './storage.js'
 import { isSchoolPlanningEditing, exitSchoolPlanningEditMode } from './profile.js'
 import { resetSchoolPlanningForm } from './planning.js'
+import { getSelectValues } from './custom-select.js'
 
 export function isSchoolPlanningFormDirty() {
   const form = document.getElementById('school-planning-form')
@@ -22,7 +23,7 @@ export function isSchoolPlanningFormDirty() {
   if (document.getElementById('sp-toefl')?.value) return true
   if (document.getElementById('sp-gre')?.value) return true
   if (document.getElementById('sp-gre-writing')?.value) return true
-  if (document.getElementById('sp-preferred-region')?.value) return true
+  if (getSelectValues(document.getElementById('sp-preferred-region')).length > 0) return true
   if (document.getElementById('sp-resume')?.files?.length) return true
 
   const countIds = ['sp-research-count', 'sp-internship-count', 'sp-paper-count']

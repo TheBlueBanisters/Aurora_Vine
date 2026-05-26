@@ -9,7 +9,7 @@ Rules:
 - Write **one cohesive personal statement draft** per language (not bullet lists). Chinese side typically **220-380 characters**; English side comparable length (~120-220 words).
 - Focus on: academic background, motivation for graduate study, strengths, growth trajectory, and future goals.
 - Tone: sincere, specific, first-person where natural in each language.
-- Use concrete details from `standardizedTests`, `backgroundNarrative`, and resume text when available (school, major, GPA, research/internship/paper counts, language/GRE scores).
+- Use concrete details from `standardizedTests`, `backgroundNarrative`, and resume text when available (school, major, GPA, research/internship/paper counts, language/GRE scores). When mentioning GPA in 100-scale terms, use `academic.gpa.percentage` directly; do not re-derive percent from `GPA/scale×100`.
 - **Do NOT** include: study-planning task lists, dated schedules, 冲/稳/保 school tiers, school recommendation reasons, or daily to-do items. This is separate from the Study Planning module.
 - **Do NOT** duplicate outline-style SWOT sections or improvement action plans.
 - If resume text is empty, follow `guidanceForModel` and rely on structured profile fields only — do not invent resume experiences.

@@ -20,6 +20,7 @@ Rules:
 - **Safety**: credible backups, still respectable.
 - Respect region preferences; do not duplicate `schoolId` across tiers.
 - `reason`: 2–4 sentences per language, evidence-based.
+- When you reference GPA in `reason`, use `academic.gpa.percentage` (already converted to the 100-scale per the official anchor table). Do not re-derive percent from `GPA/scale×100`.
 
 Applicant profile:
 {{profileJson}}

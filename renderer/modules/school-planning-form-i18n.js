@@ -1,7 +1,7 @@
 import { t } from './i18n.js'
 import { isAccountMode, isGuestMode } from './state.js'
 import { populateInstitutionTierSelect } from './institution-tier.js'
-import { refreshSelect, refreshSelectsIn } from './custom-select.js'
+import { refreshSelect, refreshSelectsIn, getSelectValues, setSelectValues } from './custom-select.js'
 import { syncSchoolPlanningResumePickerI18n } from './school-planning-resume-picker.js'
 
 const REGION_OPTION_DEFS = [
@@ -16,7 +16,7 @@ const REGION_OPTION_DEFS = [
 
 export function populatePreferredRegionSelect(select) {
   if (!select) return
-  const current = select.value
+  const currentValues = getSelectValues(select)
   select.innerHTML = ''
   const none = document.createElement('option')
   none.value = ''
@@ -28,9 +28,8 @@ export function populatePreferredRegionSelect(select) {
     opt.textContent = t(labelKey)
     select.appendChild(opt)
   })
-  if (current && Array.from(select.options).some((o) => o.value === current)) {
-    select.value = current
-  }
+  const allowed = new Set(REGION_OPTION_DEFS.map((d) => d.value))
+  setSelectValues(select, currentValues.filter((v) => allowed.has(v)))
 }
 
 function updateEmptyOptionLabel(select) {
@@ -96,11 +95,11 @@ export function syncSchoolPlanningFormI18n() {
   const institutionTierSelect = document.getElementById('sp-institution-tier')
   const preferredRegionSelect = document.getElementById('sp-preferred-region')
   const savedTier = institutionTierSelect?.value || ''
-  const savedRegion = preferredRegionSelect?.value || ''
+  const savedRegions = preferredRegionSelect ? getSelectValues(preferredRegionSelect) : []
   populateInstitutionTierSelect(institutionTierSelect)
   populatePreferredRegionSelect(preferredRegionSelect)
   if (institutionTierSelect) institutionTierSelect.value = savedTier
-  if (preferredRegionSelect) preferredRegionSelect.value = savedRegion
+  if (preferredRegionSelect) setSelectValues(preferredRegionSelect, savedRegions)
 
   updateEmptyOptionLabel(document.getElementById('sp-graduation-year'))
   repopulateScoreSelect(document.getElementById('sp-ielts'), IELTS_OPTIONS)

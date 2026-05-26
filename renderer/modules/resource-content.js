@@ -1,11 +1,29 @@
 import { greVocabContent } from './resource-content/gre-vocab.js'
 import { greVocab2Content } from './resource-content/gre-vocab-2.js'
 import { greMathContent } from './resource-content/gre-math.js'
+import { GRE_EXTRA_CONTENT } from './resource-content/gre-extra.js'
+import { IELTS_EXTRA_CONTENT } from './resource-content/ielts-extra.js'
+import { TOEFL_EXTRA_CONTENT } from './resource-content/toefl-extra.js'
+import { DUOLINGO_EXTRA_CONTENT } from './resource-content/duolingo-extra.js'
+import { LETTERS_EXTRA_CONTENT } from './resource-content/letters-extra.js'
+import { RESUME_EXTRA_CONTENT } from './resource-content/resume-extra.js'
+import { SOP_EXTRA_CONTENT } from './resource-content/sop-extra.js'
+import { PPT_EXTRA_CONTENT } from './resource-content/ppt-extra.js'
+import { GUIDE_EXTRA_CONTENT } from './resource-content/guide-extra.js'
 
 export const RESOURCE_CONTENT = {
   'gre-vocab': greVocabContent,
   'gre-vocab-2': greVocab2Content,
   'gre-math': greMathContent,
+  ...GRE_EXTRA_CONTENT,
+  ...IELTS_EXTRA_CONTENT,
+  ...TOEFL_EXTRA_CONTENT,
+  ...DUOLINGO_EXTRA_CONTENT,
+  ...LETTERS_EXTRA_CONTENT,
+  ...RESUME_EXTRA_CONTENT,
+  ...SOP_EXTRA_CONTENT,
+  ...PPT_EXTRA_CONTENT,
+  ...GUIDE_EXTRA_CONTENT,
   'ielts-speaking': {
     zh: {
       sections: [

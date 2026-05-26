@@ -1,4 +1,5 @@
 import { normalizeGpaTopPercent } from '../utils/gpa-percent.js';
+import { gpaToPercent, gpaConversionRuleText } from '../utils/gpa-conversion.js';
 import { buildStudyPreferencesBlock } from './study-preferences.js';
 
 const TIER_LABELS = {
@@ -77,6 +78,7 @@ function buildGpaBlock(profile) {
   const gpa = parseOptionalFloat(profile.gpa);
   const scale = profile.gpaScale === '5' ? 5 : 4;
   const topPercent = normalizeGpaTopPercent(profile.gpaPercentile);
+  const conversionRule = gpaConversionRuleText(scale);
 
   if (gpa == null) {
     return {
@@ -84,21 +86,28 @@ function buildGpaBlock(profile) {
       scale,
       topPercent,
       percentile: topPercent,
+      percentage: null,
+      conversionRule,
       display: { zh: 'GPA：未填写', en: 'GPA: not provided' }
     };
   }
 
+  const percentage = gpaToPercent(gpa, scale);
   const pctText = topPercent != null ? `，年级排名前 ${topPercent}%` : '';
   const pctTextEn = topPercent != null ? `, top ${topPercent}% of class` : '';
+  const percentText = percentage != null ? `（按规则换算约 ${percentage} 分/百分制）` : '';
+  const percentTextEn = percentage != null ? ` (≈ ${percentage}/100 by the official anchor table)` : '';
 
   return {
     value: gpa,
     scale,
     topPercent,
     percentile: topPercent,
+    percentage,
+    conversionRule,
     display: {
-      zh: `GPA ${gpa}/${scale}${pctText}`,
-      en: `GPA ${gpa}/${scale}${pctTextEn}`
+      zh: `GPA ${gpa}/${scale}${percentText}${pctText}`,
+      en: `GPA ${gpa}/${scale}${percentTextEn}${pctTextEn}`
     }
   };
 }

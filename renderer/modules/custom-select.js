@@ -3,6 +3,29 @@ const enhanced = new WeakMap()
 
 let globalListenersBound = false
 
+function isMulti(select) {
+  return select?.dataset?.multi === 'true'
+}
+
+function readMultiValues(select) {
+  if (!isMulti(select)) return []
+  const raw = select.dataset.multiValues || ''
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === 'string' && v !== '') : []
+  } catch {
+    return raw.split(',').map((s) => s.trim()).filter(Boolean)
+  }
+}
+
+function writeMultiValues(select, values) {
+  if (!isMulti(select)) return
+  const cleaned = Array.from(new Set((values || []).filter((v) => typeof v === 'string' && v !== '')))
+  select.dataset.multiValues = JSON.stringify(cleaned)
+  select.value = cleaned[0] || ''
+}
+
 function closeAllOpen(exceptWrapper = null) {
   document.querySelectorAll('.custom-select.is-open').forEach((wrapper) => {
     if (wrapper === exceptWrapper) return
@@ -40,12 +63,30 @@ function syncOpenState(select, ui) {
 
 function updateTriggerState(select, ui) {
   const { wrapper, trigger, labelEl } = ui
-  const selected = select.options[select.selectedIndex]
   const noneLocked = select.dataset.noneLocked === 'true'
-  labelEl.textContent = selected?.textContent || ''
-  wrapper.classList.toggle('is-placeholder', !select.value)
+
+  if (isMulti(select)) {
+    const values = readMultiValues(select)
+    const labels = values
+      .map((v) => Array.from(select.options).find((o) => o.value === v)?.textContent)
+      .filter(Boolean)
+    if (labels.length > 0) {
+      labelEl.textContent = labels.join('、')
+      wrapper.classList.remove('is-placeholder')
+    } else {
+      const placeholder = Array.from(select.options).find((o) => o.value === '')
+      labelEl.textContent = placeholder?.textContent || ''
+      wrapper.classList.add('is-placeholder')
+    }
+  } else {
+    const selected = select.options[select.selectedIndex]
+    labelEl.textContent = selected?.textContent || ''
+    wrapper.classList.toggle('is-placeholder', !select.value)
+  }
+
   wrapper.classList.toggle('is-disabled', select.disabled || noneLocked)
   wrapper.classList.toggle('is-none-locked', noneLocked)
+  wrapper.classList.toggle('is-multi', isMulti(select))
   trigger.disabled = select.disabled && !noneLocked
 }
 
@@ -53,14 +94,21 @@ function rebuildOptions(select, ui) {
   const { list } = ui
   list.replaceChildren()
 
+  const multi = isMulti(select)
+  const multiValues = multi ? new Set(readMultiValues(select)) : null
+
   Array.from(select.options).forEach((option) => {
     const item = document.createElement('li')
     item.className = 'custom-select-option'
     item.dataset.value = option.value
     item.textContent = option.textContent
     item.setAttribute('role', 'option')
-    item.setAttribute('aria-selected', option.value === select.value ? 'true' : 'false')
-    if (option.value === select.value) item.classList.add('is-selected')
+
+    const isSelected = multi
+      ? (option.value === '' ? multiValues.size === 0 : multiValues.has(option.value))
+      : option.value === select.value
+    item.setAttribute('aria-selected', isSelected ? 'true' : 'false')
+    if (isSelected) item.classList.add('is-selected')
     if (option.disabled) {
       item.classList.add('is-disabled')
       item.setAttribute('aria-disabled', 'true')
@@ -77,6 +125,21 @@ function setSelectValue(select, value, ui) {
   rebuildOptions(select, ui)
   ui.wrapper.classList.remove('is-open')
   syncOpenState(select, ui)
+}
+
+function toggleMultiValue(select, value, ui) {
+  if (value === '') {
+    writeMultiValues(select, [])
+  } else {
+    const current = readMultiValues(select)
+    const next = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value]
+    writeMultiValues(select, next)
+  }
+  rebuildOptions(select, ui)
+  select.dispatchEvent(new Event('change', { bubbles: true }))
+  select.dispatchEvent(new CustomEvent('aurora:multi-change', { bubbles: true }))
 }
 
 function bindSelectEvents(select, ui) {
@@ -98,7 +161,12 @@ function bindSelectEvents(select, ui) {
   list.addEventListener('click', (event) => {
     const item = event.target.closest('.custom-select-option')
     if (!item || item.classList.contains('is-disabled')) return
-    setSelectValue(select, item.dataset.value ?? '', ui)
+    const value = item.dataset.value ?? ''
+    if (isMulti(select)) {
+      toggleMultiValue(select, value, ui)
+    } else {
+      setSelectValue(select, value, ui)
+    }
   })
 
   select.addEventListener('change', () => rebuildOptions(select, ui))
@@ -108,10 +176,28 @@ function bindSelectEvents(select, ui) {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['disabled', 'selected', 'data-none-locked'],
+    attributeFilter: ['disabled', 'selected', 'data-none-locked', 'data-multi', 'data-multi-values'],
     characterData: true
   })
   ui.observer = observer
+}
+
+export function getSelectValues(select) {
+  if (!select) return []
+  if (isMulti(select)) return readMultiValues(select)
+  return select.value ? [select.value] : []
+}
+
+export function setSelectValues(select, values) {
+  if (!select) return
+  if (isMulti(select)) {
+    writeMultiValues(select, Array.isArray(values) ? values : [])
+  } else {
+    const list = Array.isArray(values) ? values : []
+    select.value = list.find((v) => Array.from(select.options).some((o) => o.value === v)) || ''
+  }
+  const ui = enhanced.get(select)
+  if (ui) rebuildOptions(select, ui)
 }
 
 export function refreshSelect(select) {

@@ -18,6 +18,10 @@ import {
   summarizeDailyTaskCoverage,
   distributeDailyTasksToCheckin
 } from './daily-task-distributor.js'
+import {
+  composeFullPipelineResult,
+  buildOutlinePayloadFromEntries
+} from './pipeline-compose.js'
 
 function pickColorByIndex(index) {
   return DAILY_TASK_COLORS[index % DAILY_TASK_COLORS.length].value
@@ -29,12 +33,13 @@ function buildTimelineFromProfile(profile = {}) {
   const gradYear = Number.isFinite(gradYearRaw) && gradYearRaw >= 2020
     ? gradYearRaw
     : now.getFullYear() + 1
-  const applicationSeasonYear = gradYear - 1
+  const targetIntakeYear = gradYear
   const pad = (n) => String(n).padStart(2, '0')
   const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
   const planStart = new Date(now)
   planStart.setHours(0, 0, 0, 0)
-  const planEnd = new Date(`${applicationSeasonYear}-12-15T00:00:00`)
+  // Cover from now through arrival/orientation (~Sep of intake year) so visa & pre-departure tasks fit.
+  const planEnd = new Date(`${targetIntakeYear}-09-30T00:00:00`)
   return { planStartDate: fmt(planStart), planEndDate: fmt(planEnd) }
 }
 
@@ -95,9 +100,18 @@ async function loadOutlinePayloadForSchedule(profile) {
 }
 
 export async function runSchoolPlanningLlmPipeline(profile, options = {}) {
-  const { resumeFile, generatePersonalStatement = false } = options
-  const progress = createLoadingProgressTracker(
-    countSubmitPipelineSteps({ resumeFile, generatePersonalStatement })
+  const {
+    resumeFile,
+    generatePersonalStatement = false,
+    progressTracker = null
+  } = options
+  // 当外部已传入 tracker（合并提交时）就复用它；否则按 outline-only 步骤数建一个独立 tracker。
+  const progress = progressTracker || createLoadingProgressTracker(
+    countSubmitPipelineSteps({
+      resumeFile,
+      generatePersonalStatement,
+      includeSmartSchedule: false
+    })
   )
 
   let workingProfile = { ...profile }
@@ -193,13 +207,15 @@ export async function runSchoolPlanningLlmPipeline(profile, options = {}) {
   return {
     profile: workingProfile,
     scoreResult,
-    outlineCount: outlineEntries.length
+    outlineCount: outlineEntries.length,
+    outlineEntries
   }
 }
 
-export async function runSmartScheduleRegeneratePipeline() {
-  const profile = getSchoolPlanningProfile()
-  if (!profile) throw new Error(t('studyPlanning.needProfile'))
+// 纯粹执行「schedule + dailyTasks + 分发到 checkin」段：3 次 progress.tick()。
+// 抽出来供合并提交 (runFullSchoolPlanningPipeline) 与「重新生成」(runSmartScheduleRegeneratePipeline) 共享。
+async function runSmartScheduleSegment({ profile, outlinePayload, outlineCount, progressTracker }) {
+  if (!progressTracker) throw new Error('runSmartScheduleSegment: progressTracker is required')
 
   const scoreInput = profileToScoreInput(profile)
   if (profile.llmScore != null) scoreInput.llmScore = profile.llmScore
@@ -210,9 +226,6 @@ export async function runSmartScheduleRegeneratePipeline() {
     md5: profile.resumeMd5 || null
   }
 
-  const progress = createLoadingProgressTracker(countSmartRegenerateSteps())
-  const outlinePayload = await loadOutlinePayloadForSchedule(profile)
-
   if (window.api?.studyPlanClearBySourceAndKind) {
     await window.api.studyPlanClearBySourceAndKind({ source: 'llm', kind: 'schedule' })
   }
@@ -222,7 +235,7 @@ export async function runSmartScheduleRegeneratePipeline() {
     outline: outlinePayload,
     ...llmScorePayload
   })
-  progress.tick()
+  progressTracker.tick()
   if (!scheduleRes?.success) throw new Error(scheduleRes?.error || t('planning.scheduleFail'))
 
   const schedulePayload = {
@@ -231,9 +244,8 @@ export async function runSmartScheduleRegeneratePipeline() {
   }
 
   const dailyGen = await generateDailyTasksWithRetry(profile, schedulePayload, llmScorePayload)
-  progress.tick()
+  progressTracker.tick()
 
-  const outlineCount = outlinePayload.entries.length
   const scheduleEntries = enrichEntries(scheduleRes.scheduleEntries || [], outlineCount)
 
   const resolved = resolveDailyTasksForCheckin(scheduleEntries, dailyGen.dailyTasks, profile)
@@ -266,7 +278,7 @@ export async function runSmartScheduleRegeneratePipeline() {
 
   const checkinColor = scheduleEntries[0]?.color || pickColorByIndex(outlineCount)
   const distribution = await distributeDailyTasksToCheckin(resolved.dailyTasks, checkinColor)
-  progress.tick()
+  progressTracker.tick()
 
   if (distribution.error === 'no_tasks') {
     throw new Error(t('planning.dailyTasksEmpty'))
@@ -290,6 +302,63 @@ export async function runSmartScheduleRegeneratePipeline() {
   }
 }
 
+export async function runSmartScheduleRegeneratePipeline() {
+  const profile = getSchoolPlanningProfile()
+  if (!profile) throw new Error(t('studyPlanning.needProfile'))
+
+  const progress = createLoadingProgressTracker(countSmartRegenerateSteps())
+  const outlinePayload = await loadOutlinePayloadForSchedule(profile)
+
+  return runSmartScheduleSegment({
+    profile,
+    outlinePayload,
+    outlineCount: outlinePayload.entries.length,
+    progressTracker: progress
+  })
+}
+
+// 合并：outline 段 + schedule/dailyTasks/checkin 分发段。
+// 使用同一个 progress tracker、同一段 loading 覆盖；schedule 段失败时不抛错，仅返回 smartError 让上层提示「重试」。
+export async function runFullSchoolPlanningPipeline(profile, options = {}) {
+  const { resumeFile, generatePersonalStatement = false } = options
+  const progress = createLoadingProgressTracker(
+    countSubmitPipelineSteps({
+      resumeFile,
+      generatePersonalStatement,
+      includeSmartSchedule: true
+    })
+  )
+
+  const outlineResult = await runSchoolPlanningLlmPipeline(profile, {
+    resumeFile,
+    generatePersonalStatement,
+    progressTracker: progress
+  })
+
+  // outline 已成功并入库，立即衔接 schedule 段。
+  // 直接复用刚刚生成的 outlineEntries，不再回读 DB（避免任何时序/缓存问题）。
+  const outlinePayload = buildOutlinePayloadFromEntries(
+    outlineResult.profile,
+    outlineResult.outlineEntries
+  )
+
+  let smartResult = null
+  let smartError = null
+  try {
+    smartResult = await runSmartScheduleSegment({
+      profile: outlineResult.profile,
+      outlinePayload,
+      outlineCount: outlineResult.outlineEntries.length,
+      progressTracker: progress
+    })
+  } catch (err) {
+    smartError = err
+    console.warn('runFullSchoolPlanningPipeline: smart schedule segment failed:', err)
+  }
+
+  return composeFullPipelineResult(outlineResult, { smartResult, smartError })
+}
+
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -304,13 +373,43 @@ export async function executeSchoolPlanningSubmit(profile, resumeFile) {
   try {
     const keyRes = await window.api.settingsGetDeepseekApiKey?.()
     const generatePersonalStatement = !!keyRes?.configured
-    const result = await runSchoolPlanningLlmPipeline(profile, {
+    const result = await runFullSchoolPlanningPipeline(profile, {
       resumeFile,
       generatePersonalStatement
     })
+
+    // 整段成功（outline + schedule 全过）才会有 smartResult；否则降级到只显示 outline 提示。
     setSchoolPlanningProfile(result.profile)
     renderScoreResult(result.scoreResult)
-    showToast(t('planning.submitSuccess', result.outlineCount), 'success')
+
+    if (result.smartResult) {
+      showToast(
+        t(
+          'planning.submitFullSuccess',
+          result.outlineCount,
+          result.smartResult.scheduleCount,
+          result.smartResult.appended
+        ),
+        'success'
+      )
+      if (result.smartResult.dailyWarning) {
+        showToast(result.smartResult.dailyWarning, 'warning')
+      }
+      if (result.smartResult.skipped > 0) {
+        showToast(
+          t(
+            'planning.dailyTasksPartial',
+            result.smartResult.appended,
+            result.smartResult.expectedTasks || result.smartResult.appended
+          ),
+          'warning'
+        )
+      }
+    } else {
+      // outline 段已落库，仍算「部分成功」；提示用户稍后点重新生成。
+      showToast(t('planning.submitSuccess', result.outlineCount), 'success')
+      showToast(t('planning.submitScheduleFail'), 'warning')
+    }
     return result
   } catch (err) {
     console.error('executeSchoolPlanningSubmit:', err)

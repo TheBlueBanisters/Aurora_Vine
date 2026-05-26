@@ -44,13 +44,27 @@ export function createLoadingProgressTracker(totalSteps) {
   };
 }
 
-export function countSubmitPipelineSteps({ resumeFile, generatePersonalStatement } = {}) {
+// 单段步骤计数：outline 生成 + outline 保存 = 2；可选：简历上传/评分 +2；可选：个人陈述 +1。
+export function countOutlineSegmentSteps({ resumeFile, generatePersonalStatement } = {}) {
   let total = 2;
   if (resumeFile) total += 2;
   if (generatePersonalStatement) total += 1;
   return total;
 }
 
+// 单段步骤计数：智能日程 + 每日任务 + 分发到打卡 = 3。
 export function countSmartRegenerateSteps() {
   return 3;
+}
+
+// 合并提交流水线步骤计数：outline 段 + （可选）schedule 段。
+// 默认 includeSmartSchedule=true 以匹配新的「提交即生成」体验。
+export function countSubmitPipelineSteps({
+  resumeFile,
+  generatePersonalStatement,
+  includeSmartSchedule = true
+} = {}) {
+  const outlineSteps = countOutlineSegmentSteps({ resumeFile, generatePersonalStatement });
+  const smartSteps = includeSmartSchedule ? countSmartRegenerateSteps() : 0;
+  return outlineSteps + smartSteps;
 }

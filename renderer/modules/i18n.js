@@ -137,6 +137,14 @@ const translations = {
   'planning.err.gpaScale': { zh: '请选择绩点分制', en: 'Please select GPA scale' },
   'planning.err.gpaPercentile': { zh: '请输入 1–100，表示年级前百分之几（如 30 表示前 30%）', en: 'Enter 1–100: top X% of your class (e.g. 30 = top 30%)' },
   'planning.gpaPercentileHint': { zh: '例：30 表示年级前 30%', en: 'e.g. 30 = top 30% of class' },
+  'planning.gpaConversionHint5': {
+    zh: '5 分制换算：3.0→80，3.5→85，4.0→90（公式 percent = 50 + GPA × 10）',
+    en: '5-scale → 100-scale: 3.0→80, 3.5→85, 4.0→90 (percent = 50 + GPA × 10)'
+  },
+  'planning.gpaConversionHint4': {
+    zh: '4 分制换算：3.0→80，3.5→85，3.7→87，4.0→90（按 WES 锚点线性插值）',
+    en: '4-scale → 100-scale: 3.0→80, 3.5→85, 3.7→87, 4.0→90 (WES anchor interpolation)'
+  },
   'planning.err.ielts': { zh: '请选择雅思分数或勾选无', en: 'Please select IELTS score or check None' },
   'planning.err.toefl': { zh: '请选择托福分数或勾选无', en: 'Please select TOEFL score or check None' },
   'planning.err.gre': { zh: '请选择GRE分数或勾选无', en: 'Please select GRE score or check None' },
@@ -157,6 +165,8 @@ const translations = {
   'planning.scheduleFail': { zh: '生成智能日程失败', en: 'Failed to generate smart schedule' },
   'planning.submitFail': { zh: '提交失败，请检查 LLM Key 或稍后重试', en: 'Submit failed. Check your LLM Key or try again later' },
   'planning.submitSuccess': { zh: '背景分析完成，已生成 {0} 条规划大纲。请前往「留学规划」生成智能日程与打卡任务。', en: 'Profile analyzed. {0} outline entries generated. Go to Study Planning to generate schedule and check-in tasks.' },
+  'planning.submitFullSuccess': { zh: '背景分析完成：已生成 {0} 条规划大纲、{1} 条智能日程，并同步 {2} 条任务到每日打卡。', en: 'Profile analyzed: {0} outline entries, {1} schedule entries generated, and {2} task(s) synced to daily check-in.' },
+  'planning.submitScheduleFail': { zh: '已生成大纲，但智能日程生成失败，请稍后点击「重新生成」重试', en: 'Outline generated, but smart schedule failed. Click "Regenerate" later to retry.' },
 
   'loading.default': { zh: 'AI 正在分析，请稍候…', en: 'AI is analyzing, please wait…' },
   'loading.waitTitle': { zh: '请稍候，正在加载中…', en: 'Please wait, loading…' },

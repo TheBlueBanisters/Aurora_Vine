@@ -11,6 +11,7 @@ Rules:
 - summary.zh and summary.en must convey the same meaning in Chinese and English respectively.
 - Be realistic and constructive.
 - Use `standardizedTests` and `backgroundNarrative` together with the resume for evaluation.
+- For GPA references in `summary`, use `academic.gpa.percentage` (already pre-converted by the official anchor table). Do not re-derive percent via a naive `GPA/scale×100` ratio.
 
 Structured applicant profile (includes standardized tests & background narrative):
 {{profileJson}}
